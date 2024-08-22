@@ -16,3 +16,4 @@ Imports:
     readr,
     rmarkdown,
     xml2
+RoxygenNote: 7.2.3

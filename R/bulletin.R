@@ -1,5 +1,6 @@
 #' Create a bulletin
 #' @return an object that represents the bulletin content
+#' @export
 create_bulletin <- function() {
   list(elements = list())
 }
@@ -9,6 +10,7 @@ add_element <- function(bulletin, element) {
   bulletin
 }
 
+#' @export
 bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")) {
   file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
   on.exit(close(file_conn))
@@ -21,11 +23,13 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
   filename
 }
 
+#' @export
 bulletin_to_pdf <- function(bulletin, filename = tempfile(fileext = ".pdf")) {
   markdown_file = bulletin_to_markdown(bulletin)
   rmarkdown::render(markdown_file, output_format = "pdf_document", output_file = filename)
 }
 
+#' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
   xml <- xml2::xml_new_root(.value = "title", "Title")
@@ -36,6 +40,7 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   filename
 }
 
+#' @export
 bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) {
   tmpdir <- tempdir()
   bulletindir <- file.path(tmpdir, "bulletin")
