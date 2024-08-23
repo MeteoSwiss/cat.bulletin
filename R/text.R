@@ -5,6 +5,7 @@ text_element <- function(text) {
 }
 
 #' add text to a bulletin
+#' @export
 add_text <- function(bulletin, text) {
   add_element(bulletin, text_element(text))
 }
