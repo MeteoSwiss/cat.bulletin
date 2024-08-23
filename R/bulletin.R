@@ -74,3 +74,16 @@ bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) 
   )
   filename
 }
+
+
+bulletin_pdfxmlzip <- function(bulletin) {
+
+  pdf <- bulletin_to_pdf(bulletin)
+  xml <- bulletin_to_xml(bulletin)
+  zip <- bulletin_to_webzip(bulletin)
+  
+  cli::cli_h1("Output:")
+  cli::cli_li(paste("pdf:", pdf))
+  cli::cli_li(paste("xml:", xml))
+  cli::cli_li(paste("zip:", zip))
+}
