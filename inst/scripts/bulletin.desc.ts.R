@@ -9,8 +9,8 @@ mon <- as.numeric(substr(enddate,5,6))
 
 if (par == "T") {
 	param <- "ths200m0"
-} else if (par == "P") {
-	param <. "rhs150m0"
+} else if (param == "P") {
+	param <- "rhs150m0"
 }
 
 refper <- ref_period
@@ -167,15 +167,15 @@ if (rankcurr == 1) {
 } else if (rankcurr < 6) {
         subtitle <- paste0(rankcurr,".-wärmster ",month[mon]," seit Messbeginn 1864")
 } else if (acurr < -3) {
-	subtitle <- paste0("Kalter ",month[mon])
+	subtitle <- paste0("Temperatur im ",month[mon]," weit unter der Norm")
 } else if (acurr < -1) {
-	subtitle <- paste0("Kühler ",month[mon])
+	subtitle <- paste0("Unterdurchschnittliche Temperatur im ",month[mon])
 } else if (acurr >= -1 & acurr <= 1) {
 	subtitle <- paste0("Temperaturen im ",month[mon]," im Normbereich")
 } else if (acurr > 3) {
-	subtitle <- paste0("Sehr milder ",month[mon])
+	subtitle <- paste0("Temperatur im ",month[mon]," weit über der Norm")
 } else if (acurr > 1) {
-        subtitle <- paste0("Milder ",month[mon])
+        subtitle <- paste0("Überdurchschnittliche Temperatur im ",month[mon])
 }
 
 text01.05 <- paste0("Der damalige ",month[mon]," erreichte ",art2[2]," ",monmean," von ",recval,"",unit,", bei einer Abweichung von ",reca,"",unit," zur Norm ",norm,".")

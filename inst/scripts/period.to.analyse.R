@@ -1,5 +1,5 @@
 # Define period to be analysed
-anaperiod <- function(timespan="m",year=NULL,period=NULL,ref_period=c(1991,2020),day_thres=21) {
+anaperiod <- function(timespan="m",year=NULL,period=NULL,ref_period=c(1991,2020),day_thres=25) {
 library(lubridate)
 
 seasons <- array(NA, c(4,3))
