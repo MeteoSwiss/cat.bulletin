@@ -1,0 +1,17 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Monatsbilanz
+### Temperatur
+#### Landesweite Mitteltemperatur und Entwicklung ab Messbeginn 1864
+
+
+```{r calcP, include=TRUE}
+p <- 3 + 4
+vcurr
+```
+
+Die landesweit gemittelte Monatstemperatur im `r month[mon]` `r ycurr` betrug `r format(vcurr, nsmall=1)`&nbsp;°C.
