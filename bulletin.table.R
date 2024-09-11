@@ -2,11 +2,7 @@ bulletin.table <- function(stations,begdate,enddate,refabbr) {
 library(clim.table)
 library(mchdwh)
 
-if (refabbr=="9120") {
-	np.id <- 7
-}
-
-data <- clim.table::climtable(period=c(begdate,enddate),np.id=np.id)
+data <- clim.table::climtable(period=c(begdate,enddate))
 vals <- data$dana$vals
 vals$Region <- rep("",length(vals$Station))
 vals$Region[1:14] <- "Westschweiz"

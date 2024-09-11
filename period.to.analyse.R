@@ -35,9 +35,9 @@ if (is.null(period)) {
 	status <- "past"
 }
 
+current_date <- Sys.Date()
 if (mode == "automatic") {
 # Current date
-current_date <- Sys.Date()
 day_of_month <- as.numeric(format(current_date,"%d"))
 current_month<- as.numeric(format(current_date,"%m"))
 current_year <- as.numeric(format(current_date,"%Y"))
@@ -122,10 +122,12 @@ if (day_of_month >= day_thres) {
 	#settings for month
 	if (timespan == "m") {
 		y1 <- year
-		if (m1 < 10) {
+		if (period < 10) {
 			m1 <- paste0("0",period)
+		} else {
+		  m1 <- period
 		}
-	        periodname <- monthname[as.numeric(m1)]	
+	  periodname <- monthname[as.numeric(m1)]	
 		begdate <- paste0(y1,".",m1,".01")
 		enddate <- format(ceiling_date(as.Date(gsub("\\.","-",begdate)),"month") - 1,"%Y.%m.%d")
 	}
