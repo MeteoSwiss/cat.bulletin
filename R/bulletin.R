@@ -1,12 +1,9 @@
 #' Create a bulletin
 #' @return an object that represents the bulletin content
 #' @export
-create_bulletin <- function() {
+create_bulletin <- function(bulletin_dir = "bulletin", bulletin_path = file.path(tempdir(), bulletin_dir)) {
   
   # prepare temp dir
-  tmpdir <- tempdir()
-  bulletin_dir <- "bulletin"
-  bulletin_path <- file.path(tmpdir, bulletin_dir)
   dir.create(bulletin_path)
   
   list(elements = list(),
