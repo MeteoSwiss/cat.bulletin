@@ -11,7 +11,7 @@ create_bulletin_monthly <- function() {
 }
 
 monatsbulletin_head <- function(bulletin) {
-  add_text(bulletin, paste("# Monthly Bulletin", Sys.Date())) %>%
+    add_text(bulletin, paste("# Monthly Bulletin", Sys.Date())) %>%
     add_text(paste("normal text")) %>%
     add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
               filename = "loess.png",
@@ -43,8 +43,7 @@ monatsbilanz_temp <- function(bulletin) {
   ybeg <- year[1]
   abs  <- data_abs$val
   vcurr <- round(abs[poscurr],1)
-  
-  
+
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
   #bulletin <- add_text(bulletin, 
