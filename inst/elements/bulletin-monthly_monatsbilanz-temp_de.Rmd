@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r calcP, include=TRUE}
 p <- 3 + 4
-vcurr
 ```
 
-Die landesweit gemittelte Monatstemperatur im `r month[mon]` `r ycurr` betrug `r format(vcurr, nsmall=1)`&nbsp;°C.
+Die landesweit gemittelte Monatstemperatur im `r month[mon]` `r ycurr` betrug `r format(vcurr, nsmall=1)`&nbsp;°C. Dies entspricht einer Abweichung zur Normperiode 1991-2020 von `r format(acurr, nsmall=1)`&nbsp;°C. Damit belegt der `r month[mon]` `r ycurr` im Schweizer Durchschnitt den `r rankcurr`. Rang seit Messbeginn `r ybeg`.
