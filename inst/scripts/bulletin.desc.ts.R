@@ -120,20 +120,7 @@ if (par == "T") {
   loesscurr <- as.numeric(loess$fit[poscurr])
   diff <- round(loesscurr-mpre,1)
   
-  # get lookup-table
-  lookup_table <- read.csv("sentences.csv", stringsAsFactors = FALSE)
-  
-  paragraph00 <- paste(lookup_table$sentence_de[lookup_table$name=="temp_swissmean_abs"],lookup_table$sentence_de[lookup_table$name=="temp_swissmean_dev"],lookup_table$sentence_de[lookup_table$name=="temp_swissmean_rank"])
-  
-  paragraph00_new <- gsub("<current_month>", month[mon], paragraph00)
-  paragraph00_new <- gsub("<current_year>", ycurr, paragraph00_new)
-  paragraph00_new <- gsub("<temp_abs_swissmean>", vcurr, paragraph00_new)
-  paragraph00_new <- gsub("<norm_period>", norm, paragraph00_new)
-  paragraph00_new <- gsub("<temp_dev_swissmean>", acurr, paragraph00_new)
-  paragraph00_new <- gsub("<current_rank>", rankcurr, paragraph00_new)
-  paragraph00_new <- gsub("<begin_measurements>", ybeg, paragraph00_new)
-  
-  
+
   # Paragraph 1: General situation in Switzerland (Swiss mean)
   # How warm was the current month?
   text01.01 <- paste0("Die landesweit gemittelte Monatstemperatur im ",month[mon]," ",ycurr," betrug ",vcurr,"°C.")
@@ -143,7 +130,22 @@ if (par == "T") {
   
   # What was the rank of the current month and since when?
   text01.03 <- paste0("Damit belegt der ",month[mon]," ",ycurr," im Schweizer Durchschnitt den ",rankcurr,". Rang seit Messbeginn ",ybeg,".")
+
+  # are there other years among the top5 that have similar deviations from the norm?
+  diffc_t5 <- abs(ranking$x[which(ranking$ix==poscurr)]-ranking$x[1:5])
+  if (any(diffc_t5<0.1)) {
+    isim <- which(diffc_t5<0.1)
+    isimy <- ranking$ix[isim]
+    isimy <- isimy[-which(isimy==poscurr)]
+    if (length(isimy)==1) {
+      text01.09 <- paste0("Der ",month[mon]," ",year[isimy]," zeigte eine ähnliche Temperaturabweichung zur Norm.")
+    }
+    if (length(isimy)>1) {
+      text01.09 <- paste0("Ähnliche Temperaturabweichungen für den Monat ",month[mon]," wurden in folgenden Jahren registriert: ",paste0(year[isimy],collapse=", "),".")
+    }
+  }
   
+    
   # Warmest month so far
   # If the current month is the warmest (new record), give year and values of rank 2, otherwise take rank 1
   if (rankcurr != 1) {
