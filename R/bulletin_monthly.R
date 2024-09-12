@@ -70,12 +70,21 @@ monatsbilanz_temp <- function(bulletin) {
     reca <- round(anom[ind01],1)
   }
   
+  # loess trend
   loess <- evoclim::loess.filt.knmi(x=abs,years=year)
   preind <- 1871:1900
   ipre <- which(year %in% preind)
   mpre <- mean(abs[ipre])
   loesscurr <- as.numeric(loess$fit[poscurr])
   diff <- round(loesscurr-mpre,1)
+  
+  # years similar to current
+  diffc_t5 <- abs(ranking$x[which(ranking$ix==poscurr)]-ranking$x[1:5])
+  if (any(diffc_t5<0.1)) {
+    isim <- which(diffc_t5<0.1)
+    isimy <- ranking$ix[isim]
+    isimy <- isimy[-which(isimy==poscurr)]
+  }
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
