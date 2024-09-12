@@ -11,7 +11,7 @@ create_bulletin_monthly <- function() {
 }
 
 monatsbulletin_head <- function(bulletin) {
-    add_text(bulletin, paste("# Monthly Bulletin", Sys.Date())) %>%
+    add_text(bulletin, paste("# Monatsbulletin", Sys.Date())) %>%
     add_text(paste("normal text")) %>%
     add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
               filename = "loess.png",
@@ -57,12 +57,30 @@ monatsbilanz_temp <- function(bulletin) {
   # regional rankings    
   ranking <- sort.int(anom,decreasing=T,index.return=T)
   rankcurr <- which(ranking$ix==poscurr)
+
+  if (rankcurr != 1) {
+    ind01 <- ranking$ix[1]
+    recy <- year[ind01]
+    recval <- round(abs[ind01],1)
+    reca <- round(anom[ind01],1)
+  } else {
+    ind01 <- ranking$ix[2]
+    recy <- year[ind01]
+    recval <- round(abs[ind01],1)
+    reca <- round(anom[ind01],1)
+  }
+  
+  loess <- evoclim::loess.filt.knmi(x=abs,years=year)
+  preind <- 1871:1900
+  ipre <- which(year %in% preind)
+  mpre <- mean(abs[ipre])
+  loesscurr <- as.numeric(loess$fit[poscurr])
+  diff <- round(loesscurr-mpre,1)
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
   #bulletin <- add_text(bulletin, 
   #                     text = paste0("Die landesweit gemittelte Monatstemperatur im ",month[mon]," ",ycurr," betrug ",vcurr,"°C."))
-  
+    
 }
-
 

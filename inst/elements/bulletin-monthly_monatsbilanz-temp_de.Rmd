@@ -6,11 +6,14 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Monatsbilanz
 ### Temperatur
-#### Landesweite Mitteltemperatur und Entwicklung ab Messbeginn 1864
+#### Schweizer Mitteltemperatur und Entwicklung ab Messbeginn 1864
 
 
-```{r calcP, include=TRUE}
+```{r calcP, include=TRUE,eval=TRUE}
 p <- 3 + 4
 ```
 
-Die landesweit gemittelte Monatstemperatur im `r month[mon]` `r ycurr` betrug `r format(vcurr, nsmall=1)`&nbsp;°C. Dies entspricht einer Abweichung zur Normperiode 1991-2020 von `r format(acurr, nsmall=1)`&nbsp;°C. Damit belegt der `r month[mon]` `r ycurr` im Schweizer Durchschnitt den `r rankcurr`. Rang seit Messbeginn `r ybeg`.
+Die landesweit gemittelte Monatstemperatur im `r month[mon]` `r ycurr` betrug `r format(vcurr, nsmall=1)`&nbsp;°C. Dies entspricht einer Abweichung zur Normperiode 1991-2020 von `r format(acurr, nsmall=1)`&nbsp;°C. Damit belegt der `r month[mon]` `r ycurr` im Schweizer Durchschnitt den `r rankcurr`. Rang seit Messbeginn `r ybeg`. Der bisher wärmste `r month[mon]` `r if(rankcurr != 1) {"stammt"} else {"stammte"}` aus dem Jahr `r recy`. Der damalige `r month[mon]` erreichte eine Monatsmitteltemperatur von `r recval`&nbsp;°C, bei einer Abweichung von `r reca`&nbsp;°C zur Norm 1991-2020.
+
+Im Vergleich zur vorindustriellen Referenzperiode 1871-1900 ist die landesweit gemittelte Monatstemperatur im `r month[mon]` um `r diff`&nbsp;°C `r if (diff > 0) {"gestiegen."} else {"gesunken."}`
+
