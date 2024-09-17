@@ -1,0 +1,11 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Hinweise zu diesem Bulletin
+
+Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Klimas im aktuellen Monat, vergleicht diesen mit der momentan gültigen Normperiode 1991-2020 gemäss Vorgabe der Weltorganisation für Meteorologie WMO und ordnet ihn in den historischen Kontext seit Messbeginn 1864 ein. Das Bulletin wird ab dem 22. Tag des Monats erstellt und täglich aufdatiert bis zum letzten Tag des Monats. Bis zu diesem Zeitpunkt basieren die Angaben im Bulletin auf provisorischen Daten. Das definitive Bulletin mit finalen Zahlen ist ab dem 10. Tag des Folgemonats hier auch als PDF zu finden.
+
+**Stand: `r Sys.Date()`**

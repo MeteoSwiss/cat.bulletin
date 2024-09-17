@@ -8,6 +8,7 @@ create_bulletin_monthly <- function() {
     monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
     temporal_evolution() %>%
+    monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
@@ -131,4 +132,8 @@ temporal_evolution <- function(bulletin) {
 
 monatsbulletin_more_info <- function(bulletin) {
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_more-info_de.Rmd")
+}
+
+monatsbulletin_disclaimer <- function(bulletin) {
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_disclaimer_de.Rmd")
 }
