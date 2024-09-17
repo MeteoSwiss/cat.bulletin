@@ -4,14 +4,15 @@ create_bulletin_monthly <- function() {
   
   bulletin <- create_bulletin() %>%
     monatsbulletin_head() %>%
-    monatsbilanz_temp()
+    monatsbilanz_temp() %>%
+    temporal_evolution()
   
   #bulletin_pdfxmlzip(bulletin)
   bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
 }
 
 monatsbulletin_head <- function(bulletin) {
-    add_text(bulletin, paste("# Monatsbulletin", Sys.Date())) %>%
+    add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
     add_text(paste("normal text")) %>%
     add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
               filename = "loess.png",
@@ -70,14 +71,6 @@ monatsbilanz_temp <- function(bulletin) {
     reca <- round(anom[ind01],1)
   }
   
-  # loess trend
-  loess <- evoclim::loess.filt.knmi(x=abs,years=year)
-  preind <- 1871:1900
-  ipre <- which(year %in% preind)
-  mpre <- mean(abs[ipre])
-  loesscurr <- as.numeric(loess$fit[poscurr])
-  diff <- round(loesscurr-mpre,1)
-  
   # years similar to current
   diffc_t5 <- abs(ranking$x[which(ranking$ix==poscurr)]-ranking$x[1:5])
   if (any(diffc_t5<0.1)) {
@@ -88,8 +81,39 @@ monatsbilanz_temp <- function(bulletin) {
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
-  #bulletin <- add_text(bulletin, 
-  #                     text = paste0("Die landesweit gemittelte Monatstemperatur im ",month[mon]," ",ycurr," betrug ",vcurr,"°C."))
-    
+
 }
 
+temporal_evolution <- function(bulletin) {
+  
+  #input aus anaperiod
+  mon = 8
+  
+  # fix: könnte aus cat.lang gelesen werden
+  month <- c("Januar","Februar","März","April","Mai","Juni",
+             "Juli","August","September","Oktober","November","Dezember")
+  
+  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+  data_abs <- read.table(filename_abs, header = TRUE)
+  
+  filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_anom_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+  data_anom <- read.table(filename_anom, header = TRUE)
+  
+  # absolute temperature, swissmean
+  year <- data_abs$year
+  poscurr <- length(year)
+  ycurr <- year[poscurr]
+  ybeg <- year[1]
+  abs  <- data_abs$val
+
+  # loess trend
+  loess <- evoclim::loess.filt.knmi(x=abs,years=year)
+  preind <- 1871:1900
+  ipre <- which(year %in% preind)
+  mpre <- mean(abs[ipre])
+  loesscurr <- as.numeric(loess$fit[poscurr])
+  diff <- round(loesscurr-mpre,1)
+  
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
+  
+}

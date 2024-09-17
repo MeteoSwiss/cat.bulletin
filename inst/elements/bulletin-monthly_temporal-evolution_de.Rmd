@@ -1,0 +1,9 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Klimawandel im Monat
+
+Der globale Klimawandel betrifft auch die Schweiz. Die Temperatur steigt seit der vorindustriellen Zeit in allen Jahreszeiten an. Im Vergleich zur vorindustriellen Referenzperiode 1871-1900 ist die landesweit gemittelte Monatstemperatur im `r month[mon]` um `r diff`&nbsp;°C `r if (diff > 0) {"gestiegen."} else {"gesunken."}`
