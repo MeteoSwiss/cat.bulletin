@@ -5,7 +5,10 @@ create_bulletin_monthly <- function() {
   bulletin <- create_bulletin() %>%
     monatsbulletin_head() %>%
     monatsbilanz_temp() %>%
-    temporal_evolution()
+    monatsbilanz_precip() %>%
+    monatsbilanz_sun() %>%
+    temporal_evolution() %>%
+    monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
   bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
@@ -84,6 +87,14 @@ monatsbilanz_temp <- function(bulletin) {
 
 }
 
+monatsbilanz_precip <- function(bulletin) {
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-precip_de.Rmd")
+}
+
+monatsbilanz_sun <- function(bulletin) {
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-sun_de.Rmd")
+}
+
 temporal_evolution <- function(bulletin) {
   
   #input aus anaperiod
@@ -116,4 +127,8 @@ temporal_evolution <- function(bulletin) {
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
   
+}
+
+monatsbulletin_more_info <- function(bulletin) {
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_more-info_de.Rmd")
 }
