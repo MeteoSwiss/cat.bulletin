@@ -1,0 +1,9 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Klimawandel im Monat
+
+Im Vergleich zur vorindustriellen Referenzperiode 1871-1900 ist die landesweit gemittelte Monatstemperatur im `r month[mon]` um `r diff`&nbsp;°C `r if (diff > 0) {"gestiegen."} else {"gesunken."}`

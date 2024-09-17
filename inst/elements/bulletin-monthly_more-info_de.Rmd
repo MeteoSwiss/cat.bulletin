@@ -1,0 +1,17 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Weiterführende Informationen
+
+Unter folgenden Links finden Sie weitere Informationen und Daten zum Klima und Klimawandel in der Schweiz, sowie den hier verwendeten Methoden:
+
+* [Klima der Schweiz](https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz.html)
+* [Klima-Normwerte](https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz/klima-normwerte.html)
+* [Wetterarchiv der Schweiz](https://www.meteoschweiz.admin.ch/wetter/wetter-und-klima-von-a-bis-z/wetterarchiv-der-schweiz.html)
+* [Klimawandel](https://www.meteoschweiz.admin.ch/klima/klimawandel.html)
+* [Entwicklung von Temperatur, Niederschlag und Sonnenschein in der Schweiz](https://www.meteoschweiz.admin.ch/klima/klimawandel/entwicklung-temperatur-niederschlag-sonnenschein.html)
+* [Eine neue Beschreibung des Klimaverlaufs und Bestimmung des aktuellen Klimazustands](https://www.meteoschweiz.admin.ch/service-und-publikationen/publikationen/verschiedenes/2023/eine-neue-beschreibung-des-klimaverlaufs-und-bestimmung-des-aktuellen-klimazustands.html)
+* [Räumliche Klimaanalysen](https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz/raeumliche-klimaanalysen.html)
