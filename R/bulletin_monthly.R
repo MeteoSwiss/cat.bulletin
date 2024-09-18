@@ -41,6 +41,9 @@ monatsbilanz_temp <- function(bulletin) {
   # definitiv  für entsprechenden Monat: climate-temperature-evolution
   # https://service.meteoswiss.ch/productbrowser/authenticated/productDisplay/climate-temperature-evolution?cg1-static.valueBase=abs&cg1-static.timeOfYear=08&cg1-static.normalPeriod=1991-2020&cg1-static.location=regSwiss&cg1-static.language=de&cg1-static.plotPeriod=1864-today&cg1-static.productName=climate-temperature-evolution&lang=de
   
+  # Tables:
+  # https://rmarkdown.rstudio.com/lesson-7.html, knitr::kable
+  
   filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
   data_abs <- read.table(filename_abs, header = TRUE)
 
