@@ -6,9 +6,21 @@ create_bulletin <- function(bulletin_dir = "bulletin", bulletin_path = file.path
   # prepare temp dir
   dir.create(bulletin_path)
   
+  # prepare data path
+  data_path <- file.path(bulletin_path, "data")
+  dir.create(data_path)
+  
+  # prepare image path
+  image_path <- file.path(bulletin_path, "images")
+  dir.create(image_path)
+  
   list(elements = list(),
        bulletin_dir = bulletin_dir,
-       bulletin_path = bulletin_path)
+       bulletin_path = bulletin_path,
+       data_path = data_path,
+       image_path = image_path,
+       stage = "prod"
+  )
 }
 
 add_element <- function(bulletin, element) {
@@ -74,7 +86,7 @@ bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) 
 
 
 bulletin_pdfxmlzip <- function(bulletin) {
-
+  
   pdf <- bulletin_to_pdf(bulletin)
   xml <- bulletin_to_xml(bulletin)
   zip <- bulletin_to_webzip(bulletin)

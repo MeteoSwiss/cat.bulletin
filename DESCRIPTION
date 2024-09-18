@@ -15,5 +15,6 @@ Config/testthat/edition: 3
 Imports: 
     readr,
     rmarkdown,
-    xml2
+    xml2,
+    cat.func (>= 0.17.0)
 RoxygenNote: 7.2.3

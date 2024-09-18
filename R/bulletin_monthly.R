@@ -4,19 +4,21 @@ create_bulletin_monthly <- function() {
   
   bulletin <- create_bulletin() %>%
     monatsbulletin_head() %>%
-    monatsbilanz_temp() %>%
-    monatsbilanz_precip() %>%
-    monatsbilanz_sun() %>%
-    temporal_evolution() %>%
-    monatsbulletin_disclaimer() %>%
-    monatsbulletin_more_info()
+    monatsbilanz_temp() 
+  
+  
+  # monatsbilanz_precip() %>%
+  # monatsbilanz_sun() %>%
+  # temporal_evolution() %>%
+  # monatsbulletin_disclaimer() %>%
+  # monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
   bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
 }
 
 monatsbulletin_head <- function(bulletin) {
-    add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
+  add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
     add_text(paste("normal text")) %>%
     add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
               filename = "loess.png",
@@ -27,11 +29,52 @@ monatsbilanz_temp <- function(bulletin) {
   
   #input aus anaperiod
   mon = 8
+  provisional = TRUE
+  
+  monatsbulletin_downloads <- function(bulletin, name, provisional = FALSE) {
+    switch(name,
+           "monatsbilanz_temp_abs.txt" = 
+             if (provisional) {
+               download_data(
+                 bulletin = bulletin,
+                 product = "climate-temperature-evolution-outlook",
+                 filter = list(
+                   valueBase = "abs",
+                   timeGranularity="month",
+                   normalPeriod= "1991-2020",
+                   location= "regSwiss",
+                   language = "de",
+                   plotPeriod = "1864-today",
+                   mediaType = "text/plain"
+                 ),
+                 filename = name
+               )
+             } else {
+               download_data(
+                 bulletin = bulletin,
+                 product = "climate-temperature-evolution",
+                 filter = list(
+                   valueBase = "abs",
+                   timeOfYear = sprintf("%02d", mon),
+                   normalPeriod= "1991-2020",
+                   location= "regSwiss",
+                   language = "de",
+                   plotPeriod = "1864-today",
+                   mediaType = "text/plain"
+                 ),
+                 filename = name
+               )
+             },
+           stop("unknown name in monatsbulletin_downloads")
+    )
+  }
   
   # fix: könnte aus cat.lang gelesen werden
   month <- c("Januar","Februar","März","April","Mai","Juni",
              "Juli","August","September","Oktober","November","Dezember")
   
+  filename_abs <- monatsbulletin_downloads(bulletin, name = "monatsbilanz_temp_abs.txt")
+    
   # provisorisch: climate-evolution-series-outlook monthly daten file
   # Absolutwerte:
   # https://service.meteoswiss.ch/productbrowser/authenticated/productDisplay/climate-evolution-series-outlook?cg1-static.valueBase=abs&cg1-static.timeGranularity=month&cg1-static.normalPeriod=1991-2020&cg1-static.location=regSwiss&cg1-static.language=de&cg1-static.plotPeriod=1864-today&cg1-static.productName=climate-temperature-evolution-outlook&lang=de
@@ -44,9 +87,9 @@ monatsbilanz_temp <- function(bulletin) {
   # Tables:
   # https://rmarkdown.rstudio.com/lesson-7.html, knitr::kable
   
-  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
   data_abs <- read.table(filename_abs, header = TRUE)
-
+  
   filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_anom_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
   data_anom <- read.table(filename_anom, header = TRUE)
   
@@ -57,7 +100,7 @@ monatsbilanz_temp <- function(bulletin) {
   ybeg <- year[1]
   abs  <- data_abs$val
   vcurr <- round(abs[poscurr],1)
-
+  
   # anomaly temperature, swissmean
   anom <- data_anom$val
   acurr <- round(anom[poscurr],1)
@@ -65,7 +108,7 @@ monatsbilanz_temp <- function(bulletin) {
   # regional rankings    
   ranking <- sort.int(anom,decreasing=T,index.return=T)
   rankcurr <- which(ranking$ix==poscurr)
-
+  
   if (rankcurr != 1) {
     ind01 <- ranking$ix[1]
     recy <- year[ind01]
@@ -88,7 +131,7 @@ monatsbilanz_temp <- function(bulletin) {
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
-
+  
 }
 
 monatsbilanz_precip <- function(bulletin) {
@@ -103,6 +146,8 @@ temporal_evolution <- function(bulletin) {
   
   #input aus anaperiod
   mon = 8
+  
+  
   
   # fix: könnte aus cat.lang gelesen werden
   month <- c("Januar","Februar","März","April","Mai","Juni",
@@ -120,7 +165,7 @@ temporal_evolution <- function(bulletin) {
   ycurr <- year[poscurr]
   ybeg <- year[1]
   abs  <- data_abs$val
-
+  
   # loess trend
   loess <- evoclim::loess.filt.knmi(x=abs,years=year)
   preind <- 1871:1900
@@ -140,3 +185,5 @@ monatsbulletin_more_info <- function(bulletin) {
 monatsbulletin_disclaimer <- function(bulletin) {
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_disclaimer_de.Rmd")
 }
+
+
