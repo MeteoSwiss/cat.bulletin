@@ -1,9 +1,19 @@
 #' Create a bulletin
+#' @param bulletin_args a list of arguments 
+#' @param workdir working directory for bulletin creation
+#' @param bulletin_path the path to the directory where the bulletin will be created in
+#' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @return an object that represents the bulletin content
 #' @export
-create_bulletin <- function(bulletin_dir = "bulletin", bulletin_path = file.path(tempdir(), bulletin_dir)) {
+create_bulletin <- function(bulletin_args = list(),
+                            bulletin_dir = "bulletin", 
+                            workdir = tempdir(),
+                            bulletin_path = file.path(workdir, bulletin_dir)) {
   
-  # prepare temp dir
+  bulletin <- bulletin_args
+  
+  # prepare bulletin dir
+  bulletin_path <- normalizePath(bulletin_path)
   dir.create(bulletin_path)
   
   # prepare data path
@@ -14,12 +24,14 @@ create_bulletin <- function(bulletin_dir = "bulletin", bulletin_path = file.path
   image_path <- file.path(bulletin_path, "images")
   dir.create(image_path)
   
-  list(elements = list(),
-       bulletin_dir = bulletin_dir,
-       bulletin_path = bulletin_path,
-       data_path = data_path,
-       image_path = image_path,
-       stage = "prod"
+  c(bulletin, 
+    list(elements = list(),
+         bulletin_dir = bulletin_dir,
+         bulletin_path = bulletin_path,
+         data_path = data_path,
+         image_path = image_path,
+         stage = "prod"
+    )
   )
 }
 
@@ -59,7 +71,9 @@ write_markdown_frontmatter <- function(file_conn) {
 
 #' @export
 bulletin_to_pdf <- function(bulletin, filename = tempfile(fileext = ".pdf")) {
+  log_debug("Processing bulletin to pdf via markdown...")
   markdown_file = bulletin_to_markdown(bulletin)
+  log_debug("Processing file", markdown_file, "to pdf.")
   rmarkdown::render(markdown_file, output_format = "pdf_document", output_file = filename)
 }
 
