@@ -1,0 +1,23 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Bilan mensuel
+
+### Température
+
+#### Température moyenne nationale
+
+La température moyenne nationale pour le mois `r month[mon]` `r ycurr` était de `r format(vcurr, nsmall=1)`&nbsp;°C. Cela correspond à une anomalie par rapport à la période de référence 1991-2020 de `r format(acurr, nsmall=1)`&nbsp;°C. Ce qui place le mois `r month[mon]` `r ycurr` au `r ordinal_number(rankcurr,"m","F")` rang depuis le début des mesures en `r ybeg`. `r if (length(isimy)==1) {paste0("Le mois de ",month[mon]," ",year[isimy]," a présenté une anomalie similaire par rapport à la norme.")}` `r if (length(isimy)>1) {paste0("Des anomalies similaires pour le mois ",month[mon]," ont été enregistrées les années suivantes : ",paste0(year[isimy],collapse=", "),".")}`
+
+Le mois `r month[mon]` le plus chaud `r if(rankcurr != 1) {"provient"} else {"provenait"}` de l'année `r recy`. Ce mois `r month[mon]` avait atteint une température moyenne de `r recval`&nbsp;°C, avec une anomalie de `r reca`&nbsp;°C par rapport à la norme 1991-2020.
+
+#### Différences régionales
+
+La Figure 1 montre la température moyenne du mois (à gauche) et l'anomalie par rapport à la moyenne de la période de référence 1991-2020 (à droite) en °C pour le mois `r month[mon]` `r ycurr`. Les valeurs correspondent à la moyenne pour la période allant du 1er jusqu'au `r Sys.Date()`. Les températures moyennes du mois supérieures à 0&nbsp;°C sont en rouge, tandis que les valeurs inférieures à 0&nbsp;°C sont en bleu (graphique de gauche). Si les températures étaient supérieures à la norme, les zones correspondantes sur la Figure 1 (à droite) sont colorées en rouge, les zones bleues indiquent des températures inférieures à la moyenne à long terme.
+
+```{r echo=FALSE, results='asis'}
+knitr::kable(mtcars[1:5,],caption="Tabellenüberschrift")
+```
