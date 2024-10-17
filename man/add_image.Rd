@@ -4,8 +4,22 @@
 \alias{add_image}
 \title{add an image with caption to a bulletin}
 \usage{
-add_image(bulletin, filename, caption)
+add_image(bulletin, filepath, filename = basename(filepath), caption = NULL)
+}
+\arguments{
+\item{bulletin}{the bulletin object to which to append the image element}
+
+\item{filepath}{the path to the image to add}
+
+\item{filename}{the name of the image within the bulletin (can differ from the filepath)}
+
+\item{caption}{image caption in the bulletin}
 }
 \description{
-add an image with caption to a bulletin
+copies the image from the filepath to the bulletin directory and adds an image element
+}
+\examples{
+image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+bulletin <- create_bulletin() \%>\%
+  add_image(filepath = image_filepath, caption = "An example figure.")
 }

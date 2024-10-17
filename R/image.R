@@ -13,6 +13,10 @@ image_element <- function(filepath, filename = basename(filepath), caption) {
 #' @param filepath the path to the image to add
 #' @param filename the name of the image within the bulletin (can differ from the filepath)
 #' @param caption image caption in the bulletin
+#' @examples 
+#' image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+#' bulletin <- create_bulletin() %>%
+#'   add_image(filepath = image_filepath, caption = "An example figure.")
 #' @export
 add_image <- function(bulletin, filepath, filename = basename(filepath), caption = NULL) {
   assert_that(file.exists(filepath))
@@ -23,8 +27,8 @@ add_image <- function(bulletin, filepath, filename = basename(filepath), caption
 
 image_to_markdown <- function(element) {
   # try to use knitr::include_graphics(rep("images/knit-logo.png", 3)) in an knitr junk!
-  paste0("![", element$caption, " \\label{fig1}](", element$filepath, ")", "\n",
-         element$caption, "\n")
+  paste0("![", element$caption, " \\label{fig1}](", element$filepath, ")", "\n")
+  #         element$caption, "\n")
 }
 
 image_to_markdwon2 <- function(element) {

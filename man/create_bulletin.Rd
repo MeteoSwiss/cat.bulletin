@@ -2,9 +2,30 @@
 % Please edit documentation in R/bulletin.R
 \name{create_bulletin}
 \alias{create_bulletin}
+\alias{add_element}
 \title{Create a bulletin}
 \usage{
-create_bulletin()
+create_bulletin(
+  bulletin_args = list(),
+  bulletin_dir = "bulletin",
+  workdir = tempdir(),
+  bulletin_path = file.path(workdir, bulletin_dir)
+)
+
+add_element(bulletin, element)
+}
+\arguments{
+\item{bulletin_args}{a list of arguments}
+
+\item{bulletin_dir}{the name of the directory within the bulletin_path where bulletin related files will be stored.}
+
+\item{workdir}{working directory for bulletin creation}
+
+\item{bulletin_path}{the path to the directory where the bulletin will be created in}
+
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+
+\item{element}{one of the bulletin elements}
 }
 \value{
 an object that represents the bulletin content

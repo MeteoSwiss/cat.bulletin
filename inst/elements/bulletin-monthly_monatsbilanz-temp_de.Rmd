@@ -21,6 +21,3 @@ Der bisher wärmste `r month[mon]` `r if(rankcurr != 1) {"stammt"} else {"stammt
 
 Abbildung 1 zeigt die Monatsmitteltemperatur (links) und die Abweichung zum Mittel über die Normperiode 1991-2020 (rechts) in °C für den Februar 2024. Die Werte entsprechen dem jeweiligen Mittel über den Zeitraum vom 1. bis `r Sys.Date()`. Monatsmitteltemperaturen über 0&nbsp;°C sind rot eingefärbt, Werte unter 0&nbsp;°C sind blau (linke Grafik). Lagen die Temperaturen über der Norm, sind die entsprechenden Bereiche in Abbildung 1 (rechts) rot eingefärbt, blaue Gebiete weisen Temperaturen unter dem langjährigen Mittel auf.
 
-```{r echo=FALSE, results='asis'}
-knitr::kable(mtcars[1:5,],caption="Tabellenüberschrift")
-```

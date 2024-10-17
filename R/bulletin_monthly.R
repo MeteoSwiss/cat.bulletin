@@ -15,11 +15,11 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
     monatsbilanz_temp() %>%
-  monatsbilanz_precip() %>%
-  monatsbilanz_sun() %>%
-  temporal_evolution() %>%
-  monatsbulletin_disclaimer() %>%
-  monatsbulletin_more_info()
+    monatsbilanz_precip() %>%
+    monatsbilanz_sun() %>%
+    temporal_evolution() %>%
+    monatsbulletin_disclaimer() %>%
+    monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
   bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
@@ -33,7 +33,7 @@ monatsbilanz_temp <- function(bulletin) {
   
   #input aus anaperiod
   mon = bulletin$month
-  provisional = TRUE
+  provisional = bulletin$provisional
   
   download_monatsbilanz_temp <- function(bulletin,
                                          filename = NULL,
@@ -135,21 +135,44 @@ monatsbilanz_temp <- function(bulletin) {
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
   
-  
   # Add images 
   filename = "monatsbilanz_temp_abs.png"
   bulletin <- add_image(bulletin = bulletin,
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, mediaType = "image/png", filename = "monatsbilanz_temp_abs.png"),
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, mediaType = "image/png", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
   filename = "monatsbilanz_temp_anom.png"
   bulletin <- add_image(bulletin = bulletin,
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = provisional, mediaType = "image/png", filename = "monatsbilanz_temp_anom.png"),
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = provisional, mediaType = "image/png", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
+  # example table
+  regdata_table <- regdata_example_table(bulletin)
+  bulletin <- add_flextable(bulletin, flextable = regdata_table)
+  
   bulletin
+}
+
+regdata_example_table <- function(bulletin) {
+  regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
+  df <- as.data.frame(regdata)
+  df <- format(df)
+  df$region <- rownames(regdata)
+  df <- df[,c(4,1:3)]  # set column order
+  
+  table <- flextable(df) %>%
+    set_header_labels(values =c("Region", "Mittelwert", "Minimum", "Maximum")) %>%
+    add_header_row(
+      values = c("", "Temperaturen"),
+      colwidths = c(1,3)
+    ) %>%
+    bg(i = ~ as.numeric(TTanom_mean) < 0, j = "TTanom_mean", bg = "#EFEFEF", part = "body") %>%
+    add_footer_lines("Example footer line") %>%
+    set_caption("Regional temperature data") %>%
+    set_table_properties(layout = "autofit")
+  table
 }
 
 monatsbilanz_precip <- function(bulletin) {
