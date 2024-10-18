@@ -19,7 +19,6 @@ download_realization <- function(bulletin, product, filter, filename, out_path, 
     return(filepath)
   }
   
-  
   retry(cat.func::download_realization(
     product = product,
     filter = filter,
@@ -113,4 +112,29 @@ download_monatsbilanz_temp <- function(bulletin,
       filename = filename
     )
   }
+}
+
+download_witterungsverlauf <- function(bulletin,
+                                       filename = NULL,
+                                       month = 10,
+                                       year = 2024, 
+                                       location = "SMA",
+                                       language = "de") {
+  
+#  valueBase = match.arg(valueBase)
+
+  attributevalues <- 
+    list(
+      mediaType = "image/png",
+      productName = "climate-overview-series-monthdaily"
+    )
+
+  attributevalues = c(attributevalues, c(month = sprintf("%02d", bulletin$month), year = bulletin$year, location = location, language = language))
+  
+  download_realization(
+    bulletin = bulletin,
+    product = attributevalues$productName,
+    filter = attributevalues,
+    filename = filename
+  )
 }

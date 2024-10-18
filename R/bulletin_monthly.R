@@ -18,6 +18,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
     monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
     #temporal_evolution() %>%
+    monatsbulletin_daily_timeseries() %>%
     monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
   
@@ -27,10 +28,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
 
 monatsbulletin_head <- function(bulletin) {
   add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
-    add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG.")) %>%
-    add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
-              filename = "loess.png",
-              caption = "This is a caption.")
+  add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
 }
 
 monatsbilanz_temp <- function(bulletin) {
@@ -289,6 +287,8 @@ regdata_example_table <- function(bulletin) {
 
 monatsbilanz_precip <- function(bulletin) {
 
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-precip_de.Rmd")
+  
   # Add images 
   filename = "monatsbilanz_prec_map_abs.png"
   bulletin <- add_image(bulletin = bulletin,
@@ -301,12 +301,12 @@ monatsbilanz_precip <- function(bulletin) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
-  
-  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-precip_de.Rmd")
 }
 
 monatsbilanz_sun <- function(bulletin) {
 
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-sun_de.Rmd")
+  
   # Add images 
   filename = "monatsbilanz_sunshine_map_abs.png"
   bulletin <- add_image(bulletin = bulletin,
@@ -319,9 +319,6 @@ monatsbilanz_sun <- function(bulletin) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
-  
-  
-  bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-sun_de.Rmd")
 }
 
 temporal_evolution <- function(bulletin) {
@@ -374,6 +371,17 @@ temporal_evolution <- function(bulletin) {
   bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
+  
+}
+
+monatsbulletin_daily_timeseries <- function(bulletin) {
+  bulletin <- add_Rmd(bulletin, filename = "bulletin-daily_timeseries_de.Rmd")
+  
+  filename = "witterungsverlauf.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language="de", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
   
 }
 
