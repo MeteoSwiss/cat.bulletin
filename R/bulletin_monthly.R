@@ -41,40 +41,6 @@ monatsbilanz_temp <- function(bulletin) {
   
   lang <- "G"
   
-  download_monatsbilanz_temp <- function(bulletin,
-                                         filename = NULL,
-                                         valueBase = "abs", 
-                                         provisional = FALSE, 
-                                         mediaType = "text/plain") {
-    attributevalues <- 
-      list(
-        valueBase = valueBase,
-        normalPeriod= "1991-2020",
-        location= "regSwiss",
-        language = "de",
-        plotPeriod = "1864-today",
-        mediaType = mediaType
-      )
-    
-    if (provisional) {
-      download_realization(
-        bulletin = bulletin,
-        product = "climate-temperature-evolution-outlook",
-        filter = c(attributevalues, list(timeGranularity="month")),
-        filename = filename
-      )
-    } else {
-      download_realization(
-        bulletin = bulletin,
-        product = "climate-temperature-evolution",
-        filter = c(attributevalues, list(timeOfYear = sprintf("%02d", bulletin$month))),
-        filename = filename
-      )
-    }
-  }
-  
-  
-  
   month <- c(cat.lang::get.text("january",lang),
              cat.lang::get.text("february",lang),
              cat.lang::get.text("march",lang),
@@ -112,7 +78,7 @@ monatsbilanz_temp <- function(bulletin) {
   filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, filename = "monatsbilanz_temp_abs.txt")
   data_abs <- read.table(filename_abs, header = TRUE)
   
-  filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_anom_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+  filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = provisional, filename = "monatsbilanz_temp_anom.txt")
   data_anom <- read.table(filename_anom, header = TRUE)
   
   #  filename_anom_south <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_south.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
@@ -267,7 +233,16 @@ monatsbilanz_temp <- function(bulletin) {
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
   
-
+  # daily records
+  daily_records = day_records(ycurr = ycurr, mon = mon)
+  
+  numrec_Txx = daily_records$numrec_Txx
+  Txx_sorted_subset = daily_records$Txx_sorted_subset
+  Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
+  
+  numrec_Tnx = daily_records$numrec_Tnx
+  Tnx_sorted_subset = daily_records$Tnx_sorted_subset
+  Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
@@ -368,17 +343,6 @@ temporal_evolution <- function(bulletin) {
   resid <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
   
   bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
-  
-  # daily records
-  daily_records = day_records(ycurr = ycurr, mon = mon)
-  
-  numrec_Txx = daily_records$numrec_Txx
-  Txx_sorted_subset = daily_records$Txx_sorted_subset
-  Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
-  
-  numrec_Tnx = daily_records$numrec_Tnx
-  Tnx_sorted_subset = daily_records$Tnx_sorted_subset
-  Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
   
