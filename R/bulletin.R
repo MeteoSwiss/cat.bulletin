@@ -1,21 +1,52 @@
 #' Create a bulletin
+#' @param bulletin_args a list of arguments 
+#' @param workdir working directory for bulletin creation
+#' @param bulletin_path the path to the directory where the bulletin will be created in
+#' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @return an object that represents the bulletin content
 #' @export
-create_bulletin <- function(bulletin_dir = "bulletin", bulletin_path = file.path(tempdir(), bulletin_dir)) {
+create_bulletin <- function(bulletin_args = list(),
+                            bulletin_dir = "bulletin", 
+                            workdir = tempdir(),
+                            bulletin_path = file.path(workdir, bulletin_dir)) {
   
-  # prepare temp dir
+  bulletin <- bulletin_args
+  
+  # prepare bulletin dir
+  bulletin_path <- normalizePath(bulletin_path)
   dir.create(bulletin_path)
   
-  list(elements = list(),
-       bulletin_dir = bulletin_dir,
-       bulletin_path = bulletin_path)
+  # prepare data path
+  data_path <- file.path(bulletin_path, "data")
+  dir.create(data_path)
+  
+  # prepare image path
+  image_path <- file.path(bulletin_path, "images")
+  dir.create(image_path)
+  
+  c(bulletin, 
+    list(elements = list(),
+         bulletin_dir = bulletin_dir,
+         bulletin_path = bulletin_path,
+         data_path = data_path,
+         image_path = image_path,
+         bulletin_envir = new.env(),
+         stage = "prod"
+    )
+  )
 }
 
+#' @rdname create_bulletin
+#' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
+#' @param element one of the bulletin elements
 add_element <- function(bulletin, element) {
   bulletin$elements <- append(bulletin$elements, list(element))
   bulletin
 }
 
+#' Render a bulletin to markdown
+#' @inheritParams add_element
+#' @param filename The name of the file to write the R markdown to.
 #' @export
 bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")) {
   file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
@@ -40,15 +71,24 @@ write_markdown_frontmatter <- function(file_conn) {
     "  pdf_document:",
     "    fig_caption: true",
     "    fig_width: 5",
+    "header-includes:",
+    "  - \\usepackage{xcolor}",
+    #    "    includes:",
+#    "      in_header: 'preamble.tex',
     "---"
   )
   readr::write_lines(front_matter, file = file_conn)
 }
 
+#' Render a bulletin to pdf
+#' @inheritParams add_element
+#' @param filename The name of the file to write the pdf.
 #' @export
 bulletin_to_pdf <- function(bulletin, filename = tempfile(fileext = ".pdf")) {
+  log_debug("Processing bulletin to pdf via markdown...")
   markdown_file = bulletin_to_markdown(bulletin)
-  rmarkdown::render(markdown_file, output_format = "pdf_document", output_file = filename)
+  log_debug("Processing file", markdown_file, "to pdf.")
+  rmarkdown::render(markdown_file, envir = bulletin$bulletin_envir, output_format = "pdf_document", output_file = filename, clean = FALSE)
 }
 
 #' @export
@@ -74,7 +114,7 @@ bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) 
 
 
 bulletin_pdfxmlzip <- function(bulletin) {
-
+  
   pdf <- bulletin_to_pdf(bulletin)
   xml <- bulletin_to_xml(bulletin)
   zip <- bulletin_to_webzip(bulletin)

@@ -1,8 +1,18 @@
+#' Create the monthly bulletin
+#' @param year Bulletin year
+#' @param month Bulletin month
+#' @param provisional boolean indicating if the provisional version of the bulletin shall be created
+#' @param ... further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc. 
 #' @importFrom magrittr %>%
 #' @export
-create_bulletin_monthly <- function() {
+create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, ...) {
   
-  bulletin <- create_bulletin() %>%
+  bulletin <- create_bulletin(bulletin_args = list(year = year,
+                                                   month = month,
+                                                   provisional = provisional),
+                              ...)
+  
+  bulletin <- bulletin %>%
     monatsbulletin_head() %>%
     monatsbilanz_temp() %>%
     monatsbilanz_precip() %>%
@@ -16,7 +26,7 @@ create_bulletin_monthly <- function() {
 }
 
 monatsbulletin_head <- function(bulletin) {
-    add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
+  add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
     add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG.")) %>%
     add_image(filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png"),
               filename = "loess.png",
@@ -26,10 +36,45 @@ monatsbulletin_head <- function(bulletin) {
 monatsbilanz_temp <- function(bulletin) {
   
   #input aus anaperiod
-  mon <- 8
-
+  mon = bulletin$month
+  provisional = bulletin$provisional
+  
   lang <- "G"
-
+  
+  download_monatsbilanz_temp <- function(bulletin,
+                                         filename = NULL,
+                                         valueBase = "abs", 
+                                         provisional = FALSE, 
+                                         mediaType = "text/plain") {
+    attributevalues <- 
+      list(
+        valueBase = valueBase,
+        normalPeriod= "1991-2020",
+        location= "regSwiss",
+        language = "de",
+        plotPeriod = "1864-today",
+        mediaType = mediaType
+      )
+    
+    if (provisional) {
+      download_realization(
+        bulletin = bulletin,
+        product = "climate-temperature-evolution-outlook",
+        filter = c(attributevalues, list(timeGranularity="month")),
+        filename = filename
+      )
+    } else {
+      download_realization(
+        bulletin = bulletin,
+        product = "climate-temperature-evolution",
+        filter = c(attributevalues, list(timeOfYear = sprintf("%02d", bulletin$month))),
+        filename = filename
+      )
+    }
+  }
+  
+  
+  
   month <- c(cat.lang::get.text("january",lang),
              cat.lang::get.text("february",lang),
              cat.lang::get.text("march",lang),
@@ -62,20 +107,22 @@ monatsbilanz_temp <- function(bulletin) {
   # Anforderungen für Tabellen definieren, nicht alles in markdown lösen wegen xml
   # Bei der Tabelle sicherstellen, dass Abweichungen mit den entsprechenden Farbskalen der Kartengrafik eingefärbt sind.
   
-  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.abs.txt", package = "cat.bulletin")
+  # Download data
+  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+  filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, filename = "monatsbilanz_temp_abs.txt")
   data_abs <- read.table(filename_abs, header = TRUE)
-
-  filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
+  
+  filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_anom_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
   data_anom <- read.table(filename_anom, header = TRUE)
   
-#  filename_anom_south <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_south.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
-#  data_anom_south <- read.table(filename_anom_south, header = TRUE)
-
-#  filename_anom_north_low <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_north_low.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
-#  data_anom_north_low <- read.table(filename_anom_north_low, header = TRUE)
-
-#  filename_anom_north_high <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_north_high.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
-#  data_anom_north_high <- read.table(filename_anom_north_high, header = TRUE)
+  #  filename_anom_south <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_south.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
+  #  data_anom_south <- read.table(filename_anom_south, header = TRUE)
+  
+  #  filename_anom_north_low <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_north_low.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
+  #  data_anom_north_low <- read.table(filename_anom_north_low, header = TRUE)
+  
+  #  filename_anom_north_high <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean_north_high.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
+  #  data_anom_north_high <- read.table(filename_anom_north_high, header = TRUE)
   
   
   # absolute temperature, swissmean
@@ -85,22 +132,23 @@ monatsbilanz_temp <- function(bulletin) {
   ybeg <- year[1]
   abs  <- data_abs$val
   vcurr <- round(abs[poscurr],1)
+  
   vcurr_t <- format(vcurr, nsmall=1)
-
+  
   # anomaly temperature, swissmean
   anom <- data_anom$val
   acurr <- round(anom[poscurr],1)
   acurr_t <- format(acurr, nsmall=1)
-
-#  acurr_reg <- rep(NA,3)
-#  acurr_reg[1] <- round(data_anom_north_low$val[poscurr],1)
-#  acurr_reg[2] <- round(data_anom_north_high$val[poscurr],1)
-#  acurr_reg[3] <- round(data_anom_south$val[poscurr],1)
+  
+  #  acurr_reg <- rep(NA,3)
+  #  acurr_reg[1] <- round(data_anom_north_low$val[poscurr],1)
+  #  acurr_reg[2] <- round(data_anom_north_high$val[poscurr],1)
+  #  acurr_reg[3] <- round(data_anom_south$val[poscurr],1)
   
   # regional rankings    
   ranking <- sort.int(anom,decreasing=T,index.return=T)
   rankcurr <- which(ranking$ix==poscurr)
-
+  
   if (rankcurr != 1) {
     ind01 <- ranking$ix[1]
     recy <- year[ind01]
@@ -121,6 +169,8 @@ monatsbilanz_temp <- function(bulletin) {
     isim <- which(diffc_t5<0.1)
     isimy <- ranking$ix[isim]
     isimy <- isimy[-which(isimy==poscurr)]
+  } else {
+    isim <- isimy <- NULL
   }
   
   # prepare table
@@ -131,7 +181,7 @@ monatsbilanz_temp <- function(bulletin) {
   dpm <- c(31,28,31,30,31,30,31,31,30,31,30,31)
   if (ycurr %% 4 == 0) {dpm <- c(31,29,31,30,31,30,31,31,30,31,30,31)}
   enddate <- paste0(ycurr,mondate,dpm[mon])
-    
+  
   data <- clim.table::climtable(period=c(begdate,enddate))
   vals <- data$dana$vals
   vals$Region <- rep("",length(vals$Station))
@@ -144,9 +194,9 @@ monatsbilanz_temp <- function(bulletin) {
   vals$Region[77:88] <- "Alpensüdseite"
   
   acurr_all <- vals$Abw[!is.na(vals$Abw)]
-  a_ueber <- length(which(acurr_all>0.5))/length(acurr_all)
-  a_unter <- length(which(acurr_all<0.5))/length(acurr_all)
-  a_bereich <- 1-ueber-unter
+  a_ueber <- length(which(acurr_all > 0.5)) / length(acurr_all)
+  a_unter <- length(which(acurr_all < 0.5)) / length(acurr_all)
+  a_bereich <- 1 - a_ueber - a_unter
   quac <- quantile(acurr_all,probs = c(0.16,0.84))
   
   # monthly mean temp ranks at stations
@@ -217,83 +267,49 @@ monatsbilanz_temp <- function(bulletin) {
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
   
-  # Tagesrekorde
-  dayrec_stats <- c("ABO","AIG","ALT","ARO","BAS","BEH","BER","BLA","BRL","BUF","BUS","CDF","CGI","CHA","CHD","CHM","CHU",
-                    "CIM","COM","COV","DAV","DEM","DIS","DOL","EBK","EIN","ELM","ENG","EVO","FAH","FRE","GLA","GRA","GRC",
-                    "GRH","GRO","GSB","GUE","GUT","GVE","HAI","HLL","HOE","INT","JUN","KLO","KOP","LAG","LUG","LUZ","MAG",
-                    "MER","MLS","MVE","NAP","NEU","OTL","PAY","PIL","PIO","PLF","PUY","RAG","REH","ROB","ROE","RUE","SAE",
-                    "SAM","SBE","SBO","SCU","SHA","SIA","SIO","SMA","SMM","STG","TAE","ULR","VAD","VIS","WAE","WFJ","WYN","ZER")
-  Txx <- rep(NA,length(dayrec_stats))
-  Rank_Txx <- rep(NA,length(dayrec_stats))
-  firstmeas_Txx <- rep(NA,length(dayrec_stats))
-  date_Txx <- rep(NA,length(dayrec_stats))
-  for (s in 1:length(dayrec_stats)) {
-    recstat <- rekorde(top=10,minmax="max",year=ycurr,month=mon,station=dayrec_stats[s],parameter="ths200dx",rectype="m")
-    Rank_Txx[s] <- recstat$ranks_curryear[1]
-    Txx[s] <- recstat$values_curryear[1]
-    firstmeas_Txx[s] <- recstat$firstmeas
-    date_Txx[s] <- paste0(substr(recstat$dates_curryear[1],7,8),".",substr(recstat$dates_curryear[1],5,6),".")
-  }
-  Txx_all <- data.frame(Txx,date_Txx,Rank_Txx,firstmeas_Txx)
-  row.names(Txx_all) <- dayrec_stats
-  Txx_sorted <- Txx_all[order(Txx_all$Rank_Txx), ]
-  Txx_sorted_subset <- Txx_sorted[Txx_sorted$Rank_Txx <= 5 & Txx_sorted$firstmeas_Txx <= 1959, ]
-  # number of new Txx records
-  numrec_Txx <- dim(Txx_sorted_subset)[1]
-  sinf_Txx <- mchdwh::station_info(nat_abbr=row.names(Txx_sorted_subset))
-  row.names(Txx_sorted_subset) <- sinf_Txx$station_name[order(match(sinf_Txx$nat_abbr,row.names(Txx_sorted_subset)))]
-  Txx_sorted_subset_pretty <- Txx_sorted_subset
-  names(Txx_sorted_subset_pretty) <- c("Maximale Temperatur (°C)","Datum","Rang","Messbeginn")
-  if (numrec_Txx>6) {
-    Txx_sorted_subset_pretty <- Txx_sorted_subset_pretty[1:6,]
-  }
-  
-  Tnx <- rep(NA,length(dayrec_stats))
-  Rank_Tnx <- rep(NA,length(dayrec_stats))
-  firstmeas_Tnx <- rep(NA,length(dayrec_stats))
-  date_Tnx <- rep(NA,length(dayrec_stats))
-  for (s in 1:length(dayrec_stats)) {
-    recstat <- rekorde(top=10,minmax="max",year=ycurr,month=mon,station=dayrec_stats[s],parameter="ths200dn",rectype="m")
-    Rank_Tnx[s] <- recstat$ranks_curryear[1]
-    Tnx[s] <- recstat$values_curryear[1]
-    firstmeas_Tnx[s] <- recstat$firstmeas
-    date_Tnx[s] <- paste0(substr(recstat$dates_curryear[1],7,8),".",substr(recstat$dates_curryear[1],5,6),".")
-  }
-  Tnx_all <- data.frame(Tnx,date_Tnx,Rank_Tnx,firstmeas_Tnx)
-  row.names(Tnx_all) <- dayrec_stats
-  Tnx_sorted <- Tnx_all[order(Tnx_all$Rank_Tnx), ]
-  Tnx_sorted_subset <- Tnx_sorted[Tnx_sorted$Rank_Tnx <= 5 & Tnx_sorted$firstmeas_Tnx <= 1959, ]
-  # number of new Txx records
-  numrec_Tnx <- dim(Tnx_sorted_subset)[1]
-  sinf_Tnx <- mchdwh::station_info(nat_abbr=row.names(Tnx_sorted_subset))
-  row.names(Tnx_sorted_subset) <- sinf_Tnx$station_name[order(match(sinf_Tnx$nat_abbr,row.names(Tnx_sorted_subset)))]
-  Tnx_sorted_subset_pretty <- Tnx_sorted_subset
-  names(Tnx_sorted_subset_pretty) <- c("Höchstes Tagesminimum (°C)","Datum","Rang","Messbeginn")
-  if (numrec_Tnx>6) {
-    Tnx_sorted_subset_pretty <- Tnx_sorted_subset_pretty[1:6,]
-  }
-  
-  # statslow_north <- vals$Station[vals$Region %in% c("Westschweiz","Mittelland","Alpennordhang","Wallis") & vals$Hoehe < 500]
-  # lownorth_Rank_Tmax <- rep(NA, length(statslow_north))
-  # lownorth_Tmax <- rep(NA, length(statslow_north))
-  # for (s in 1:length(statslow_north)) {
-  #   recstat <- rekorde(top=10,minmax="max",year=2024,month=mon,station=statslow_north[s],parameter="ths200dx",rectype="m")
-  #   lownorth_Rank_Tmax[s] <- recstat$ranks_curryear[1]
-  #   lownorth_Tmax[s] <- recstat$values_curryear[1]
-  # }
-  # statslow_south <- vals$Station[vals$Region == "Alpensüdseite" & vals$Hoehe < 400]
-  # lowsouth_Rank_Tmax <- rep(NA, length(statslow_south))
-  # lowsouth_Tmax <- rep(NA, length(statslow_south))
-  # for (s in 1:length(statslow_south)) {
-  #   recstat <- rekorde(top=10,minmax="max",year=2024,month=mon,station=statslow_south[s],parameter="ths200dx",rectype="m")
-  #   lowsouth_Rank_Tmax[s] <- recstat$ranks_curryear[1]
-  #   lowsouth_Tmax[s] <- recstat$values_curryear[1]
-  # }
-  
+
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
+  
+  # Add images 
+  filename = "monatsbilanz_temp_abs.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, mediaType = "image/png", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
+  filename = "monatsbilanz_temp_anom.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = provisional, mediaType = "image/png", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
+  # example table
+  regdata_table <- regdata_example_table(bulletin)
+  bulletin <- add_flextable(bulletin, flextable = regdata_table)
+  
+  bulletin
+}
 
+regdata_example_table <- function(bulletin) {
+  regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
+  df <- as.data.frame(regdata)
+  df <- format(df)
+  df$region <- rownames(regdata)
+  df <- df[,c(4,1:3)]  # set column order
+  
+  table <- flextable::flextable(df) %>%
+    flextable::set_header_labels(values =c("Region", "Mittelwert", "Minimum", "Maximum")) %>%
+    flextable::add_header_row(
+      values = c("", "Temperaturen"),
+      colwidths = c(1,3)
+    ) %>%
+    flextable::bg(i = ~ as.numeric(TTanom_mean) < 0, j = "TTanom_mean", bg = "#EFEFEF", part = "body") %>%
+    flextable::add_footer_lines("Example footer line") %>%
+    flextable::set_caption("Regional temperature data") %>%
+    flextable::set_table_properties(layout = "autofit")
+  table
 }
 
 monatsbilanz_precip <- function(bulletin) {
@@ -306,11 +322,9 @@ monatsbilanz_sun <- function(bulletin) {
 
 temporal_evolution <- function(bulletin) {
   
+  mon = bulletin$month
   lang <- "G"
   
-  #input aus anaperiod
-  mon = 8
-
   month <- c(cat.lang::get.text("january",lang),
              cat.lang::get.text("february",lang),
              cat.lang::get.text("march",lang),
@@ -323,7 +337,8 @@ temporal_evolution <- function(bulletin) {
              cat.lang::get.text("october",lang),
              cat.lang::get.text("november",lang),
              cat.lang::get.text("december",lang))
-
+  
+  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
   filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.abs.txt", package = "cat.bulletin")
   data_abs <- read.table(filename_abs, header = TRUE)
   
@@ -336,9 +351,10 @@ temporal_evolution <- function(bulletin) {
   ycurr <- year[poscurr]
   ybeg <- year[1]
   abs  <- data_abs$val
+  
   vcurr <- round(abs[poscurr],1)
   vcurr_t <- format(vcurr, nsmall=1)
-
+  
   # regional rankings    
   ranking <- sort.int(abs,decreasing=T,index.return=T)
   rankcurr <- which(ranking$ix==poscurr)
@@ -348,10 +364,21 @@ temporal_evolution <- function(bulletin) {
   signif <- as.numeric(loess$incr.pval)
   diff <- round(as.numeric(c(loess$conf.l[poscurr]-loess$val1,loess$t.incr,loess$conf.u[poscurr]-loess$val1)),1)
   ydiff_ca <- round(ycurr-1885+1,-1)
-
+  
   resid <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
   
   bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
+  
+  # daily records
+  daily_records = day_records(ycurr = ycurr, mon = mon)
+  
+  numrec_Txx = daily_records$numrec_Txx
+  Txx_sorted_subset = daily_records$Txx_sorted_subset
+  Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
+  
+  numrec_Tnx = daily_records$numrec_Tnx
+  Tnx_sorted_subset = daily_records$Tnx_sorted_subset
+  Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
   
@@ -417,76 +444,4 @@ collapse_sentence <- function(strings) {
     # More than two strings, collapse with ", " and " und " for the last two
     return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " und "))
   }
-}
-
-rekorde <- function(top=10,minmax="max",year=2024,month=2,station="SMA",parameter="ths200m0",rectype="m") {
-  # Get records for different variables up to current month
-  # Input
-  if (rectype=="m") {
-    data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
-                                            param_short=parameter,
-                                            year=c(1864,year),
-                                            month=month,meas_cat=1),
-                     error=function(e) e)
-    if (is(data,"error")) {
-      data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
-                                              param_short=parameter,
-                                              year=c(1864,year),
-                                              month=month,meas_cat=12),
-                       error=function(e) e)
-    }
-  }
-  if (rectype=="y") {
-    data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
-                                            param_short=parameter,
-                                            year=c(1864,year),meas_cat=1),
-                     error=function(e) e)
-    if (is(data,"error")) {
-      data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
-                                              param_short=parameter,
-                                              year=c(1864,year),meas_cat=12),
-                       error=function(e) e)
-    }
-  }
-  
-  
-  if (minmax == "max") {
-    dsort <- order(data$value,as.numeric(data$datetime),decreasing=T)
-  } else {
-    dsort <- order(data$value,as.numeric(data$datetime),decreasing=F)
-  }
-  vals <- data$value[dsort]
-  ranks <- 1
-  for (i in 2:length(vals)) {
-    if (vals[i]-vals[i-1] != 0) {
-      ranks[i] <- i
-    } else {
-      ranks[i] <- ranks[i-1]
-    }
-  }
-  
-  ind_recs <- which(ranks <= top)
-  if (rectype=="m") {
-    ind_curr <- which(dsort %in% which(as.numeric(substr(data$datetime,1,4))==year))
-  } else {
-    ind_curr <- which(dsort %in% which(as.numeric(substr(data$datetime,1,4))==year & as.numeric(substr(data$datetime,5,6))==month))
-  }
-  
-  record <- list()
-  record$datetime <- data$datetime[dsort][ind_recs]
-  record$value <- data$value[dsort][ind_recs]
-  record$ranks <- ranks[ind_recs]
-  record$firstmeas <- as.numeric(substr(data$datetime[1],1,4))
-  
-  if (length(ind_curr)>=1) {
-    ranks_currentyear <- ranks[ind_curr]
-    dates_currentyear <- data$datetime[dsort][ind_curr]
-    values_currentyear <- data$value[dsort][ind_curr]
-    record$dates_curryear <- dates_currentyear
-    record$values_curryear <- values_currentyear
-    record$ranks_curryear <- ranks_currentyear
-  }
-  
-  return(record)
-  
 }

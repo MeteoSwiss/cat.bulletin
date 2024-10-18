@@ -16,5 +16,7 @@ Imports:
     readr,
     rmarkdown,
     xml2,
+    cat.func (>= 0.17.0),
+    flextable,
     cat.lang
 RoxygenNote: 7.2.3
