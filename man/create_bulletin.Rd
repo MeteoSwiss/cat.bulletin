@@ -4,7 +4,10 @@
 \alias{create_bulletin}
 \title{Create a bulletin}
 \usage{
-create_bulletin()
+create_bulletin(
+  bulletin_dir = "bulletin",
+  bulletin_path = file.path(tempdir(), bulletin_dir)
+)
 }
 \value{
 an object that represents the bulletin content

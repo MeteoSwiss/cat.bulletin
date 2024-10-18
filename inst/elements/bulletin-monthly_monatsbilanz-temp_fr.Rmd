@@ -10,9 +10,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 #### Température moyenne nationale
 
-La température moyenne nationale pour le mois `r month[mon]` `r ycurr` était de `r format(vcurr, nsmall=1)`&nbsp;°C. Cela correspond à une anomalie par rapport à la période de référence 1991-2020 de `r format(acurr, nsmall=1)`&nbsp;°C. Ce qui place le mois `r month[mon]` `r ycurr` au `r ordinal_number(rankcurr,"m","F")` rang depuis le début des mesures en `r ybeg`. `r if (length(isimy)==1) {paste0("Le mois de ",month[mon]," ",year[isimy]," a présenté une anomalie similaire par rapport à la norme.")}` `r if (length(isimy)>1) {paste0("Des anomalies similaires pour le mois ",month[mon]," ont été enregistrées les années suivantes : ",paste0(year[isimy],collapse=", "),".")}`
+La température moyenne nationale pour le mois `r month[mon]` `r ycurr` était de `r vcurr_t`&nbsp;°C. Cela correspond à une anomalie par rapport à la période de référence 1991-2020 de `r acurr_t`&nbsp;°C. Ce qui place le mois `r month[mon]` `r ycurr` au `r ordinal_number(rankcurr,"m","F")` rang depuis le début des mesures en `r ybeg`. `r if (length(isimy)==1) {paste0("Le mois de ",month[mon]," ",year[isimy]," a présenté une anomalie similaire par rapport à la norme.")}` `r if (length(isimy)>1) {paste0("Des anomalies similaires pour le mois ",month[mon]," ont été enregistrées les années suivantes : ",paste0(year[isimy],collapse=", "),".")}`
 
-Le mois `r month[mon]` le plus chaud `r if(rankcurr != 1) {"provient"} else {"provenait"}` de l'année `r recy`. Ce mois `r month[mon]` avait atteint une température moyenne de `r recval`&nbsp;°C, avec une anomalie de `r reca`&nbsp;°C par rapport à la norme 1991-2020.
+Le mois `r month[mon]` le plus chaud `r if(rankcurr != 1) {"provient"} else {"provenait"}` de l'année `r recy`. Ce mois `r month[mon]` avait atteint une température moyenne de `r recval_t`&nbsp;°C, avec une anomalie de `r reca_t`&nbsp;°C par rapport à la norme 1991-2020.
 
 #### Différences régionales
 
