@@ -112,7 +112,9 @@ download_monatsbilanz_temp <- function(bulletin,
       filename = filename
     )
   }
+
 }
+
 
 download_witterungsverlauf <- function(bulletin,
                                        filename = NULL,

@@ -26,29 +26,3 @@ Abbildung 1 zeigt die Monatsmitteltemperatur (links) und die Abweichung zum Mitt
 caption <- paste0("Monatsmitteltemperatur für den Monat ",month[mon]," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Normwert (1991-2020), die Abweichung zur Norm, der Rang und das Jahr des Messbeginns angegeben.")
 knitr::kable(subset_climtab,caption=caption)
 ```
-
-#### Rekorde
-
-`r if (numrec_Txx == 0) {"Es wurden keine neuen Rekorde bei der Tageshöchsttemperatur registriert."}``r if (numrec_Txx == 1) {paste0("Am Messstandort ",row.names(Txx_sorted_subset)[1]," wurde am ",Txx_sorted_subset$date_Txx[1],ycurr," ein Tagesmaximum von ",Txx_sorted_subset$Txx[1],"&nbsp;°C gemessen. Das ist an diesem Standort ein neuer Rang ",Txx_sorted_subset$Rank_Txx[1]," der höchsten Temperaturen in einem ",month[mon]," seit Messbeginn ",Txx_sorted_subset$firstmeas_Txx[1],".")}``r if (numrec_Txx %in% 2:6) {paste0("An folgenden Messstandorten wurden Tageshöchsttemperaturen gemessen, die zu den höchsten in einem ",month[mon]," an diesen Standorten gehören: ")}``r if (numrec_Txx>6) {paste0("Es wurden in diesem ",month[mon]," an ",numrec_Txx," Stationen mit Daten ab 1959 oder früher neue Tageshöchsttemperaturen verzeichnet. Beispiele sind in der nachfolgenden Tabelle aufgelistet:")}`
-
-```{r echo=FALSE, results='asis'}
-if (numrec_Txx > 2) {
-  caption <- paste0("Höchste gemessene Temperatur im ",month[mon]," ",ycurr," an Messstandorten mit Daten ab 1959 oder früher. Gezeigt ist der höchste Tageswert, das Datum der Messung, deren Rang und das Jahr des Messbeginns.")
-  knitr::kable(Txx_sorted_subset_pretty,caption=caption)
-}
-```
-
-`r if (numrec_Tnx == 0) {"Es wurden keine neuen Höchstwerte bei der Tagesminimumtemperatur registriert."}``r if (numrec_Tnx == 1) {paste0("Am Messstandort ",row.names(Tnx_sorted_subset)[1]," wurde am ",Tnx_sorted_subset$date_Txx[1],ycurr," ein Tagesminimum von ",Tnx_sorted_subset$Tnx[1],"&nbsp;°C gemessen. Das ist an diesem Standort ein neuer Rang ",Tnx_sorted_subset$Rank_Tnx[1]," der höchsten Temperaturen in einem ",month[mon]," seit Messbeginn ",Txx_sorted_subset$firstmeas_Txx[1],".")}``r if (numrec_Tnx %in% 2:6) {paste0("An folgenden Messstandorten wurden Tagesminima gemessen, die zu den höchsten in einem ",month[mon]," an diesen Standorten gehören: ")}``r if (numrec_Tnx>6) {paste0("Es wurden in diesem ",month[mon]," an ",numrec_Tnx," Stationen mit Daten ab 1959 oder früher neue Höchstwerte der Tagesminimumtemperatur verzeichnet. Beispiele sind in der nachfolgenden Tabelle aufgelistet:")}`
-
-```{r echo=FALSE, results='asis'}
-if (numrec_Tnx > 2) {
-  caption <- paste0("Höchste gemessene Tagesminimumtemperatur im ",month[mon]," ",ycurr," an Messstandorten mit Daten ab 1959 oder früher. Gezeigt ist die höchste Tagesminimumtemperatur, das Datum der Messung, deren Rang und das Jahr des Messbeginns.")
-  knitr::kable(Tnx_sorted_subset_pretty,caption=caption)
-}
-```
-
-HIER BRAUCHT ES NOCH HINWEISE ZU MÖGLICHEN NEUEN TIEFSTWERTEN.
-
-#### Temperaturindikatoren
-
-HIER KOMMEN NOCH INFOS ZU TEMPERATURINDIKATOREN (am besten saisonal verschieden)

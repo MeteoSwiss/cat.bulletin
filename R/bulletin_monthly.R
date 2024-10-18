@@ -5,7 +5,7 @@
 #' @param ... further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc. 
 #' @importFrom magrittr %>%
 #' @export
-create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, ...) {
+create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE, ...) {
   
   bulletin <- create_bulletin(bulletin_args = list(year = year,
                                                    month = month,
@@ -14,10 +14,10 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
   
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
-    #monatsbilanz_temp() %>%
+    monatsbilanz_temp() %>%
     monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
-    #temporal_evolution() %>%
+    temporal_evolution() %>%
     monatsbulletin_daily_timeseries() %>%
     monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
@@ -231,16 +231,16 @@ monatsbilanz_temp <- function(bulletin) {
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
   
-  # daily records
-  daily_records = day_records(ycurr = ycurr, mon = mon)
-  
-  numrec_Txx = daily_records$numrec_Txx
-  Txx_sorted_subset = daily_records$Txx_sorted_subset
-  Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
-  
-  numrec_Tnx = daily_records$numrec_Tnx
-  Tnx_sorted_subset = daily_records$Tnx_sorted_subset
-  Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
+  # # daily records
+  # daily_records = day_records(ycurr = ycurr, mon = mon)
+  # 
+  # numrec_Txx = daily_records$numrec_Txx
+  # Txx_sorted_subset = daily_records$Txx_sorted_subset
+  # Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
+  # 
+  # numrec_Tnx = daily_records$numrec_Tnx
+  # Tnx_sorted_subset = daily_records$Tnx_sorted_subset
+  # Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
   
   # homogoval.eval datenfile für august (abs temp und anonmalie)
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-temp_de.Rmd")
@@ -248,13 +248,26 @@ monatsbilanz_temp <- function(bulletin) {
   # Add images 
   filename = "monatsbilanz_temp_abs.png"
   bulletin <- add_image(bulletin = bulletin,
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = provisional, mediaType = "image/png", filename = filename),
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
   filename = "monatsbilanz_temp_anom.png"
   bulletin <- add_image(bulletin = bulletin,
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = provisional, mediaType = "image/png", filename = filename),
+                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
+  # Add images 
+  filename = "monatsbilanz_temp_map_abs.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
+  filename = "monatsbilanz_temp_map_anom.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
