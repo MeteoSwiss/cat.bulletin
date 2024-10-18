@@ -15,7 +15,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
     #monatsbilanz_temp() %>%
-    #monatsbilanz_precip() %>%
+    monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
     #temporal_evolution() %>%
     monatsbulletin_disclaimer() %>%
@@ -288,6 +288,20 @@ regdata_example_table <- function(bulletin) {
 }
 
 monatsbilanz_precip <- function(bulletin) {
+
+  # Add images 
+  filename = "monatsbilanz_prec_map_abs.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
+  filename = "monatsbilanz_prec_map_anom.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-precip_de.Rmd")
 }
 
@@ -299,6 +313,13 @@ monatsbilanz_sun <- function(bulletin) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
+  
+  filename = "monatsbilanz_sunshine_map_anom.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-sun_de.Rmd")
 }

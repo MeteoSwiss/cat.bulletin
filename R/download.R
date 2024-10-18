@@ -40,7 +40,7 @@ filter_to_string <- function(filter) {
 # https://service.meteoswiss.ch/productbrowser/authenticated/productDisplay/climate-maps-monthly-prelim
 download_monatsbilanz_maps <- function(bulletin,
                                        filename = NULL,
-                                       valueBase = c("abs", "anom"),
+                                       valueBase = c("abs", "anom9120"),
                                        provisional = FALSE,
                                        parameter = c("temp", "prec", "sunshine")) {
   
