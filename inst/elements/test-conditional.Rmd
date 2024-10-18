@@ -1,0 +1,7 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Der bisher wärmste `r month[mon]` stammt aus dem Jahr `r recy`.
