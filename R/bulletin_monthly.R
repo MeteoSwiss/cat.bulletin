@@ -162,16 +162,16 @@ regdata_example_table <- function(bulletin) {
   df$region <- rownames(regdata)
   df <- df[,c(4,1:3)]  # set column order
   
-  table <- flextable(df) %>%
-    set_header_labels(values =c("Region", "Mittelwert", "Minimum", "Maximum")) %>%
-    add_header_row(
+  table <- flextable::flextable(df) %>%
+    flextable::set_header_labels(values =c("Region", "Mittelwert", "Minimum", "Maximum")) %>%
+    flextable::add_header_row(
       values = c("", "Temperaturen"),
       colwidths = c(1,3)
     ) %>%
-    bg(i = ~ as.numeric(TTanom_mean) < 0, j = "TTanom_mean", bg = "#EFEFEF", part = "body") %>%
-    add_footer_lines("Example footer line") %>%
-    set_caption("Regional temperature data") %>%
-    set_table_properties(layout = "autofit")
+    flextable::bg(i = ~ as.numeric(TTanom_mean) < 0, j = "TTanom_mean", bg = "#EFEFEF", part = "body") %>%
+    flextable::add_footer_lines("Example footer line") %>%
+    flextable::set_caption("Regional temperature data") %>%
+    flextable::set_table_properties(layout = "autofit")
   table
 }
 
