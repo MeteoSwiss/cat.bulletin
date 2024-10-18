@@ -14,10 +14,10 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = TRUE, 
   
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
-    monatsbilanz_temp() %>%
-    monatsbilanz_precip() %>%
+    #monatsbilanz_temp() %>%
+    #monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
-    temporal_evolution() %>%
+    #temporal_evolution() %>%
     monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
   
@@ -292,6 +292,14 @@ monatsbilanz_precip <- function(bulletin) {
 }
 
 monatsbilanz_sun <- function(bulletin) {
+
+  # Add images 
+  filename = "monatsbilanz_sunshine_map_abs.png"
+  bulletin <- add_image(bulletin = bulletin,
+                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
+                        filename = filename,
+                        caption = "This is a caption.")
+  
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_monatsbilanz-sun_de.Rmd")
 }
 

@@ -37,11 +37,57 @@ filter_to_string <- function(filter) {
   paste(names(filter), filter, sep="=", collapse = ",")
 }
 
+# https://service.meteoswiss.ch/productbrowser/authenticated/productDisplay/climate-maps-monthly-prelim
+download_monatsbilanz_maps <- function(bulletin,
+                                       filename = NULL,
+                                       valueBase = c("abs", "anom"),
+                                       provisional = FALSE,
+                                       parameter = c("temp", "prec", "sunshine")) {
+  
+  valueBase = match.arg(valueBase)
+  parameter = match.arg(parameter)
+  assertthat::assert_that(is.logical(provisional))
+  
+  #https://service.meteoswiss.ch/pbbackend/api/v1/products/climate-precipitation-maps-M/realizations?productName=climate-precipitation-maps-M&year=2024&parameter=R&month=09&representation=nostats&valueBase=abs&mediaType=image%2Fpng
+  
+  attributevalues <- 
+    list(
+      valueBase = valueBase,
+      mediaType = "image/png",
+      productName = switch(parameter, 
+                           prec = "climate-precipitation-maps-M", 
+                           temp = "climate-temperature-maps-M",
+                           sunshine = "climate-sunshine-maps-M"),
+      parameter = switch(parameter, prec = "R", 
+                         temp = "T",
+                         sunshine = "S")
+    )
+  
+  #provisional
+  if (provisional) {
+    attributevalues$productName = paste0(attributevalues$productName, "prelim")
+  } else {
+    attributevalues = c(attributevalues, c(month = sprintf("%02d", bulletin$month), year = bulletin$year, representation = "nostats"))
+  }
+  
+  download_realization(
+    bulletin = bulletin,
+    product = attributevalues$productName,
+    filter = attributevalues,
+    filename = filename
+  )
+  
+}
+
 download_monatsbilanz_temp <- function(bulletin,
                                        filename = NULL,
-                                       valueBase = "abs", 
+                                       valueBase = c("abs", "anom"),
                                        provisional = FALSE, 
                                        mediaType = "text/plain") {
+  
+  valueBase = match.arg(valueBase)
+  assertthat::assert_that(is.logical(provisional))
+  
   attributevalues <- 
     list(
       valueBase = valueBase,
