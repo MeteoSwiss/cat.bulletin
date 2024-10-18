@@ -12,7 +12,7 @@ rcy <- array(NA,c(length(stats),13))
 for (i in 1:length(stats)) {
 	stat <- stats[i]
 	print(stat)
-	data <- rekorde(station=stat,year=2024,month=1)
+	data <- rekorde(station=stat,year=2024,month=8)
 	if (!(is.null(data$ranks_curryear))) {
 		rcy[i,1] <- data$ranks_curryear
 	} else {

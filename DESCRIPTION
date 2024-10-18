@@ -17,5 +17,6 @@ Imports:
     rmarkdown,
     xml2,
     cat.func (>= 0.17.0),
-    flextable
+    flextable,
+    cat.lang
 RoxygenNote: 7.2.3
