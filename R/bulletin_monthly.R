@@ -27,8 +27,10 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
 }
 
 monatsbulletin_head <- function(bulletin) {
-  add_text(bulletin, paste("# Klimabulletin", Sys.Date())) %>%
-  add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
+  add_text(bulletin, paste("# Klimabulletin", Sys.Date()))
+  add_text(bulletin, paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
+
+  add_image(bulletin, filename = "202408_teaser_image.jpg", filepath = "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/202408/202408_teaser_image.jpg", caption=readLines("/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/202408/202408_teaser_text.txt", n = 1))
 }
 
 monatsbilanz_temp <- function(bulletin) {
