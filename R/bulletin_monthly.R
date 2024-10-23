@@ -27,8 +27,22 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
 }
 
 monatsbulletin_head <- function(bulletin) {
-  add_text(bulletin, paste("# Klimabulletin", Sys.Date()))
-  add_text(bulletin, paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
+  
+  month <- c(cat.lang::get.text("january",lang),
+             cat.lang::get.text("february",lang),
+             cat.lang::get.text("march",lang),
+             cat.lang::get.text("april",lang),
+             cat.lang::get.text("may",lang),
+             cat.lang::get.text("june",lang),
+             cat.lang::get.text("july",lang),
+             cat.lang::get.text("august",lang),
+             cat.lang::get.text("september",lang),
+             cat.lang::get.text("october",lang),
+             cat.lang::get.text("november",lang),
+             cat.lang::get.text("december",lang))
+  
+  add_text(bulletin, paste("# Klimabulletin", month[bulletin$month], bulletin$year)) %>%
+  add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
 
   basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
   
