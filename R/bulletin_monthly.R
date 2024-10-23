@@ -12,12 +12,14 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
                                                    provisional = provisional),
                               ...)
   
+  swissmean <- calculate_swissmean_temp(bulletin)
+
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
-    monatsbilanz_temp() %>%
+    monatsbilanz_temp(swissmean = swissmean) %>%
     monatsbilanz_precip() %>%
     monatsbilanz_sun() %>%
-    temporal_evolution() %>%
+    temporal_evolution(swissmean = swissmean) %>%
     monatsbulletin_daily_timeseries() %>%
     monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
@@ -27,6 +29,8 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
 }
 
 monatsbulletin_head <- function(bulletin) {
+  
+  lang <- "G"
   
   month <- c(cat.lang::get.text("january",lang),
              cat.lang::get.text("february",lang),
@@ -58,12 +62,11 @@ monatsbulletin_head <- function(bulletin) {
 
 }
 
-monatsbilanz_temp <- function(bulletin) {
+monatsbilanz_temp <- function(bulletin, swissmean) {
   
   #input aus anaperiod
   mon = bulletin$month
   provisional = bulletin$provisional
-  
   lang <- "G"
   
   month <- c(cat.lang::get.text("january",lang),
@@ -84,64 +87,14 @@ monatsbilanz_temp <- function(bulletin) {
     month <- as.character(month)
   }
   
-  # Download data
-  filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
-  data_abs <- read.table(filename_abs, header = TRUE)
-
-  filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
-  data_anom <- read.table(filename_anom, header = TRUE)
-
-  # absolute temperature, swissmean
-  year <- data_abs$year
-  poscurr <- length(year)
-  ycurr <- year[poscurr]
-  ybeg <- year[1]
-  abs  <- data_abs$val
-  vcurr <- round(abs[poscurr],1)
-
-  vcurr_t <- format(vcurr, nsmall=1)
-
-  # anomaly temperature, swissmean
-  anom <- data_anom$val
-  acurr <- round(anom[poscurr],1)
-  acurr_t <- format(acurr, nsmall=1)
-
-  # rank swissmean
-  ranking <- sort.int(anom,decreasing=T,index.return=T)
-  rankcurr <- which(ranking$ix==poscurr)
-
-  if (rankcurr != 1) {
-    ind01 <- ranking$ix[1]
-    recy <- year[ind01]
-    recval <- round(abs[ind01],1)
-    reca <- round(anom[ind01],1)
-  } else {
-    ind01 <- ranking$ix[2]
-    recy <- year[ind01]
-    recval <- round(abs[ind01],1)
-    reca <- round(anom[ind01],1)
-  }
-  reca_t <- format(reca, nsmall=1)
-  recval_t <- format(recval, nsmall=1)
-
-  # years similar to current
-  diffc_t5 <- abs(ranking$x[which(ranking$ix==poscurr)]-ranking$x[1:5])
-  if (any(diffc_t5<0.1)) {
-    isim <- which(diffc_t5<0.1)
-    isimy <- ranking$ix[isim]
-    isimy <- isimy[-which(isimy==poscurr)]
-  } else {
-    isim <- isimy <- NULL
-  }
-  
   # prepare table
   stations <- c("BER","SMA","GVE","BAS","ENG","SIO","LUG","SAM")
   
   if (mon<10) {mondate <- paste0("0",mon)} else {mondate <- as.character(mon)}
-  begdate <- paste0(ycurr,mondate,"01")
+  begdate <- paste0(bulletin$year,mondate,"01")
   dpm <- c(31,28,31,30,31,30,31,31,30,31,30,31)
-  if (ycurr %% 4 == 0) {dpm <- c(31,29,31,30,31,30,31,31,30,31,30,31)}
-  enddate <- paste0(ycurr,mondate,dpm[mon])
+  if (bulletin$year %% 4 == 0) {dpm <- c(31,29,31,30,31,30,31,31,30,31,30,31)}
+  enddate <- paste0(bulletin$year,mondate,dpm[mon])
   
   data <- clim.table::climtable(period=c(begdate,enddate))
   vals <- data$dana$vals
@@ -177,8 +130,8 @@ monatsbilanz_temp <- function(bulletin) {
   diff_highlow <- abs(median(vals$Abw[vals$Hoehe>=1500],na.rm=T))-abs(median(vals$Abw[vals$Hoehe<1500],na.rm=T))
   
   # stations with time series of more than 100 years
-  ranky100 <- vals$Rank_T[vals$firstmeas_T<(ycurr-100)]
-  r1y100 <- which(vals$firstmeas_T<(ycurr-100) & vals$Rank_T==1)
+  ranky100 <- vals$Rank_T[vals$firstmeas_T<(bulletin$year-100)]
+  r1y100 <- which(vals$firstmeas_T<(bulletin$year-100) & vals$Rank_T==1)
   
   # greatest deviations in all regions
   regs <- unique(vals$Region)
@@ -260,13 +213,13 @@ monatsbilanz_temp <- function(bulletin) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in °C für den ",month[mon]," ",ycurr,"."))
+                        caption = paste0("Monatsmitteltemperaturen in °C für den ",month[mon]," ",bulletin$year,"."))
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",month[mon]," ",ycurr,"."))
+                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",month[mon]," ",bulletin$year,"."))
   
   # example table
   regdata_table <- regdata_example_table(bulletin)
@@ -298,7 +251,6 @@ regdata_example_table <- function(bulletin) {
 monatsbilanz_precip <- function(bulletin) {
 
   mon = bulletin$month
-  ycurr = bulletin$year
   lang = "G"
   
   provisional = bulletin$provisional
@@ -323,19 +275,18 @@ monatsbilanz_precip <- function(bulletin) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",month[mon]," ",ycurr,"."))
+                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",month[mon]," ",bulletin$year,"."))
   
   filename = "monatsbilanz_prec_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",month[mon]," ",ycurr,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",month[mon]," ",bulletin$year,", dargestellt in Prozent der Norm."))
 }
 
 monatsbilanz_sun <- function(bulletin) {
 
   mon = bulletin$month
-  ycurr = bulletin$year
   lang = "G"
 
   provisional = bulletin$provisional
@@ -360,17 +311,17 @@ monatsbilanz_sun <- function(bulletin) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",month[mon]," ",ycurr,"."))
+                        caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",month[mon]," ",bulletin$year,"."))
   
   filename = "monatsbilanz_sunshine_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",month[mon]," ",ycurr,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",month[mon]," ",bulletin$year,", dargestellt in Prozent der Norm."))
 
 }
 
-temporal_evolution <- function(bulletin) {
+temporal_evolution <- function(bulletin, swissmean) {
   
   mon = bulletin$month
   lang <- "G"
@@ -387,37 +338,6 @@ temporal_evolution <- function(bulletin) {
              cat.lang::get.text("october",lang),
              cat.lang::get.text("november",lang),
              cat.lang::get.text("december",lang))
-  
-  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
-  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.abs.txt", package = "cat.bulletin")
-  data_abs <- read.table(filename_abs, header = TRUE)
-  
-  filename_anom <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.anom.txt", package = "cat.bulletin")
-  data_anom <- read.table(filename_anom, header = TRUE)
-  
-  # absolute temperature, swissmean
-  year <- data_abs$year
-  poscurr <- length(year)
-  ycurr <- year[poscurr]
-  ybeg <- year[1]
-  abs  <- data_abs$val
-  
-  vcurr <- round(abs[poscurr],1)
-  vcurr_t <- format(vcurr, nsmall=1)
-  
-  # regional rankings    
-  ranking <- sort.int(abs,decreasing=T,index.return=T)
-  rankcurr <- which(ranking$ix==poscurr)
-  
-  # loess trend
-  loess <- evoclim::loess.filt.knmi(x=abs,years=year,y1=1885,y2=ycurr,y1asmean=TRUE)
-  signif <- as.numeric(loess$incr.pval)
-  diff <- round(as.numeric(c(loess$conf.l[poscurr]-loess$val1,loess$t.incr,loess$conf.u[poscurr]-loess$val1)),1)
-  ydiff_ca <- round(ycurr-1885+1,-1)
-  
-  resid <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
-  
-  bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
   
   bulletin <- add_Rmd(bulletin, filename = "bulletin-monthly_temporal-evolution_de.Rmd")
   
