@@ -28,11 +28,12 @@ calculate_regional_differences <- function(bulletin, parameter = "temp") {
   vals$Region[71:76] <- "Engadin"
   vals$Region[77:88] <- "Alpensüdseite"
 
+  ### TEMPERATURE ###
   # check whether all or a large fraction of the data
   # are either above, below or in the range of the norm
   acurr_all <- vals$Abw[!is.na(vals$Abw)]
   a_ueber <- length(which(acurr_all > 0.5)) / length(acurr_all)
-  a_unter <- length(which(acurr_all < 0.5)) / length(acurr_all)
+  a_unter <- length(which(acurr_all < -0.5)) / length(acurr_all)
   a_bereich <- 1 - a_ueber - a_unter
   quac <- quantile(acurr_all,probs = c(0.16,0.84))
   quac[quac>0] <- paste0("+",quac[quac>0])
@@ -107,6 +108,15 @@ calculate_regional_differences <- function(bulletin, parameter = "temp") {
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
   
+  ### PRECIPITATION ###
+  # check whether all or a large fraction of the data
+  # are either above, below or in the range of the norm
+  acurr_all_prec <- vals$R.dev[!is.na(vals$R.dev)]
+  a_ueber_prec <- length(which(acurr_all_prec > 105)) / length(acurr_all_prec)
+  a_unter_prec <- length(which(acurr_all_prec < 95)) / length(acurr_all_prec)
+  a_bereich_prec <- 1 - a_ueber_prec - a_unter_prec
+  quac_prec <- quantile(acurr_all_prec,probs = c(0.16,0.84))
+
   return(
     list (
       allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
