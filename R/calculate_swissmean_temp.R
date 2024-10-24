@@ -9,7 +9,7 @@ calculate_swissmean_temp <- function (bulletin) {
   
   # absolute temperature, swissmean
   year <- data_abs$year
-  poscurr <- length(year)
+  poscurr <- which(year == bulletin$year)
   ycurr <- year[poscurr]
   ybeg <- year[1]
   abs  <- data_abs$val
@@ -20,6 +20,9 @@ calculate_swissmean_temp <- function (bulletin) {
   anom <- data_anom$val
   acurr <- round(anom[poscurr],1)
   acurr_t <- format(acurr, nsmall=1)
+  if (acurr_t > 0) {
+    acurr_t <- paste0("+", acurr_t)
+  }
 
   # rank swissmean    
   ranking <- sort.int(anom,decreasing=T,index.return=T)
@@ -37,6 +40,9 @@ calculate_swissmean_temp <- function (bulletin) {
     reca <- round(anom[ind01],1)
   }
   reca_t <- format(reca, nsmall=1)
+  if (reca_t > 0) {
+    reca_t <- paste0("+", reca_t)
+  }
   recval_t <- format(recval, nsmall=1)
   
   # years similar to current

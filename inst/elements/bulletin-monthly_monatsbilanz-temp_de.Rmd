@@ -14,7 +14,14 @@ Der bisher wärmste `r month[mon]` `r if(swissmean$curr_rank != 1) {"stammt"} el
 
 #### Regionale Unterschiede
 
-`r if (all(regdiff$allvalues) > 0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit über der Norm 1991-2020.")}``r if (all(regdiff$allvalues) < -0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit unter der Norm 1991-2020.")}``r if (all(regdiff$allvalues) <= 0.5 & all(regdiff$allvalues)>= -0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit im Bereich der Norm 1991-2020.")}``r if (regdiff$anteil_ueber > 0.7 & regdiff$anteil_ueber < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet über der Norm 1991-2020.")}``r if (regdiff$anteil_unter > 0.7 & regdiff$anteil_unter < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet unter der Norm 1991-2020.")}``r if (regdiff$anteil_bereich > 0.7 & regdiff$anteil_bereich < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet im Bereich der Norm 1991-2020.")}` An den Messstandorten von MeteoSchweiz wurden Abweichungen zur Norm zwischen `r min(regdiff$allvalues)` und `r max(regdiff$allvalues)`&nbsp;°C registriert, wobei ein Grossteil der Stationen eine Abweichung von `r regdiff$quantiles[1]` bis `r regdiff$quantiles[2]`&nbsp;°C aufwies.
+``` {r echo=FALSE, results = "hide"}
+minval <- min(regdiff$allvalues)
+if (minval > 0) minval <- paste0("+", minval)
+maxval <- max(regdiff$allvalues)
+if (maxval > 0) maxval <- paste0("+", maxval)
+```
+
+`r if (all(regdiff$allvalues) > 0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit über der Norm 1991-2020.")}``r if (all(regdiff$allvalues) < -0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit unter der Norm 1991-2020.")}``r if (all(regdiff$allvalues) <= 0.5 & all(regdiff$allvalues)>= -0.5) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag schweizweit im Bereich der Norm 1991-2020.")}``r if (regdiff$anteil_ueber > 0.7 & regdiff$anteil_ueber < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet über der Norm 1991-2020.")}``r if (regdiff$anteil_unter > 0.7 & regdiff$anteil_unter < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet unter der Norm 1991-2020.")}``r if (regdiff$anteil_bereich > 0.7 & regdiff$anteil_bereich < 1) {paste0("Die Temperatur im ",month[mon]," ",bulletin$year," lag verbreitet im Bereich der Norm 1991-2020.")}` An den Messstandorten von MeteoSchweiz wurden Abweichungen zur Norm zwischen `r minval` und `r maxval`&nbsp;°C registriert, wobei ein Grossteil der Stationen eine Abweichung von `r regdiff$quantiles[1]` bis `r regdiff$quantiles[2]`&nbsp;°C aufwies.
 
 Die stärksten Abweichungen zur Norm 1991-2020 `r if (length(regdiff$numb_stats_high)==1) {"verzeichnet die Region"} else {"verzeichnen die Regionen"}` `r regdiff$regshigh`. Beispiele für Messstandorte mit grossen Abweichungen sind `r regdiff$selhigh_stats` (siehe Tabelle 1). Die geringsten Abweichungen `r if (length(regdiff$numb_stats_low)==1) {"stammen aus der Region"} else {"stammen aus den Regionen"}` `r regdiff$regslow` (z.B. die Stationen `r regdiff$sellow_stats`). `r if (regdiff$diff_highlow >= 0.5) {"In höheren Lagen waren die Abweichungen zur Norm grösser als in den tiefergelegenen Regionen der Schweiz."} else if (regdiff$diff_highlow <= -0.5) {"In tieferen Lagen waren die Abweichungen zur Norm grösser als in den höhergelegenen Gebieten der Schweiz."}`
 
@@ -24,5 +31,5 @@ Abbildung 1 zeigt die Monatsmitteltemperatur (links) und die Abweichung zum Mitt
 
 ```{r echo=FALSE, results='asis'}
 caption <- paste0("Monatsmitteltemperatur für den Monat ",month[mon]," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Normwert (1991-2020), die Abweichung zur Norm, der Rang und das Jahr des Messbeginns angegeben.")
-knitr::kable(regdiff$subset_climtab,caption=caption)
+knitr::kable(regdiff$subset_climtab,caption=caption, align = c("l","c","c","c","c","c","c"))
 ```

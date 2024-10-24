@@ -35,7 +35,8 @@ calculate_regional_differences <- function(bulletin, parameter = "temp") {
   a_unter <- length(which(acurr_all < 0.5)) / length(acurr_all)
   a_bereich <- 1 - a_ueber - a_unter
   quac <- quantile(acurr_all,probs = c(0.16,0.84))
-
+  quac[quac>0] <- paste0("+",quac[quac>0])
+                         
   # monthly mean temp ranks at stations
   vals$Rank_T <- rep(NA,length(vals$Station))
   vals$firstmeas_T <- rep(NA,length(vals$Station))
@@ -102,9 +103,10 @@ calculate_regional_differences <- function(bulletin, parameter = "temp") {
   sn <- mchdwh::station_info(nat_abbr=subset_climtab$Station)
   sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
   subset_climtab$Station <- sn$station_name
+  subset_climtab$Abw[subset_climtab$Abw > 0] <- paste0("+", subset_climtab$Abw[subset_climtab$Abw > 0])
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
-
+  
   return(
     list (
       allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
