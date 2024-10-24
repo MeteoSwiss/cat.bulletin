@@ -321,3 +321,23 @@ collapse_sentence <- function(strings) {
     return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " und "))
   }
 }
+
+get_final_date <- function(year, month) {
+  # Get the current year, month, and day
+  current_date <- Sys.Date()
+  current_year <- lubridate::year(current_date)
+  current_month <- lubridate::month(current_date)
+  current_day <- lubridate::day(current_date)
+  
+  # If the year and month are the current year and month
+  if (year == current_year && month == current_month) {
+    # Return current day minus 1
+    last_date <- current_date - 1
+  } else {
+    # Get the last day of the specified month in the past
+    last_date <- lubridate::ceiling_date(as.Date(paste(year, month, "01", sep = "-")), "month") - 1
+  }
+  Sys.setlocale("LC_TIME", "de_DE.UTF-8")
+  last_date <- format(last_date, "%d. %B %Y")
+  return(last_date)
+}
