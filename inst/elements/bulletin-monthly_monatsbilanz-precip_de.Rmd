@@ -6,4 +6,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ### Niederschlag
 
-asdf
+``` {r echo=FALSE, results = "hide"}
+minval <- min(regdiff$allvalues_R)
+maxval <- max(regdiff$allvalues_R)
+```
+
+`r if (all(regdiff$allvalues_R > 105)) {paste0("Die monatliche Niederschlagssumme im ",month[mon]," ",bulletin$year," war schweizweit über der Norm 1991-2020.")}``r if (all(regdiff$allvalues_R < 95)) {paste0("Die Niederschlagsmengen im ",month[mon]," ",bulletin$year," lagen schweizweit unter der Norm 1991-2020.")}``r if (all(regdiff$allvalues_R <= 105) & all(regdiff$allvalues_R >= 95)) {paste0("Die Monatsniederschläge im ",month[mon]," ",bulletin$year," waren im ganzen Land im Bereich der Norm 1991-2020.")}``r if (regdiff$anteil_ueber_R > 0.7 & regdiff$anteil_ueber_R < 1) {paste0("Die monatliche Niederschlagssumme im ",month[mon]," ",bulletin$year," war verbreitet über der Norm 1991-2020.")}``r if (regdiff$anteil_unter_R > 0.7 & regdiff$anteil_unter_R < 1) {paste0("Die Niederschlagssumme im ",month[mon]," ",bulletin$year," lag verbreitet unter der Norm 1991-2020.")}``r if (regdiff$anteil_bereich_R > 0.7 & regdiff$anteil_bereich_R < 1) {paste0("Die Monatsniederschläge im ",month[mon]," ",bulletin$year," waren verbreitet im Bereich der Norm 1991-2020.")}` An den Messstandorten von MeteoSchweiz wurden Niederschlagsmengen zwischen `r minval` und `r maxval`&nbsp;% der Norm registriert, wobei ein Grossteil der Stationen `r regdiff$quantiles_R[1]` bis `r regdiff$quantiles_R[2]`&nbsp;% der Norm aufwies.

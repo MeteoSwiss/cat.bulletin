@@ -18,7 +18,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
     monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
-    monatsbilanz_precip() %>%
+    monatsbilanz_precip(regdiff = regdiff) %>%
     monatsbilanz_sun() %>%
     temporal_evolution(swissmean = swissmean) %>%
     monatsbulletin_daily_timeseries() %>%
@@ -154,7 +154,7 @@ regdata_example_table <- function(bulletin) {
   table
 }
 
-monatsbilanz_precip <- function(bulletin) {
+monatsbilanz_precip <- function(bulletin, regdiff) {
 
   mon = bulletin$month
   lang = "G"

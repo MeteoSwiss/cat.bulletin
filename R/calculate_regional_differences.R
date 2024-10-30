@@ -1,4 +1,4 @@
-calculate_regional_differences <- function(bulletin, parameter = "temp") {
+calculate_regional_differences <- function(bulletin) {
   
   # prepare climtable
   stations <- c("BER","SMA","GVE","BAS","ENG","SIO","LUG","SAM")
@@ -116,13 +116,38 @@ calculate_regional_differences <- function(bulletin, parameter = "temp") {
   a_unter_prec <- length(which(acurr_all_prec < 95)) / length(acurr_all_prec)
   a_bereich_prec <- 1 - a_ueber_prec - a_unter_prec
   quac_prec <- quantile(acurr_all_prec,probs = c(0.16,0.84))
+  # round values to next 5 for precip
+  quac_prec <- round(quac_prec/5)*5
+  
+  # monthly prec sum ranks at stations
+  vals$Rank_R_wet <- rep(NA,length(vals$Station))
+  vals$Rank_R_dry <- rep(NA,length(vals$Station))
+  vals$firstmeas_R <- rep(NA,length(vals$Station))
+  
+  for (s in 1:length(vals$Station)) {
+    if (vals$Station[s] %in% c("AND","LAE","HOE","JUN","GSB","BEH")) {
+      vals$Rank_R_wet[s] <- NA
+      vals$Rank_R_dry[s] <- NA
+      vals$firstmeas_R[s] <- NA
+    } else {
+      recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
+      vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
+      vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
+      vals$firstmeas_R[s] <- recstat_R$firstmeas
+    }
+  }
 
+  # hier noch die Niederschlagsparameter einfügen...
   return(
     list (
+      # temperature
       allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
       quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
       selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, diff_highlow = diff_highlow, 
-      ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab
+      ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab,
+      # precipitation 
+      allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
+      anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec
     )
   )
 
