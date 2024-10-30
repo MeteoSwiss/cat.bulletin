@@ -192,12 +192,12 @@ calculate_regional_differences <- function(bulletin) {
   subset_climtab_R <- vals[which(vals$Station %in% stations),]
   subset_climtab_R <- subset_climtab_R[order(match(subset_climtab_R$Station, stations)), ]
   subset_climtab_R <- rbind(subset_climtab_R,selreg_R)
-  subset_climtab_R <- subset_climtab_R[,c(1:2,11:13,21,20)]
+  subset_climtab_R <- subset_climtab_R[,c(1,11:13,21,20)]
   sn_R <- mchdwh::station_info(nat_abbr=subset_climtab_R$Station)
   sn_R <- sn_R[order(match(sn_R$nat_abbr, subset_climtab_R$Station)), ]
   subset_climtab_R$Station <- sn_R$station_name
   rownames(subset_climtab_R) <- NULL
-  attributes(subset_climtab_R)$names <- c("Station","Höhe (m)","Monatssumme (mm)","Norm (mm)","% der Norm","Rang","Messbeginn")
+  attributes(subset_climtab_R)$names <- c("Station","Monatssumme (mm)","Norm (mm)","% der Norm","Rang","Messbeginn")
   
   return(
     list (
@@ -211,7 +211,8 @@ calculate_regional_differences <- function(bulletin) {
       anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
       regshigh_R = regshigh_R, numb_stats_low_R = mlow_R, regslow_R = regslow_R, 
       selhigh_stats_R = selhigh_stats_R, sellow_stats_R = sellow_stats_R, 
-      subset_climtab_R = subset_climtab_R
+      subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
+      rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
     )
   )
 
