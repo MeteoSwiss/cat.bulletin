@@ -128,8 +128,8 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
                         caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",month[mon]," ",bulletin$year,"."))
   
   # example table
-  regdata_table <- regdata_example_table(bulletin)
-  bulletin <- add_flextable(bulletin, flextable = regdata_table)
+#  regdata_table <- regdata_example_table(bulletin)
+#  bulletin <- add_flextable(bulletin, flextable = regdata_table)
   
   bulletin
 }

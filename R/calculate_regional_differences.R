@@ -136,8 +136,69 @@ calculate_regional_differences <- function(bulletin) {
       vals$firstmeas_R[s] <- recstat_R$firstmeas
     }
   }
+  vals$Rank_R_comb <- ifelse(
+    is.na(vals$Rank_R_wet) | is.na(vals$Rank_R_dry),
+    "",
+    ifelse (
+      vals$Rank_R_wet <= vals$Rank_R_dry,
+      paste0(vals$Rank_R_wet, "\u2193"),
+      paste0(vals$Rank_R_dry, "\u2191")
+    )
+  )
 
-  # hier noch die Niederschlagsparameter einfügen...
+  # stations with time series of more than 100 years
+  ranky100_R_wet <- vals$Rank_R_wet[vals$firstmeas_R<(bulletin$year-100)]
+  ranky100_R_dry <- vals$Rank_R_dry[vals$firstmeas_R<(bulletin$year-100)]
+  r1y100_R_wet <- which(vals$firstmeas_R<(bulletin$year-100) & vals$Rank_R_wet==1)
+  r1y100_R_dry <- which(vals$firstmeas_R<(bulletin$year-100) & vals$Rank_R_dry==1)
+  
+  # greatest deviations in all regions
+  vhighest_R <- 1
+  vlowest_R <- 1
+  for (r in 1:length(regs)) {
+    indr <- which(vals$Region == regs[r])
+    vhighest_R[r] <- quantile(vals$R.dev[indr],0.75,na.rm=TRUE)
+    vlowest_R[r] <- quantile(vals$R.dev[indr],0.25,na.rm=TRUE)
+  }
+  member_h_R <- cutree(hclust(dist(vhighest_R)),3)
+  member_l_R <- cutree(hclust(dist(vlowest_R)),3)
+  mr_h_R <- 0
+  mr_l_R <- 0
+  for (i in 1:3) {
+    indm_h_R <- which(member_h_R == i)
+    mr_h_R[i] <- mean(vhighest_R[indm_h_R])
+    indm_l_R <- which(member_l_R == i)
+    mr_l_R[i] <- mean(vlowest_R[indm_l_R])
+  }
+  mhigh_R <- which(mr_h_R==max(mr_h_R))
+  mhigh_R <- which(member_h_R == mhigh_R)
+  regshigh_R <- collapse_sentence(regs[mhigh_R])
+  mlow_R <- which(mr_l_R==min(mr_l_R))
+  mlow_R <- which(member_l_R == mlow_R)
+  regslow_R <- collapse_sentence(regs[mlow_R])
+  # add a few relevant stations to the list below
+  selhigh_R <- vals[which(vals$Region %in% regs[mhigh_R]),]
+  selhigh_R <- selhigh_R[order(match(selhigh_R$R.dev, sort(selhigh_R$R.dev,decreasing = TRUE))), ]
+  selhigh_R <- selhigh_R[1:2,]
+  sellow_R <- vals[which(vals$Region %in% regs[mlow_R]),]
+  sellow_R <- sellow_R[order(match(sellow_R$R.dev, sort(sellow_R$R.dev,decreasing = FALSE))), ]
+  sellow_R <- sellow_R[1:2,]
+  selreg_R <- rbind(selhigh_R,sellow_R)
+  sellow_stats_R <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow_R$Station)$station_name)
+  selhigh_stats_R <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh_R$Station)$station_name)
+  
+  # generate subset for a printable table
+  # (reduced to the stations defined above)
+  subset_climtab_R <- vals[which(vals$Station %in% stations),]
+  subset_climtab_R <- subset_climtab_R[order(match(subset_climtab_R$Station, stations)), ]
+  subset_climtab_R <- rbind(subset_climtab_R,selreg_R)
+  subset_climtab_R <- subset_climtab_R[,c(1:2,11:13,21,20)]
+  sn_R <- mchdwh::station_info(nat_abbr=subset_climtab_R$Station)
+  sn_R <- sn_R[order(match(sn_R$nat_abbr, subset_climtab_R$Station)), ]
+  subset_climtab_R$Station <- sn_R$station_name
+  rownames(subset_climtab_R) <- NULL
+  attributes(subset_climtab_R)$names <- c("Station","Höhe (m)","Monatssumme (mm)","Norm (mm)","% der Norm","Rang","Messbeginn")
+  
   return(
     list (
       # temperature
@@ -147,7 +208,10 @@ calculate_regional_differences <- function(bulletin) {
       ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab,
       # precipitation 
       allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
-      anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec
+      anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
+      regshigh_R = regshigh_R, numb_stats_low_R = mlow_R, regslow_R = regslow_R, 
+      selhigh_stats_R = selhigh_stats_R, sellow_stats_R = sellow_stats_R, 
+      subset_climtab_R = subset_climtab_R
     )
   )
 
