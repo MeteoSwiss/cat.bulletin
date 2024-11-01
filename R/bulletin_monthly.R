@@ -37,20 +37,7 @@ monatsbulletin_head <- function(bulletin) {
   
   log_info("bulletin head")
   
-  month <- c(cat.lang::get.text("january"),
-             cat.lang::get.text("february"),
-             cat.lang::get.text("march"),
-             cat.lang::get.text("april"),
-             cat.lang::get.text("may"),
-             cat.lang::get.text("june"),
-             cat.lang::get.text("july"),
-             cat.lang::get.text("august"),
-             cat.lang::get.text("september"),
-             cat.lang::get.text("october"),
-             cat.lang::get.text("november"),
-             cat.lang::get.text("december"))
-  
-  add_text(bulletin, paste("# Klimabulletin", month[bulletin$month], bulletin$year)) %>%
+  add_text(bulletin, paste("# Klimabulletin", bulletin$month_str, bulletin$year)) %>%
     add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
   
   basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
@@ -71,27 +58,10 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   
   log_info("monatsbilanz_temp")
   
-  #input aus anaperiod
-  mon = bulletin$month
-  provisional = bulletin$provisional
-  
-  month <- c(cat.lang::get.text("january"),
-             cat.lang::get.text("february"),
-             cat.lang::get.text("march"),
-             cat.lang::get.text("april"),
-             cat.lang::get.text("may"),
-             cat.lang::get.text("june"),
-             cat.lang::get.text("july"),
-             cat.lang::get.text("august"),
-             cat.lang::get.text("september"),
-             cat.lang::get.text("october"),
-             cat.lang::get.text("november"),
-             cat.lang::get.text("december"))
-  
-  if (bulletin$language != "de"){
-    month <- sapply(month,add_article)
-    month <- as.character(month)
-  }
+  # if (bulletin$language != "de"){
+  #   month <- sapply(bulletin$month_str,add_article)
+  #   month <- as.character(month)
+  # }
   
   # # daily records
   # daily_records = day_records(ycurr = ycurr, mon = mon)
@@ -124,13 +94,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in °C für den ",month[mon]," ",bulletin$year,"."))
+                        caption = paste0("Monatsmitteltemperaturen in °C für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",month[mon]," ",bulletin$year,"."))
+                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,"."))
   
   # example table
   #  regdata_table <- regdata_example_table(bulletin)
@@ -163,23 +133,6 @@ regdata_example_table <- function(bulletin) {
 monatsbilanz_precip <- function(bulletin, regdiff) {
   log_info("monatsbilanz_precip")
   
-  mon = bulletin$month
-  
-  provisional = bulletin$provisional
-  
-  month <- c(cat.lang::get.text("january"),
-             cat.lang::get.text("february"),
-             cat.lang::get.text("march"),
-             cat.lang::get.text("april"),
-             cat.lang::get.text("may"),
-             cat.lang::get.text("june"),
-             cat.lang::get.text("july"),
-             cat.lang::get.text("august"),
-             cat.lang::get.text("september"),
-             cat.lang::get.text("october"),
-             cat.lang::get.text("november"),
-             cat.lang::get.text("december"))
-  
   bulletin <- add_Rmd(bulletin, element_id = "monatsbilanz-precip")
   
   # Add images 
@@ -187,34 +140,17 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",month[mon]," ",bulletin$year,"."))
+                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_prec_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",month[mon]," ",bulletin$year,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
 }
 
 monatsbilanz_sun <- function(bulletin) {
   log_info("monatsbilanz_sun")
-  
-  mon = bulletin$month
-  
-  provisional = bulletin$provisional
-  
-  month <- c(cat.lang::get.text("january"),
-             cat.lang::get.text("february"),
-             cat.lang::get.text("march"),
-             cat.lang::get.text("april"),
-             cat.lang::get.text("may"),
-             cat.lang::get.text("june"),
-             cat.lang::get.text("july"),
-             cat.lang::get.text("august"),
-             cat.lang::get.text("september"),
-             cat.lang::get.text("october"),
-             cat.lang::get.text("november"),
-             cat.lang::get.text("december"))
   
   bulletin <- add_Rmd(bulletin, element_id = "monatsbilanz-sun")
   
@@ -223,34 +159,19 @@ monatsbilanz_sun <- function(bulletin) {
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",month[mon]," ",bulletin$year,"."))
+                        caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_sunshine_map_anom.png"
   bulletin <- add_image(bulletin = bulletin,
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",month[mon]," ",bulletin$year,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
   
 }
 
 temporal_evolution <- function(bulletin, swissmean) {
   
   log_info("temporal_evolution")
-  
-  mon = bulletin$month
-  
-  month <- c(cat.lang::get.text("january"),
-             cat.lang::get.text("february"),
-             cat.lang::get.text("march"),
-             cat.lang::get.text("april"),
-             cat.lang::get.text("may"),
-             cat.lang::get.text("june"),
-             cat.lang::get.text("july"),
-             cat.lang::get.text("august"),
-             cat.lang::get.text("september"),
-             cat.lang::get.text("october"),
-             cat.lang::get.text("november"),
-             cat.lang::get.text("december"))
   
   bulletin <- add_Rmd(bulletin, element_id = "temporal-evolution")
   
