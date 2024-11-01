@@ -1,5 +1,7 @@
 calculate_swissmean_temp <- function (bulletin) {
 
+  log_info("Calculating swissmean for temperature")
+  
   # Download data
   filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
   data_abs <- read.table(filename_abs, header = TRUE)

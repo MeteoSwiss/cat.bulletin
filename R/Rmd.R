@@ -9,7 +9,9 @@ Rmd_element <- function(filename, envir) {
 
 #' add text to a bulletin
 #' @export
-add_Rmd <- function(bulletin, filename, envir = parent.frame()) {
+add_Rmd <- function(bulletin, element_id, envir = parent.frame()) {
+  filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")
+  log_debug("Adding RMD element with filename", filename)
   add_element(bulletin, Rmd_element(filename, envir = envir))
 }
 

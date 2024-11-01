@@ -5,10 +5,16 @@
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @return an object that represents the bulletin content
 #' @export
-create_bulletin <- function(bulletin_args = list(),
+create_bulletin <- function(bulletin_id,
+                            language = c("de", "en", "fr", "it"),
+                            bulletin_args = list(),
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
                             bulletin_path = file.path(workdir, bulletin_dir)) {
+  
+  language = match.arg(language)
+  # set language in cat.lang
+  cat.lang::set.language(get_catlang_language_identifier(language))
   
   bulletin <- bulletin_args
   
@@ -25,14 +31,25 @@ create_bulletin <- function(bulletin_args = list(),
   dir.create(image_path)
   
   c(bulletin, 
-    list(elements = list(),
+    list(bulletin_id = bulletin_id,
+         elements = list(),
          bulletin_dir = bulletin_dir,
          bulletin_path = bulletin_path,
          data_path = data_path,
          image_path = image_path,
          bulletin_envir = new.env(),
-         stage = "prod"
+         stage = "prod",
+         language = language
     )
+  )
+}
+
+get_catlang_language_identifier <- function(language) {
+  switch(language,
+         "de" = "G",
+         "fr" = "F",
+         "it" = "I",
+         "en" = "E"
   )
 }
 

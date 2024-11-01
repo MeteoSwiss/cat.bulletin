@@ -1,5 +1,7 @@
 calculate_regional_differences <- function(bulletin) {
   
+  log_info("Calculating regional differences")
+  
   # prepare climtable
   stations <- c("BER","SMA","GVE","BAS","ENG","SIO","LUG","SAM")
   
