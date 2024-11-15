@@ -66,7 +66,7 @@ monatsbulletin_head <- function(bulletin) {
   #teaser image
   
   get_teaser_image <- function(basepath, yearmonth) {
-    filepath = file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_image.jpg"))
+    filepath = file.path(basepath, yearmonth, "teaser_image.jpg")
     if (assertthat::is.readable(filepath)) {
       filepath
     } else {
@@ -103,7 +103,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   # Tnx_sorted_subset = daily_records$Tnx_sorted_subset
   # Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
   
-  bulletin <- add_Rmd(bulletin, element_id = "monatsbilanz-temp")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp")
   
   # Add images 
   filename = "monatsbilanz_temp_abs.png"
@@ -115,27 +115,27 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   )
   
   filename = "monatsbilanz_temp_anom.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
   # Add images 
   filename = "monatsbilanz_temp_map_abs.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
                         caption = paste0("Monatsmitteltemperaturen in °C für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_temp_map_anom.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,"."))
   
   # example table
   regdata_table <- regdata_example_table(bulletin)
-  bulletin <- add_flextable(bulletin, flextable = regdata_table)
+  bulletin <- bulletin %>% add_flextable(flextable = regdata_table)
   
   bulletin
 }
@@ -164,17 +164,17 @@ regdata_example_table <- function(bulletin) {
 monatsbilanz_precip <- function(bulletin, regdiff) {
   log_info("monatsbilanz_precip")
   
-  bulletin <- add_Rmd(bulletin, element_id = "monatsbilanz-precip")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip")
   
   # Add images 
   filename = "monatsbilanz_prec_map_abs.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
                         caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_prec_map_anom.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
@@ -185,7 +185,7 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
 monatsbilanz_sun <- function(bulletin) {
   log_info("monatsbilanz_sun")
   
-  bulletin <- add_Rmd(bulletin, element_id = "monatsbilanz-sun")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun")
   
   # Add images 
   filename = "monatsbilanz_sunshine_map_abs.png"
@@ -208,30 +208,34 @@ temporal_evolution <- function(bulletin, swissmean) {
   
   log_info("temporal_evolution")
   
-  bulletin <- add_Rmd(bulletin, element_id = "temporal-evolution")
+  bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution")
   
+  bulletin
 }
 
 monatsbulletin_daily_timeseries <- function(bulletin) {
   
   log_info("monatsbulletin_daily_timeseries")
   
-  bulletin <- add_Rmd(bulletin, element_id = "daily-timeseries")
+  bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
   
   filename = "witterungsverlauf.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language=bulletin$language, filename = filename),
                         filename = filename,
                         caption = "This is a caption.")
   
+  bulletin
 }
 
 monatsbulletin_more_info <- function(bulletin) {
-  bulletin <- add_Rmd(bulletin, element_id = "more-info")
+  bulletin <- bulletin %>% add_Rmd(element_id = "more-info")
+  bulletin
 }
 
 monatsbulletin_disclaimer <- function(bulletin) {
-  bulletin <- add_Rmd(bulletin, element_id = "disclaimer")
+  bulletin <- bulletin %>% add_Rmd(element_id = "disclaimer")
+  bulletin
 }
 
 # further helping functions
