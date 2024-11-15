@@ -49,7 +49,6 @@ monatsbulletin_head <- function(bulletin) {
   yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))
   
   # teaser text
-  
   get_teaser_text <- function(basepath, yearmonth) {
     filepath <- file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
     if (assertthat::is.readable(filepath)) {
@@ -190,17 +189,19 @@ monatsbilanz_sun <- function(bulletin) {
   
   # Add images 
   filename = "monatsbilanz_sunshine_map_abs.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
                         caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_sunshine_map_anom.png"
-  bulletin <- add_image(bulletin = bulletin,
+  bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
   
+
+bulletin  
 }
 
 temporal_evolution <- function(bulletin, swissmean) {

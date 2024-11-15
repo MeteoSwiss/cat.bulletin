@@ -68,9 +68,12 @@ calculate_swissmean_temp <- function (bulletin) {
   diff <- round(as.numeric(c(loess$conf.l[poscurr]-loess$val1,loess$t.incr,loess$conf.u[poscurr]-loess$val1)),1)
   ydiff_ca <- round(ycurr-1885+1,-1)
   
-  resid <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
+  resid1 <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
+  resid2 <- as.numeric(quantile(abs-loess$fit,probs=c(0.025,0.975)))
   
-  bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
+  bounds1 <- format(round(c(loess$val2+resid1[1],loess$val2+resid1[2]),1), nsmall=1)
+  bounds2 <- format(round(c(loess$val2+resid2[1],loess$val2+resid2[2]),1), nsmall=1)
+  
   
   swissmean_temp <- list(
     curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
@@ -79,7 +82,8 @@ calculate_swissmean_temp <- function (bulletin) {
     val_form_rec = recval_t, dev_form_rec = reca_t,
     all_years = year, loess = loess, signif = signif,
     climate_change_signal = diff,
-    y_since_preind = ydiff_ca, loess_bounds = bounds
+    y_since_preind = ydiff_ca, loess_bounds1 = bounds1,
+    loess_bounds2 = bounds2
   )
   
   # cache the results
