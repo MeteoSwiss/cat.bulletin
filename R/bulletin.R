@@ -1,4 +1,5 @@
 #' Create a bulletin
+#' @param bulletin_id a string identifing the type of the bulletin, e.g. \code{bulletin-monthly}
 #' @param bulletin_args a list of arguments 
 #' @param workdir working directory for bulletin creation
 #' @param bulletin_path the path to the directory where the bulletin will be created in
@@ -12,9 +13,13 @@ create_bulletin <- function(bulletin_id,
                             workdir = tempdir(),
                             bulletin_path = file.path(workdir, bulletin_dir)) {
   
+  # use a random string for id when no is given (testing purposes)
+  if (missing(bulletin_id))
+    bulletin_id = randomString()
+  
   language = match.arg(language)
   # set language in cat.lang
-  cat.lang::set.language(get_catlang_language_identifier(language))
+  cat.lang::set.language(cat.func::isolang2dwhlang(language))
   
   bulletin <- bulletin_args
   
@@ -30,6 +35,10 @@ create_bulletin <- function(bulletin_id,
   image_path <- file.path(bulletin_path, "images")
   dir.create(image_path)
   
+  # prepare cache path
+  cache_path <- file.path(bulletin_path, "cache")
+  dir.create(cache_path)
+  
   c(bulletin, 
     list(bulletin_id = bulletin_id,
          elements = list(),
@@ -37,19 +46,11 @@ create_bulletin <- function(bulletin_id,
          bulletin_path = bulletin_path,
          data_path = data_path,
          image_path = image_path,
+         cache_path = cache_path,
          bulletin_envir = new.env(),
          stage = "prod",
          language = language
     )
-  )
-}
-
-get_catlang_language_identifier <- function(language) {
-  switch(language,
-         "de" = "G",
-         "fr" = "F",
-         "it" = "I",
-         "en" = "E"
   )
 }
 
@@ -61,6 +62,48 @@ add_element <- function(bulletin, element) {
   bulletin
 }
 
+#' @rdname create_bulletin
+#' @inheritParams add_element
+#' @param type string The type of the element(s) 
+#' @param id string The id of the element
+has_element <- function(bulletin, type = NULL, id = NULL) {
+ 
+ if (!is.null(type) && !is.null(id))
+     stop("either look for type or id, not both")
+ 
+ if (!is.null(type)) {
+   types = unique(sapply(bulletin$elements, "[[", "type"))
+   
+   return(type %in% types)
+ }
+ 
+ if (!is.null(id)) {
+   ids = sapply(bulletin$elements, "[[", "id")
+   return(id %in% ids)
+ }
+ 
+  length(bulletin$elements) > 0
+}
+
+get_elements <- function(bulletin, type = NULL, id = NULL) {
+  if (!is.null(type) && !is.null(id))
+    stop("either look for type or id, not both")
+  
+  if (!is.null(type)) {
+    types = unique(sapply(bulletin$elements, "[[", "type"))
+    i <- which(sapply(types, "%in%", type))
+    return(bulletin$elements[i])
+  }
+  
+  if (!is.null(id)) {
+    ids = unique(sapply(bulletin$elements, "[[", "id"))
+    i <- which(sapply(ids, "%in%", id))
+    return(bulletin$elements[i])
+  }
+  
+  return(bulletin$elements)
+}
+
 #' Render a bulletin to markdown
 #' @inheritParams add_element
 #' @param filename The name of the file to write the R markdown to.
@@ -70,7 +113,7 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
   on.exit(close(file_conn))
   
   # write the R markdong front matter first
-  write_markdown_frontmatter(file_conn)
+  write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
   
   # add markdown for all elements
   for (element in bulletin$elements) {
@@ -81,13 +124,23 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
   filename
 }
 
-write_markdown_frontmatter <- function(file_conn) {
+write_markdown_frontmatter <- function(bulletin, file_conn) {
   front_matter <- c(
-    "---",
+    "---"
+  )
+  
+  if (has_element(bulletin, type = "title")) {
+    front_matter <- c(
+      front_matter,
+      paste("title:", get_elements(bulletin, type = "title")[[1]]$title)
+    )
+  }
+  
+  front_matter <- c(front_matter,
     "output:",
     "  pdf_document:",
     "    fig_caption: true",
-    "    fig_width: 5",
+    "    fig_width: 3",
     "header-includes:",
     "  - \\usepackage{xcolor}",
     #    "    includes:",
@@ -110,21 +163,27 @@ bulletin_to_pdf <- function(bulletin, filename = tempfile(fileext = ".pdf")) {
 
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
-  
-  xml <- xml2::xml_new_root(.value = "title", "Title")
+  xml <- xml2::xml_new_root(.value = "root")
+  root <- xml2::xml_root(xml)
   for (element in bulletin$elements) {
-    xml <- do.call(what = paste0(element$type, "_to_xml"), args = list(xml = xml, element = element))
+    log_debug("processing element", element$id)
+    xml <- do.call(what = paste0(element$type, "_to_xml"), args = list(xml = xml2::xml_root(xml), element = element))
   }
-  xml2::write_xml(xml, file = filename)
+  xml2::write_xml(xml2::xml_root(xml), file = filename)
   filename
 }
 
 #' @export
 bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) {
-  
+  bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
   bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
   withr::with_dir(new = file.path(bulletin$bulletin_path, ".."),
-                  code = utils::zip(zipfile = filename, files = bulletin$bulletin_dir)
+                  code = utils::zip(zipfile = filename, 
+                                    files = c(file.path(bulletin$bulletin_dir, "bulletin.xml"),
+                                              file.path(bulletin$bulletin_dir, "bulletin.pdf"),
+                                              file.path(bulletin$bulletin_dir, "images")
+                                    )
+                  )
   )
   filename
 }

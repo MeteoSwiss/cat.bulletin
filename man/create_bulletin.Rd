@@ -3,9 +3,12 @@
 \name{create_bulletin}
 \alias{create_bulletin}
 \alias{add_element}
+\alias{has_element}
 \title{Create a bulletin}
 \usage{
 create_bulletin(
+  bulletin_id,
+  language = c("de", "en", "fr", "it"),
   bulletin_args = list(),
   bulletin_dir = "bulletin",
   workdir = tempdir(),
@@ -13,8 +16,12 @@ create_bulletin(
 )
 
 add_element(bulletin, element)
+
+has_element(bulletin, type = NULL, id = NULL)
 }
 \arguments{
+\item{bulletin_id}{a string identifing the type of the bulletin, e.g. \code{bulletin-monthly}}
+
 \item{bulletin_args}{a list of arguments}
 
 \item{bulletin_dir}{the name of the directory within the bulletin_path where bulletin related files will be stored.}
@@ -26,6 +33,10 @@ add_element(bulletin, element)
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{element}{one of the bulletin elements}
+
+\item{type}{string The type of the element(s)}
+
+\item{id}{string The id of the element}
 }
 \value{
 an object that represents the bulletin content

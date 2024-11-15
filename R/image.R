@@ -1,8 +1,9 @@
-image_element <- function(filepath, filename = basename(filepath), caption) {
+image_element <- function(filepath, filename = basename(filepath), caption, label) {
   element <- bulletin_element(type = "image")
   element[["caption"]] <- caption
   element[["filename"]] <- filename
   element[["filepath"]] <- filepath
+  element[["label"]] <- label
   element
 }
 
@@ -13,21 +14,26 @@ image_element <- function(filepath, filename = basename(filepath), caption) {
 #' @param filepath the path to the image to add
 #' @param filename the name of the image within the bulletin (can differ from the filepath)
 #' @param caption image caption in the bulletin
+#' @param label optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.
 #' @examples 
 #' image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
 #' bulletin <- create_bulletin() %>%
 #'   add_image(filepath = image_filepath, caption = "An example figure.")
 #' @export
-add_image <- function(bulletin, filepath, filename = basename(filepath), caption = NULL) {
+add_image <- function(bulletin, filepath, filename = basename(filepath), caption = NULL, label = NULL) {
   assert_that(file.exists(filepath))
   newpath <- file.path(bulletin$bulletin_path, filename)
   file.copy(filepath, newpath, overwrite = TRUE)
-  add_element(bulletin, image_element(filename = filename, filepath = newpath, caption = caption))
+  add_element(bulletin, image_element(filename = filename, filepath = newpath, caption = caption, label = label))
 }
 
 image_to_markdown <- function(element) {
   # try to use knitr::include_graphics(rep("images/knit-logo.png", 3)) in an knitr junk!
-  paste0("![", element$caption, " \\label{fig1}](", element$filepath, ")", "\n")
+  # see also https://bookdown.org/yihui/rmarkdown-cookbook/figure-placement.html
+  # or https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
+  # control size: ![A nice image.](foo/bar.png){width=50%}
+  label <- if (!is.null(element$label)) paste0("\\label{", element$label, "}") else ""
+  paste0("![", element$caption, " ", label, "](", element$filepath, '){width=50%,pos="h"}', "\n")
   #         element$caption, "\n")
 }
 
@@ -40,8 +46,8 @@ image_to_markdwon2 <- function(element) {
 }
 
 image_to_xml <- function(xml, element) {
-  image_node <- xml2::xml_add_sibling(xml, .value = "image")
+  image_node <- xml2::xml_add_child(xml, .value = "image")
   xml2::xml_add_child(image_node, .value = "filename", element$filename)
   xml2::xml_add_child(image_node, .value = "caption", element$caption)
-  image_node
+  xml
 }

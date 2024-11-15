@@ -4,7 +4,13 @@
 \alias{add_image}
 \title{add an image with caption to a bulletin}
 \usage{
-add_image(bulletin, filepath, filename = basename(filepath), caption = NULL)
+add_image(
+  bulletin,
+  filepath,
+  filename = basename(filepath),
+  caption = NULL,
+  label = NULL
+)
 }
 \arguments{
 \item{bulletin}{the bulletin object to which to append the image element}
@@ -14,6 +20,8 @@ add_image(bulletin, filepath, filename = basename(filepath), caption = NULL)
 \item{filename}{the name of the image within the bulletin (can differ from the filepath)}
 
 \item{caption}{image caption in the bulletin}
+
+\item{label}{optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.}
 }
 \description{
 copies the image from the filepath to the bulletin directory and adds an image element
