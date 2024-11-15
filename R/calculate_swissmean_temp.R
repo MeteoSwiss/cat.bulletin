@@ -1,6 +1,12 @@
 calculate_swissmean_temp <- function (bulletin) {
-
+  
   log_info("Calculating swissmean for temperature")
+  
+  cache_file <- file.path(bulletin$cache_path, "swissmean_temp.Rdata")
+  if (file.exists(cache_file)) {
+    log_debug("... from cache")
+    return(readRDS(cache_file))
+  }
   
   # Download data
   filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
@@ -25,7 +31,7 @@ calculate_swissmean_temp <- function (bulletin) {
   if (acurr_t > 0) {
     acurr_t <- paste0("+", acurr_t)
   }
-
+  
   # rank swissmean    
   ranking <- sort.int(anom,decreasing=T,index.return=T)
   rankcurr <- which(ranking$ix==poscurr)
@@ -66,16 +72,18 @@ calculate_swissmean_temp <- function (bulletin) {
   
   bounds <- format(round(c(loess$val2+resid[1],loess$val2+resid[2]),1), nsmall=1)
   
-  return(
-    list (
-      curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
-      curr_rank = rankcurr, meas_start = ybeg,
-      ind_simyears = isimy, year_form_rec = recy,
-      val_form_rec = recval_t, dev_form_rec = reca_t,
-      all_years = year, loess = loess, signif = signif,
-      climate_change_signal = diff,
-      y_since_preind = ydiff_ca, loess_bounds = bounds
-    )
+  swissmean_temp <- list(
+    curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
+    curr_rank = rankcurr, meas_start = ybeg,
+    ind_simyears = isimy, year_form_rec = recy,
+    val_form_rec = recval_t, dev_form_rec = reca_t,
+    all_years = year, loess = loess, signif = signif,
+    climate_change_signal = diff,
+    y_since_preind = ydiff_ca, loess_bounds = bounds
   )
   
+  # cache the results
+  saveRDS(swissmean_temp, cache_file)
+  
+  swissmean_temp
 }

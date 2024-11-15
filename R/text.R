@@ -11,10 +11,11 @@ add_text <- function(bulletin, text) {
 }
 
 text_to_markdown <- function(element) {
-  element$text
+  paste0(element$text, "\n")
 }
 
 
 text_to_xml <- function(xml, element) {
-  xml2::xml_add_sibling(xml, .value = "text", element$text)
+  xml2::xml_add_child(xml, .value = "text", element$text)
+  xml
 }

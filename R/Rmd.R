@@ -21,3 +21,11 @@ Rmd_to_markdown <- function(element) {
   md <- readr::read_lines(tmpfile)
   md
 }
+
+
+Rmd_to_xml <- function(xml, element) {
+  md <- Rmd_to_markdown(element)
+  md <- paste(md, collapse = "\n")
+  xml2::xml_add_child(xml, .value = "text", md)
+  xml
+}

@@ -2,6 +2,12 @@ calculate_regional_differences <- function(bulletin) {
   
   log_info("Calculating regional differences")
   
+  cache_file <- file.path(bulletin$cache_path, "regional_differences.Rdata")
+  if (file.exists(cache_file)) {
+    log_debug("... from cache")
+    return(readRDS(cache_file))
+  }
+  
   # prepare climtable
   stations <- c("BER","SMA","GVE","BAS","ENG","SIO","LUG","SAM")
   
@@ -11,13 +17,7 @@ calculate_regional_differences <- function(bulletin) {
   if (bulletin$year %% 4 == 0) {dpm <- c(31,29,31,30,31,30,31,31,30,31,30,31)}
   enddate <- paste0(bulletin$year,mondate,dpm[bulletin$month])
   
-  fname_climtable <- paste0(bulletin$data_path,"/climtable.RData")
-  if (file.exists(fname_climtable)) {
-    load(fname_climtable)
-  } else {
-    data <- clim.table::climtable(period=c(begdate,enddate))
-    save(data, file = fname_climtable)
-  }
+  data <- clim.table::climtable(period=c(begdate,enddate), outDir = bulletin$data_path)
   
   # set region every station is belonging to
   vals <- data$dana$vals
@@ -29,7 +29,7 @@ calculate_regional_differences <- function(bulletin) {
   vals$Region[62:70] <- "Wallis"
   vals$Region[71:76] <- "Engadin"
   vals$Region[77:88] <- "Alpensüdseite"
-
+  
   ### TEMPERATURE ###
   # check whether all or a large fraction of the data
   # are either above, below or in the range of the norm
@@ -39,7 +39,7 @@ calculate_regional_differences <- function(bulletin) {
   a_bereich <- 1 - a_ueber - a_unter
   quac <- quantile(acurr_all,probs = c(0.16,0.84))
   quac[quac>0] <- paste0("+",quac[quac>0])
-                         
+  
   # monthly mean temp ranks at stations
   vals$Rank_T <- rep(NA,length(vals$Station))
   vals$firstmeas_T <- rep(NA,length(vals$Station))
@@ -54,13 +54,13 @@ calculate_regional_differences <- function(bulletin) {
       vals$firstmeas_T[s] <- recstat$firstmeas
     }
   }
-
+  
   diff_highlow <- abs(median(vals$Abw[vals$Hoehe>=1500],na.rm=T))-abs(median(vals$Abw[vals$Hoehe<1500],na.rm=T))
-
+  
   # stations with time series of more than 100 years
   ranky100 <- vals$Rank_T[vals$firstmeas_T<(bulletin$year-100)]
   r1y100 <- which(vals$firstmeas_T<(bulletin$year-100) & vals$Rank_T==1)
-
+  
   # greatest deviations in all regions
   regs <- unique(vals$Region)
   vhighest <- 1
@@ -96,7 +96,7 @@ calculate_regional_differences <- function(bulletin) {
   selreg <- rbind(selhigh,sellow)
   sellow_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow$Station)$station_name)
   selhigh_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh$Station)$station_name)
-
+  
   # generate subset for a printable table
   # (reduced to the stations defined above)
   subset_climtab <- vals[which(vals$Station %in% stations),]
@@ -147,7 +147,7 @@ calculate_regional_differences <- function(bulletin) {
       paste0(vals$Rank_R_dry, "\u2191")
     )
   )
-
+  
   # stations with time series of more than 100 years
   ranky100_R_wet <- vals$Rank_R_wet[vals$firstmeas_R<(bulletin$year-100)]
   ranky100_R_dry <- vals$Rank_R_dry[vals$firstmeas_R<(bulletin$year-100)]
@@ -201,21 +201,23 @@ calculate_regional_differences <- function(bulletin) {
   rownames(subset_climtab_R) <- NULL
   attributes(subset_climtab_R)$names <- c("Station","Monatssumme (mm)","Norm (mm)","% der Norm","Rang","Messbeginn")
   
-  return(
-    list (
-      # temperature
-      allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
-      quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
-      selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, diff_highlow = diff_highlow, 
-      ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab,
-      # precipitation 
-      allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
-      anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
-      regshigh_R = regshigh_R, numb_stats_low_R = mlow_R, regslow_R = regslow_R, 
-      selhigh_stats_R = selhigh_stats_R, sellow_stats_R = sellow_stats_R, 
-      subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
-      rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
-    )
+  regional_differences <- list(
+    # temperature
+    allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
+    quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
+    selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, diff_highlow = diff_highlow, 
+    ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab,
+    # precipitation 
+    allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
+    anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
+    regshigh_R = regshigh_R, numb_stats_low_R = mlow_R, regslow_R = regslow_R, 
+    selhigh_stats_R = selhigh_stats_R, sellow_stats_R = sellow_stats_R, 
+    subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
+    rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
   )
-
+  
+  # cache the results
+  saveRDS(regional_differences, cache_file)
+  
+  regional_differences
 }

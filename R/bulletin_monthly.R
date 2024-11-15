@@ -30,28 +30,58 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
     monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
-  bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
+  #bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
+  #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
+  bulletin_to_webzip(bulletin)
 }
 
 monatsbulletin_head <- function(bulletin) {
   
   log_info("bulletin head")
   
-  add_text(bulletin, paste("# Klimabulletin", bulletin$month_str, bulletin$year)) %>%
-    add_text(paste("Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."))
+  title <- paste("# Klimabulletin", bulletin$month_str, bulletin$year)
+  bulletin <- bulletin %>% add_title(title) 
+  
+  leadtext <- "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."
+  bulletin <- bulletin %>% add_text(leadtext) 
   
   basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
+  yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))
   
-  if (bulletin$month < 10) { 
-    monpath <- paste0("0",bulletin$month)
-  } else {
-    monpath <- bulletin$month
+  # teaser text
+  
+  get_teaser_text <- function(basepath, yearmonth) {
+    filepath <- file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
+    if (assertthat::is.readable(filepath)) {
+      lines <- readLines(filepath)
+      if (length(lines) > 1)
+        warning("teaser_text.txt contains more than one line. Using only the first.")
+      lines[1]
+    } else {
+      log_debug("Did not found a teaser text for the current month. Using default...")
+    }
   }
-  monpath <- paste0(bulletin$year,monpath)
-  teasertext <- readLines(paste0(basepath,monpath,"/",monpath,"_teaser_text.txt"), n = 1)
   
-  add_image(bulletin, filename = paste0(monpath,"_teaser_image.jpg"), filepath = paste0(basepath,monpath,"/",monpath,"_teaser_image.jpg"), caption=teasertext)
+  teasertext <- get_teaser_text(basepath, yearmonth)
   
+  #teaser image
+  
+  get_teaser_image <- function(basepath, yearmonth) {
+    filepath = file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_image.jpg"))
+    if (assertthat::is.readable(filepath)) {
+      filepath
+    } else {
+      log_debug("Did not found a teaser image for the current month. Using default...")
+      system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
+    }
+  }
+  
+  bulletin <- bulletin %>% 
+    add_image(filename = "teaser_image.jpg", 
+              filepath = get_teaser_image(basepath, yearmonth),
+              caption = teasertext)
+  
+  bulletin
 }
 
 monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
@@ -78,10 +108,12 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   
   # Add images 
   filename = "monatsbilanz_temp_abs.png"
-  bulletin <- add_image(bulletin = bulletin,
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
-                        filename = filename,
-                        caption = "This is a caption.")
+  bulletin <- bulletin %>% add_image(
+    filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
+    filename = filename,
+    caption = "This is a caption.",
+    label = "monatsbilanz_temp_abs"
+  )
   
   filename = "monatsbilanz_temp_anom.png"
   bulletin <- add_image(bulletin = bulletin,
@@ -103,8 +135,8 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
                         caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,"."))
   
   # example table
-  #  regdata_table <- regdata_example_table(bulletin)
-  #  bulletin <- add_flextable(bulletin, flextable = regdata_table)
+  regdata_table <- regdata_example_table(bulletin)
+  bulletin <- add_flextable(bulletin, flextable = regdata_table)
   
   bulletin
 }
@@ -147,6 +179,8 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
+  
+  bulletin
 }
 
 monatsbilanz_sun <- function(bulletin) {
@@ -210,7 +244,7 @@ add_article <- function(word) {
 }
 
 ordinal_number <- function(number, gender, language) {
-  lang = get_catlang_language_identifier(language)
+  lang = cat.func::isolang2dwhlang(language)
   # Validate inputs
   if (!is.numeric(number)) stop("Number must be numeric.")
   if (!lang %in% c("G", "F", "I")) stop("Invalid language. Use G for German, F for French, I or Italian.")
@@ -254,7 +288,12 @@ collapse_sentence <- function(strings) {
   }
 }
 
-get_final_date <- function(year, month) {
+#' Get the publication date for the monthly bulletin formatted as string
+#' @return a string of the date
+#' @param year
+#' @param month
+#' @param language iso country id
+get_final_date <- function(year, month, language) {
   # Get the current year, month, and day
   current_date <- Sys.Date()
   current_year <- lubridate::year(current_date)
@@ -269,7 +308,10 @@ get_final_date <- function(year, month) {
     # Get the last day of the specified month in the past
     last_date <- lubridate::ceiling_date(as.Date(paste(year, month, "01", sep = "-")), "month") - 1
   }
-  Sys.setlocale("LC_TIME", "de_DE.UTF-8")
-  last_date <- format(last_date, "%d. %B %Y")
+  locale <- paste0(language, "_CH.UTF-8")
+  last_date <- withr::with_locale(
+    new = c("LC_TIME" = locale),
+    code = format(last_date, "%d. %B %Y")
+  )
   return(last_date)
 }
