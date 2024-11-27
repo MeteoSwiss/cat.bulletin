@@ -45,12 +45,12 @@ monatsbulletin_head <- function(bulletin) {
   leadtext <- "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."
   bulletin <- bulletin %>% add_text(leadtext) 
   
-  basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
   yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))
   
   # teaser text
-  get_teaser_text <- function(basepath, yearmonth) {
-    filepath <- file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
+  get_teaser_text <- function(bulletin_prod_path, yearmonth) {
+    filepath <- file.path(bulletin_prod_path, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
     if (assertthat::is.readable(filepath)) {
       lines <- readLines(filepath)
       if (length(lines) > 1)
@@ -61,12 +61,12 @@ monatsbulletin_head <- function(bulletin) {
     }
   }
   
-  teasertext <- get_teaser_text(basepath, yearmonth)
+  teasertext <- get_teaser_text(bulletin_prod_path, yearmonth)
   
   #teaser image
   
-  get_teaser_image <- function(basepath, yearmonth) {
-    filepath = file.path(basepath, yearmonth, "teaser_image.jpg")
+  get_teaser_image <- function(bulletin_prod_path, yearmonth) {
+    filepath = file.path(bulletin_prod_path, yearmonth, "teaser_image.jpg")
     if (assertthat::is.readable(filepath)) {
       filepath
     } else {
@@ -77,7 +77,7 @@ monatsbulletin_head <- function(bulletin) {
   
   bulletin <- bulletin %>% 
     add_image(filename = "teaser_image.jpg", 
-              filepath = get_teaser_image(basepath, yearmonth),
+              filepath = get_teaser_image(bulletin_prod_path, yearmonth),
               caption = teasertext)
   
   bulletin
