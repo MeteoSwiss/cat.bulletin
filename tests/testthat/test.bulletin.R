@@ -73,3 +73,14 @@ test_that("get_elements", {
   expect_equal(get_elements(bulletin), bulletin$elements)
   
 })
+
+test_that("frontmatter", {
+  bulletin <- create_bulletin()
+  filename <- tempfile()
+  file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
+  
+  # write the R markdong front matter first
+  write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
+ close(file_conn)
+  cat(paste(readLines(filename), collapse = "\n"))
+})

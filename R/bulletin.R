@@ -23,21 +23,29 @@ create_bulletin <- function(bulletin_id,
   
   bulletin <- bulletin_args
   
+  create_path <- function(path, subpath = NULL) {
+    if (!is.null(subpath)) path <- file.path(bulletin_path, subpath)
+    
+    if (dir.exists(path)) {
+      log_debug(paste0("directory '", path, "' already exists."))
+    } else {
+      dir.create(path)
+    }
+    path
+  }
+  
   # prepare bulletin dir
-  bulletin_path <- normalizePath(bulletin_path)
-  dir.create(bulletin_path)
+  bulletin_path <- suppressWarnings(normalizePath(bulletin_path)) # expand ~, ".", etc. 
+  bulletin_path <- create_path(bulletin_path)
   
   # prepare data path
-  data_path <- file.path(bulletin_path, "data")
-  dir.create(data_path)
+  data_path <- create_path(bulletin_path, "data")
   
   # prepare image path
-  image_path <- file.path(bulletin_path, "images")
-  dir.create(image_path)
+  image_path <- create_path(bulletin_path, "images")
   
   # prepare cache path
-  cache_path <- file.path(bulletin_path, "cache")
-  dir.create(cache_path)
+  cache_path <- create_path(bulletin_path, "cache")
   
   c(bulletin, 
     list(bulletin_id = bulletin_id,
@@ -121,8 +129,14 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
       lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
       readr::write_lines(lines, file = file_conn)
     },
-    error = function(e)
-      warning(paste("Could not process element", element$id, ":", e))
+    error = function(e) {
+      warning_message <- paste("Could not process element", element$id, ":", e)
+      warning(warning_message)
+      #readr::write_lines(paste('<span style="color:red">',  warning_message, '</span>'),
+      #                   file = file_conn)
+      #readr::write_lines( paste("Could not process element", element$id),
+      #                   file = file_conn)     
+    }
     )
   }
   
@@ -141,13 +155,23 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
     )
   }
   
+  babel <- switch(bulletin$language,
+                  "de" = "ngerman",
+                  "fr" = "french", 
+                  "it" = "italian",
+                  "en" = "british",
+                  stop("unknown language")
+                  )
+  
   front_matter <- c(front_matter,
                     "output:",
                     "  pdf_document:",
                     "    fig_caption: true",
                     "    fig_width: 3",
+#                    paste0("    lang: ", bulletin$language, "-CH"),
                     "header-includes:",
                     "  - \\usepackage{xcolor}",
+                    paste0("  - \\usepackage[", babel, "]{babel}"),
                     #    "    includes:",
                     #    "      in_header: 'preamble.tex',
                     "---"
