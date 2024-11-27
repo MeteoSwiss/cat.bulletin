@@ -67,21 +67,21 @@ add_element <- function(bulletin, element) {
 #' @param type string The type of the element(s) 
 #' @param id string The id of the element
 has_element <- function(bulletin, type = NULL, id = NULL) {
- 
- if (!is.null(type) && !is.null(id))
-     stop("either look for type or id, not both")
- 
- if (!is.null(type)) {
-   types = unique(sapply(bulletin$elements, "[[", "type"))
-   
-   return(type %in% types)
- }
- 
- if (!is.null(id)) {
-   ids = sapply(bulletin$elements, "[[", "id")
-   return(id %in% ids)
- }
- 
+  
+  if (!is.null(type) && !is.null(id))
+    stop("either look for type or id, not both")
+  
+  if (!is.null(type)) {
+    types = unique(sapply(bulletin$elements, "[[", "type"))
+    
+    return(type %in% types)
+  }
+  
+  if (!is.null(id)) {
+    ids = sapply(bulletin$elements, "[[", "id")
+    return(id %in% ids)
+  }
+  
   length(bulletin$elements) > 0
 }
 
@@ -117,8 +117,13 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
   
   # add markdown for all elements
   for (element in bulletin$elements) {
-    lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
-    readr::write_lines(lines, file = file_conn)
+    tryCatch({
+      lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
+      readr::write_lines(lines, file = file_conn)
+    },
+    error = function(e)
+      warning(paste("Could not process element", element$id, ":", e))
+    )
   }
   
   filename
@@ -137,15 +142,15 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
   }
   
   front_matter <- c(front_matter,
-    "output:",
-    "  pdf_document:",
-    "    fig_caption: true",
-    "    fig_width: 3",
-    "header-includes:",
-    "  - \\usepackage{xcolor}",
-    #    "    includes:",
-#    "      in_header: 'preamble.tex',
-    "---"
+                    "output:",
+                    "  pdf_document:",
+                    "    fig_caption: true",
+                    "    fig_width: 3",
+                    "header-includes:",
+                    "  - \\usepackage{xcolor}",
+                    #    "    includes:",
+                    #    "      in_header: 'preamble.tex',
+                    "---"
   )
   readr::write_lines(front_matter, file = file_conn)
 }
