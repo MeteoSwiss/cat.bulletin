@@ -8,11 +8,13 @@
 create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE, ...) {
   
   month_str <- cat.lang::get.text(paste("month", month, sep="."))
+  nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               bulletin_args = list(year = year,
                                                    month = month,
                                                    month_str = month_str,
+                                                   nextmonth_str = nextmonth_str,
                                                    provisional = provisional),
                               ...)
   
@@ -21,12 +23,12 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   
   bulletin <- bulletin %>%
     monatsbulletin_head() %>%
+    monatsbulletin_disclaimer() %>%
     monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
+    temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
     monatsbilanz_precip(regdiff = regdiff) %>%
     monatsbilanz_sun() %>%
-    temporal_evolution(swissmean = swissmean) %>%
     monatsbulletin_daily_timeseries() %>%
-    monatsbulletin_disclaimer() %>%
     monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
@@ -92,51 +94,38 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   #   month <- as.character(month)
   # }
   
-  # # daily records
-  # daily_records = day_records(ycurr = ycurr, mon = mon)
-  # 
-  # numrec_Txx = daily_records$numrec_Txx
-  # Txx_sorted_subset = daily_records$Txx_sorted_subset
-  # Txx_sorted_subset_pretty = daily_records$Txx_sorted_subset_pretty
-  # 
-  # numrec_Tnx = daily_records$numrec_Tnx
-  # Tnx_sorted_subset = daily_records$Tnx_sorted_subset
-  # Tnx_sorted_subset_pretty = daily_records$Tnx_sorted_subset_pretty
-  
-  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp")
-  
-  # Add images 
-  filename = "monatsbilanz_temp_abs.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
-    filename = filename,
-    caption = "This is a caption.",
-    label = "monatsbilanz_temp_abs"
-  )
-  
-  filename = "monatsbilanz_temp_anom.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
-                        filename = filename,
-                        caption = "This is a caption.")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
   # Add images 
   filename = "monatsbilanz_temp_map_abs.png"
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in °C für den ",bulletin$month_str," ",bulletin$year,"."))
+                        caption = paste0("Monatsmitteltemperaturen in °C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 °C sind rot eingefärbt, Werte unter 0 °C sind blau."))
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Norm 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,"."))
+                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,". Liegen die Temperaturen über der Referenz, sind die entsprechenden Bereiche rot eingefärbt, blaue Gebiete weisen Temperaturen unter der Referenz auf."))
   
-  # example table
-  regdata_table <- regdata_example_table(bulletin)
-  bulletin <- bulletin %>% add_flextable(flextable = regdata_table)
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
+  # filename = "monatsbilanz_temp_abs.png"
+  # bulletin <- bulletin %>% add_image(
+  #   filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
+  #   filename = filename,
+  #   caption = "This is a caption.",
+  #   label = "monatsbilanz_temp_abs"
+  # )
+  # 
+  # filename = "monatsbilanz_temp_anom.png"
+  # bulletin <- bulletin %>% add_image(
+  #                       filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
+  #                       filename = filename,
+  #                       caption = "This is a caption.")
+  
+  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab)
   bulletin
 }
 
@@ -201,10 +190,10 @@ monatsbilanz_sun <- function(bulletin) {
                         caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
   
 
-bulletin  
+  bulletin  
 }
 
-temporal_evolution <- function(bulletin, swissmean) {
+temporal_evolution <- function(bulletin, swissmean, regdiff) {
   
   log_info("temporal_evolution")
   
