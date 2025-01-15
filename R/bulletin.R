@@ -4,6 +4,7 @@
 #' @param workdir working directory for bulletin creation
 #' @param bulletin_path the path to the directory where the bulletin will be created in
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
+#' @param metadata a bulletin_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}
 #' @return an object that represents the bulletin content
 #' @export
 create_bulletin <- function(bulletin_id,
@@ -11,7 +12,9 @@ create_bulletin <- function(bulletin_id,
                             bulletin_args = list(),
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
-                            bulletin_path = file.path(workdir, bulletin_dir)) {
+                            bulletin_path = file.path(workdir, bulletin_dir),
+                            metadata = bulletin_metadata()
+                            ) {
   
   # use a random string for id when no is given (testing purposes)
   if (missing(bulletin_id))
@@ -45,6 +48,9 @@ create_bulletin <- function(bulletin_id,
   # prepare cache path
   cache_path <- create_path(bulletin_path, "cache")
   
+  #
+  assert_bulletin_metdata(metadata, languages = languagues)
+  
   bulletin <- c(bulletin, 
                 list(bulletin_id = bulletin_id,
                      bulletin_dir = bulletin_dir,
@@ -54,7 +60,8 @@ create_bulletin <- function(bulletin_id,
                      cache_path = cache_path,
                      bulletin_envir = new.env(),
                      stage = "prod",
-                     languages = languages
+                     languages = languages,
+                     metadata = metadata
                 )
   )
   
