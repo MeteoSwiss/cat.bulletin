@@ -46,16 +46,16 @@ create_bulletin <- function(bulletin_id,
   cache_path <- create_path(bulletin_path, "cache")
   
   bulletin <- c(bulletin, 
-    list(bulletin_id = bulletin_id,
-         bulletin_dir = bulletin_dir,
-         bulletin_path = bulletin_path,
-         data_path = data_path,
-         image_path = image_path,
-         cache_path = cache_path,
-         bulletin_envir = new.env(),
-         stage = "prod",
-         languages = languages
-    )
+                list(bulletin_id = bulletin_id,
+                     bulletin_dir = bulletin_dir,
+                     bulletin_path = bulletin_path,
+                     data_path = data_path,
+                     image_path = image_path,
+                     cache_path = cache_path,
+                     bulletin_envir = new.env(),
+                     stage = "prod",
+                     languages = languages
+                )
   )
   
   elements_slots <- languaged_elements(languages)
@@ -149,7 +149,7 @@ bulletin_to_markdown <- function(bulletin,
                                  language = bulletin$language, 
                                  filename = tempfile(pattern = languaged("bulletin", language),
                                                      fileext = ".Rmd")
-                                 ) {
+) {
   bulletin <- set_active_language(bulletin, language)
   
   file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
@@ -196,14 +196,14 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                   "it" = "italian",
                   "en" = "british",
                   stop("unknown language")
-                  )
+  )
   
   front_matter <- c(front_matter,
                     "output:",
                     "  pdf_document:",
                     "    fig_caption: true",
                     "    fig_width: 3",
-#                    paste0("    lang: ", bulletin$language, "-CH"),
+                    #                    paste0("    lang: ", bulletin$language, "-CH"),
                     "header-includes:",
                     "  - \\usepackage{xcolor}",
                     paste0("  - \\usepackage[", babel, "]{babel}"),
@@ -224,7 +224,7 @@ bulletin_to_pdf <- function(bulletin,
                             language = bulletin$language, 
                             filename = tempfile(pattern = languaged("bulletin", language),
                                                 fileext = ".pdf")
-                            ) {
+) {
   log_debug("Processing bulletin to pdf via markdown...")
   markdown_file = bulletin_to_markdown(bulletin, language = language)
   log_debug("Processing file", markdown_file, "to pdf.")
@@ -234,11 +234,22 @@ bulletin_to_pdf <- function(bulletin,
 
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
-  xml <- xml2::xml_new_root(.value = "root")
-  root <- xml2::xml_root(xml)
-  for (element in bulletin$elements) {
+  language = bulletin$language
+  xml <- xml2::xml_new_root(.value = "publication-page", 
+                            path="/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/neues-bulletin")
+  root_node <- xml2::xml_root(xml)
+  metadata_node <- xml2::xml_add_child(root_node, .value = "metadata")
+  content_node <- xml2::xml_add_child(root_node, .value = "content")
+  for (element in get_elements(bulletin)) {
     log_debug("processing element", element$id)
-    xml <- do.call(what = paste0(element$type, "_to_xml"), args = list(xml = xml2::xml_root(xml), element = element))
+    function_name <- paste0(element$type, "_to_xml")
+    xml_node <- switch(element$type,
+                       title = root_node,
+                       content_node
+    )
+    
+    do.call(what = function_name, 
+            args = list(xml = xml_node, element = element, language = language))
   }
   xml2::write_xml(xml2::xml_root(xml), file = filename)
   filename
