@@ -7,7 +7,7 @@
 #' @return an object that represents the bulletin content
 #' @export
 create_bulletin <- function(bulletin_id,
-                            language = c("de", "en", "fr", "it"),
+                            languages = c("de", "en", "fr", "it"),
                             bulletin_args = list(),
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
@@ -17,9 +17,7 @@ create_bulletin <- function(bulletin_id,
   if (missing(bulletin_id))
     bulletin_id = randomString()
   
-  language = match.arg(language)
-  # set language in cat.lang
-  cat.lang::set.language(cat.func::isolang2dwhlang(language))
+  languages = match.arg(languages, several.ok = TRUE)
   
   bulletin <- bulletin_args
   
@@ -47,9 +45,8 @@ create_bulletin <- function(bulletin_id,
   # prepare cache path
   cache_path <- create_path(bulletin_path, "cache")
   
-  c(bulletin, 
+  bulletin <- c(bulletin, 
     list(bulletin_id = bulletin_id,
-         elements = list(),
          bulletin_dir = bulletin_dir,
          bulletin_path = bulletin_path,
          data_path = data_path,
@@ -57,66 +54,104 @@ create_bulletin <- function(bulletin_id,
          cache_path = cache_path,
          bulletin_envir = new.env(),
          stage = "prod",
-         language = language
+         languages = languages
     )
   )
-}
-
-#' @rdname create_bulletin
-#' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
-#' @param element one of the bulletin elements
-add_element <- function(bulletin, element) {
-  bulletin$elements <- append(bulletin$elements, list(element))
+  
+  elements_slots <- languaged_elements(languages)
+  for (slot in elements_slots)
+    bulletin[[slot]] <- list()
+  
+  bulletin <- set_active_language(bulletin)
   bulletin
 }
 
+languaged_elements <- function(language) {
+  languaged("elements", language)
+}
+
+#' Set the active language for the bulletin
+#' 
+#' When compiling input
+set_active_language <- function(bulletin, language = bulletin$languages[1]) {
+  # set language in cat.lang
+  cat.lang::set.language(cat.func::isolang2dwhlang(language))
+  # set language in bulletin
+  bulletin$language <- language
+  bulletin
+}
+
+#' Adds an element to a bulletin
+#' @rdname create_bulletin
+#' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
+#' @param element one of the bulletin elements
+add_element <- function(bulletin, element, language = bulletin$language) {
+  slot <- languaged_elements(language)
+  bulletin[[slot]] <- append(bulletin[[slot]], list(element))
+  bulletin
+}
+
+#' Checks if the bulletin has an element in the given language
 #' @rdname create_bulletin
 #' @inheritParams add_element
 #' @param type string The type of the element(s) 
 #' @param id string The id of the element
-has_element <- function(bulletin, type = NULL, id = NULL) {
+has_element <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {
   
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
   
+  slot <- languaged_elements(language)
+  
   if (!is.null(type)) {
-    types = unique(sapply(bulletin$elements, "[[", "type"))
+    types = unique(sapply(bulletin[[slot]], "[[", "type"))
     
     return(type %in% types)
   }
   
   if (!is.null(id)) {
-    ids = sapply(bulletin$elements, "[[", "id")
+    ids = sapply(bulletin[[slot]], "[[", "id")
     return(id %in% ids)
   }
   
-  length(bulletin$elements) > 0
+  length(bulletin[[slot]]) > 0
 }
 
-get_elements <- function(bulletin, type = NULL, id = NULL) {
+get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
   
+  slot <- languaged_elements(language)
+  
   if (!is.null(type)) {
-    types = unique(sapply(bulletin$elements, "[[", "type"))
+    types = unique(sapply(bulletin[[slot]], "[[", "type"))
     i <- which(sapply(types, "%in%", type))
-    return(bulletin$elements[i])
+    return(bulletin[[slot]][i])
   }
   
   if (!is.null(id)) {
-    ids = unique(sapply(bulletin$elements, "[[", "id"))
+    ids = unique(sapply(bulletin[[slot]], "[[", "id"))
     i <- which(sapply(ids, "%in%", id))
-    return(bulletin$elements[i])
+    return(bulletin[[slot]][i])
   }
   
-  return(bulletin$elements)
+  return(bulletin[[slot]])
 }
 
 #' Render a bulletin to markdown
+#' 
+#' @details 
+#' This function will set the current active language to language as a side effect.
 #' @inheritParams add_element
 #' @param filename The name of the file to write the R markdown to.
 #' @export
-bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")) {
+bulletin_to_markdown <- function(bulletin, 
+                                 language = bulletin$language, 
+                                 filename = tempfile(pattern = languaged("bulletin", language),
+                                                     fileext = ".Rmd")
+                                 ) {
+  bulletin <- set_active_language(bulletin, language)
+  
   file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
   on.exit(close(file_conn))
   
@@ -124,7 +159,7 @@ bulletin_to_markdown <- function(bulletin, filename = tempfile(fileext = ".Rmd")
   write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
   
   # add markdown for all elements
-  for (element in bulletin$elements) {
+  for (element in bulletin[[languaged_elements(language)]]) {
     tryCatch({
       lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
       readr::write_lines(lines, file = file_conn)
@@ -182,11 +217,18 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
 #' Render a bulletin to pdf
 #' @inheritParams add_element
 #' @param filename The name of the file to write the pdf.
+#' @details 
+#' This function will set the current active language to language as a side effect.
 #' @export
-bulletin_to_pdf <- function(bulletin, filename = tempfile(fileext = ".pdf")) {
+bulletin_to_pdf <- function(bulletin, 
+                            language = bulletin$language, 
+                            filename = tempfile(pattern = languaged("bulletin", language),
+                                                fileext = ".pdf")
+                            ) {
   log_debug("Processing bulletin to pdf via markdown...")
-  markdown_file = bulletin_to_markdown(bulletin)
+  markdown_file = bulletin_to_markdown(bulletin, language = language)
   log_debug("Processing file", markdown_file, "to pdf.")
+  log_debug("Expected pdf-file:", filename)
   rmarkdown::render(markdown_file, envir = bulletin$bulletin_envir, output_format = "pdf_document", output_file = filename, clean = FALSE)
 }
 

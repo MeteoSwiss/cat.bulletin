@@ -1,9 +1,15 @@
+
+test_that("Create bulletin contains element slots for all languages", {
+  bulletin <- create_bulletin() 
+  expect_contains(names(bulletin), languaged("elements", bulletin$languages))
+})
+  
 test_that("Create bulletin with text elements", {
-  bulletin <- create_bulletin() %>%
+  language = "de"
+  bulletin <- create_bulletin(languages = language) %>%
     add_text("# This is a title") %>%
     add_text("This is normal text.")
-  expect_named(bulletin, "elements")
-  expect_equal(length(bulletin$elements), 2)
+  expect_length(bulletin[[languaged_elements(language)]], 2)
 })
 
 
@@ -17,7 +23,7 @@ test_that("Create markdown file from bulletin", {
   
   filename <- bulletin_to_markdown(bulletin)
   md <- readr::read_lines(filename)
-  expect_equal(md, text)
+  expect_snapshot(md)
 })
 
 test_that("Create pdf from bulletin", {
@@ -36,12 +42,14 @@ test_that("has_element", {
   title <- "# This is a title"
   text <- "This is normal text."
   
-  bulletin <- create_bulletin() %>%
+  language = "de"
+  
+  bulletin <- create_bulletin(languages = language) %>%
     add_text(text) %>%
     add_title(title)
   
-  text_element = bulletin$elements[[1]]
-  title_element = bulletin$elements[[2]]
+  text_element = bulletin[[languaged_elements(language)]][[1]]
+  title_element = bulletin[[languaged_elements(language)]][[2]]
   
   expect_true(has_element(bulletin, type = "title"))
   expect_true(has_element(bulletin, type = "text"))
@@ -57,12 +65,14 @@ test_that("get_elements", {
   title <- "# This is a title"
   text <- "This is normal text."
   
-  bulletin <- create_bulletin() %>%
+  language = "de"
+  
+  bulletin <- create_bulletin(languages = language) %>%
     add_text(text) %>%
     add_title(title)
   
-  text_element = bulletin$elements[[1]]
-  title_element = bulletin$elements[[2]]
+  text_element = bulletin[[languaged_elements(language)]][[1]]
+  title_element = bulletin[[languaged_elements(language)]][[2]]
   
   expect_equal(get_elements(bulletin, type = "title"), list(title_element))
   expect_equal(get_elements(bulletin, type = "text"), list(text_element))
@@ -75,12 +85,12 @@ test_that("get_elements", {
 })
 
 test_that("frontmatter", {
-  bulletin <- create_bulletin()
+  bulletin <- create_bulletin(languages = "fr")
   filename <- tempfile()
   file_conn <- file(filename, open = "wb") # readr::write_lines only supports binary connections
   
   # write the R markdong front matter first
   write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
- close(file_conn)
-  cat(paste(readLines(filename), collapse = "\n"))
+  close(file_conn)
+  expect_snapshot_file(filename)
 })
