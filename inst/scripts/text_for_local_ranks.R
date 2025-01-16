@@ -1,6 +1,6 @@
 library(mchdwh)
 
-df <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, year = 2024)
+df  <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, year = 2024)
 df2 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, ranking = 2)
 df1 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, ranking = 1)
 
