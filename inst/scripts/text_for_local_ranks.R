@@ -44,11 +44,14 @@ generate_highest_rank_sentence <- function(rank_summary, stations_by_rank, tempe
     } else {
       previous_records <- df1[df1$nat_abbr %in% stations, ]
     }
-    shortest_period <- as.numeric(substr(previous_records$till_date,1,4))-as.numeric(substr(previous_records$min_since_date,1,4))+1
+    sw <- ifelse(highest_rank == 1, "waren", "sind")
+    prevrec_stat_names <- mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$station_name[order(mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$nat_abbr,previous_records$nat_abbr)]
+    shortest_period <- as.numeric(substr(previous_records$till_date,1,4)) - 
+      as.numeric(substr(previous_records$min_since_date,1,4)) + 1
     shortest_period <- trunc(shortest_period/10)*10
     shortest_period <- min(shortest_period)
     previous_record_info <- paste0(
-      previous_records$nat_abbr, 
+      prevrec_stat_names, 
       " (", 
       sprintf("%.1f", previous_records$value), 
       " °C, ", 
@@ -56,8 +59,8 @@ generate_highest_rank_sentence <- function(rank_summary, stations_by_rank, tempe
       ")"
     )
     previous_record_sentence <- sprintf(
-      "Die bisherigen Monatsrekorde an diesen Messstationen sind: %s.", 
-      paste(previous_record_info, collapse = ", ")
+      "Die bisherigen Monatsrekorde an diesen Messstationen %s: %s.", 
+      sw, paste(previous_record_info, collapse = ", ")
     )
     
     sentence <- sprintf(
@@ -67,8 +70,8 @@ generate_highest_rank_sentence <- function(rank_summary, stations_by_rank, tempe
   } else {
     # Only mention the count
     sentence <- sprintf(
-      "Die Monatsmitteltemperatur im August 2024 erreicht an %d %s den %d. Rang.", 
-      count, station_word, highest_rank
+      "Die Monatsmitteltemperatur im August 2024 erreicht an %d %s mit Messreihen von über %i Jahren den %d. Rang.", 
+      count, station_word, shortest_period, highest_rank
     )
   }
   
