@@ -99,51 +99,58 @@ calculate_regional_differences <- function(bulletin) {
   subset_climtab <- flextable::set_caption(subset_climtab, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
   
   # Local temperature ranking
-  df <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, year = 2024)
-  df2 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, ranking = 2)
-  df1 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = 8, ranking = 1)
+  df <- NULL
+  result <- tryCatch(
+    {df <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = bulletin$month, year = bulletin$year)}, error = function(e) {
+      message("Keine Rekorde in diesem Monat zu diesem Parameter: ", e$message)
+      NULL
+    }
+  )
+  if (!is.null(df)) {
+    df2 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = bulletin$month, ranking = 2)
+    df1 <- mchdwh::dwhget_extreme_values(param_short = "ths20m0x", ref_period_id = 1, date_range_id = bulletin$month, ranking = 1)
   
-  # Define the ranks to consider
-  ranks_rec <- 1:10
+    # Define the ranks to consider
+    ranks_rec <- 1:10
   
-  # Create the rank summary and group stations and temperatures by rank
-  rank_summary <- table(factor(df$ranking, levels = ranks_rec))
-  stations_by_rank <- lapply(ranks_rec, function(r) {
-    df$nat_abbr[df$ranking == r]
-  })
-  temperatures_by_rank <- lapply(ranks_rec, function(r) {
-    df$value[df$ranking == r]
-  })
-  names(stations_by_rank) <- ranks_rec  # Assign numeric rank names directly
-  names(temperatures_by_rank) <- ranks_rec
+    # Create the rank summary and group stations and temperatures by rank
+    rank_summary <- table(factor(df$ranking, levels = ranks_rec))
+    stations_by_rank <- lapply(ranks_rec, function(r) {
+      df$nat_abbr[df$ranking == r]
+    })
+    temperatures_by_rank <- lapply(ranks_rec, function(r) {
+      df$value[df$ranking == r]
+    })
+    names(stations_by_rank) <- ranks_rec  # Assign numeric rank names directly
+    names(temperatures_by_rank) <- ranks_rec
 
-  # Find the highest (smallest) rank with at least one station
-  highest_rank <- min(as.numeric(names(rank_summary)[rank_summary > 0]), na.rm = TRUE)
+    # Find the highest (smallest) rank with at least one station
+    highest_rank <- min(as.numeric(names(rank_summary)[rank_summary > 0]), na.rm = TRUE)
   
-  # Get the count, stations, and temperatures for the highest rank
-  count_hr <- rank_summary[[as.character(highest_rank)]]
-  stations_longseries <- stations_by_rank[[as.character(highest_rank)]]
-  temperatures_longseries <- temperatures_by_rank[[as.character(highest_rank)]]
+    # Get the count, stations, and temperatures for the highest rank
+    count_hr <- rank_summary[[as.character(highest_rank)]]
+    stations_longseries <- stations_by_rank[[as.character(highest_rank)]]
+    temperatures_longseries <- temperatures_by_rank[[as.character(highest_rank)]]
+  
+    # Combine stations with their temperatures
+    station_with_temps <- paste0(mchdwh::station_info(nat_abbr=stations_longseries)$station_name[order(mchdwh::station_info(nat_abbr=stations_longseries)$nat_abbr,stations_longseries)],
+                                 " (", sprintf("%.1f", temperatures_longseries), " °C)")
+    stations_with_new_temp_recs <- collapse_sentence(station_with_temps)
 
-  # Combine stations with their temperatures
-  station_with_temps <- paste0(mchdwh::station_info(nat_abbr=stations_longseries)$station_name[order(mchdwh::station_info(nat_abbr=stations_longseries)$nat_abbr,stations_longseries)],
-                               " (", sprintf("%.1f", temperatures_longseries), " °C)")
-  stations_with_new_temp_recs <- collapse_sentence(station_with_temps)
-
-  # Add information about previous records from df2 (new rank 2) or df1 (rank 1 from previous year still valid)
-  if (highest_rank == 1) {
-    previous_records <- df2[df2$nat_abbr %in% stations_longseries, ]
-  } else {
-    previous_records <- df1[df1$nat_abbr %in% stations_longseries, ]
+    # Add information about previous records from df2 (new rank 2) or df1 (rank 1 from previous year still valid)
+    if (highest_rank == 1) {
+      previous_records <- df2[df2$nat_abbr %in% stations_longseries, ]
+    } else {
+      previous_records <- df1[df1$nat_abbr %in% stations_longseries, ]
+    }
+    prevrec_stat_names <- mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$station_name[order(mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$nat_abbr,previous_records$nat_abbr)]
+    shortest_period <- as.numeric(substr(previous_records$till_date,1,4)) - 
+      as.numeric(substr(previous_records$min_since_date,1,4)) + 1
+    shortest_period <- trunc(shortest_period/10)*10
+    shortest_period <- min(shortest_period)
+    previous_record_info <- paste0(prevrec_stat_names, " (", sprintf("%.1f", previous_records$value), " °C, ", substr(previous_records$datetime, 1, 4), ")")
+    old_station_records <- collapse_sentence(previous_record_info)
   }
-  prevrec_stat_names <- mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$station_name[order(mchdwh::station_info(nat_abbr=previous_records$nat_abbr)$nat_abbr,previous_records$nat_abbr)]
-  shortest_period <- as.numeric(substr(previous_records$till_date,1,4)) - 
-    as.numeric(substr(previous_records$min_since_date,1,4)) + 1
-  shortest_period <- trunc(shortest_period/10)*10
-  shortest_period <- min(shortest_period)
-  previous_record_info <- paste0(prevrec_stat_names, " (", sprintf("%.1f", previous_records$value), " °C, ", substr(previous_records$datetime, 1, 4), ")")
-  old_station_records <- collapse_sentence(previous_record_info)
-
 
   ### PRECIPITATION ###
   # check whether all or a large fraction of the data
@@ -269,9 +276,7 @@ calculate_regional_differences <- function(bulletin) {
     allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
     quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
     selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, selhigh_abw = selhigh$Abw, sellow_abw = sellow$Abw, 
-    diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab,
-    highest_rank = highest_rank, count_hr = count_hr, stations_with_new_temp_recs = stations_with_new_temp_recs,
-    shortest_period = shortest_period, old_station_records = old_station_records,
+    diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab, df = df,
     # precipitation 
     allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
     anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
@@ -280,7 +285,12 @@ calculate_regional_differences <- function(bulletin) {
     subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
     rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
   )
+  if (!is.null(df)) {
+    regional_differences <- c(regional_differences, highest_rank = highest_rank, count_hr = count_hr, stations_with_new_temp_recs = stations_with_new_temp_recs,
+    shortest_period = shortest_period, old_station_records = old_station_records)
+  }
   
+    
   # cache the results
   saveRDS(regional_differences, cache_file)
   

@@ -197,7 +197,13 @@ temporal_evolution <- function(bulletin, swissmean, regdiff) {
   
   log_info("temporal_evolution")
   
-  bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution")
+  bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p1")
+  
+  if (!is.null(regdiff$df)) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p2")
+  }
+  
+  bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p3")
   
   bulletin
 }

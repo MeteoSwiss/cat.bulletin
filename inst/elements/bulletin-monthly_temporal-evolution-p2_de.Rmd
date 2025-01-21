@@ -1,0 +1,13 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r echo=FALSE, results="hide"}
+# Determine singular or plural form
+station_word <- ifelse(regdiff$count_hr == 1, "Messstation", "Messstationen")
+sw <- ifelse(regdiff$highest_rank == 1, "waren", "sind")
+```
+
+`r ifelse(regdiff$count_hr <= 5, glue::glue("Die Monatsmitteltemperatur im August 2024 erreicht an {regdiff$count_hr} {station_word} mit Messreihen von über {regdiff$shortest_period} Jahren den {regdiff$highest_rank}. Rang: {regdiff$stations_with_new_temp_recs}. Die bisherigen Monatsrekorde an diesen Messstationen {sw}:  {regdiff$old_station_records}."), glue::glue("Die Monatsmitteltemperatur im August 2024 erreicht an {regdiff$count_hr} {station_word} mit Messreihen von über {regdiff$shortest_period} Jahren den {regdiff$highest_rank}. Rang."))`  
