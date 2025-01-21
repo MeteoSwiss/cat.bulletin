@@ -36,6 +36,22 @@ calculate_swissmean_temp <- function (bulletin) {
   # rank swissmean    
   rankcurr <- data_abs$rank.h[poscurr]
 
+  # uncertainties from outlook (bulletin$provisional == TRUE)
+  if (bulletin$provisional) {
+    outl <- mmtpred::mmtpred(station = "swissmean", granul = "m", out.type = "val", include.extr = TRUE, ranking = "high")
+    outl_dev <- mmtpred::mmtpred(station = "swissmean", granul = "m", out.type = "val", include.extr = TRUE, ranking = "high", begin.normp = "1991", end.normp = "2020", write.dev = TRUE)
+    abs_uncertainty <- c(outl[["2.5%"]], outl[["97.5%"]])
+    dev_uncertainty <- c(outl_dev[["2.5%"]], outl_dev[["97.5%"]])
+    dev_uncertainty <- sapply(dev_uncertainty, function(x) {
+      sign <- if (x > 0) "+" else ""
+      sprintf("%s%.1f", sign, x)
+    })
+    abs_diff_neq_0 <- !all(abs_uncertainty==abs_uncertainty[1])
+    rank_uncertainty <- c(attributes(outl)$ranks[["97.5%"]], attributes(outl)$ranks[["2.5%"]])
+    rank_diff_neq_0 <- !all(rank_uncertainty==rank_uncertainty[1])
+    fcst_delay <- attributes(outl)$dd.fcst.delay
+  }
+
   if (rankcurr != 1) {
     ind01 <- which(data_abs$rank.h==1)
     recy <- year[ind01]
@@ -83,6 +99,11 @@ calculate_swissmean_temp <- function (bulletin) {
     y_since_preind = ydiff_ca, loess_bounds1 = bounds1,
     loess_bounds2 = bounds2
   )
+  if (bulletin$provisional) {
+    swissmean_temp <- c(swissmean_temp, abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
+                        fcst_delay = fcst_delay, abs_diff_neq_0 = abs_diff_neq_0, 
+                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty)
+  }
   
   # cache the results
   saveRDS(swissmean_temp, cache_file)
