@@ -41,15 +41,30 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
     xml_set_attribute("type", "complex") %>%
     xml_set_attribute("lead", metadata$lead, languages = bulletin$languages) 
   
+  #metadata node
+  
   metadata_node <- xml2::xml_add_child(xml, .value = "metadata") %>%
     xml_set_attribute("description", metadata$lead, languages = bulletin$languages) %>%
     xml_set_attribute("keywords", metadata$keywords, languages = bulletin$languages) 
   
-  # teaser image
+  # teaser node 
+  
   file.copy(metadata$image$filepath, file.path(bulletin$image_path, metadata$image$filename))
-  image_node <- xml2::xml_add_child(xml, .value = "image") %>%
+  teaser_node <- xml2::xml_add_child(xml, .value = "image") %>%
     xml_set_attribute("fileName", paste0(bulletin$image_dir, "/", metadata$image$filename)) 
   
+  # publication node
+  publication_node <- xml2::xml_add_child(xml, .value = "publication") %>%
+    xml_set_attribute("publishedAt", Sys.Date()) %>%
+    xml_set_attribute("categories", metadata$categories, languages = bulletin$languages) %>%
+    xml_set_attribute("publicationType", metadata$publication_type) %>% 
+    xml_set_attribute("authors", metadata$authors, languages = bulletin$languages) 
+  
+  # document node
+  document_node <- xml2::xml_add_child(publication_node, .value = "document") %>%
+    xml_set_attribute("type", "downloadLink") %>%
+    xml_set_attribute("fileName", metadata$publication, languages = bulletin$languages) 
+
   xml
 }
 
