@@ -295,8 +295,8 @@ collapse_sentence <- function(strings) {
 
 #' Get the publication date for the monthly bulletin formatted as string
 #' @return a string of the date
-#' @param year
-#' @param month
+#' @param year publication year
+#' @param month publication month
 #' @param language iso country id
 get_final_date <- function(year, month, language) {
   # Get the current year, month, and day

@@ -3,11 +3,12 @@
 #' @param title multilanguage string with bulletin titles for each language
 #' @param lead multilanguage string with lead text for each language
 #' @param image an image element for the lead image
+#' @param document the filepath to the publication to download 
 #' @param categories a comma separated string with publication categories
 #' @param authors a multilanguage string denoting the authors of the publication
 #' @param alias multilanguage vector with alias to use in the path for each language
 #' @param keywords multilanguage vector of comma separated strings with keywords for each language
-#' 
+#' @param publication the path to the publication file
 bulletin_metadata <- function(path = NULL, 
                               alias = NULL, 
                               title = NULL, 
@@ -15,7 +16,8 @@ bulletin_metadata <- function(path = NULL,
                               keywords = NULL, 
                               image = NULL, 
                               categories = c("climate"),
-                              authors = NULL
+                              authors = NULL,
+                              publication = NULL
                               ) {
   
   metadata <- list(
@@ -28,27 +30,43 @@ bulletin_metadata <- function(path = NULL,
     keywords = keywords, 
     image = image, 
     categories = categories,
-    authors = authors
+    authors = authors, 
+    publication = publication
   )
+  metadata
+}
+
+#' @examples 
+#' m <- bulletin_metdata()
+#' m <- update_metadata_element(m, path = "new path")
+#' m <- update_metadata_element(m, title = update_multi_language_string(m$title, "de", "neuer deutscher Titel"))
+update_metadata_element <- function(metadata, ...) {
+  assert_bulletin_metdata(metadata)
+  
+  args <- list(...)
+  argnames <- names(args)
+  for (argname in argnames) {
+    if (has_name(metadata, argname)) {
+      metadata[[argname]] <- args[[argname]]
+    } else {
+      warning(paste("Cannot update metadata element", argname))
+    }
+  }
+  metadata
 }
 
 assert_bulletin_metdata <- function(metadata, languages = c("de", "fr", "it", "en")) {
   assert_that(is.list(metadata))
-  assert_that(metadata %has_name% c("sender", "publication_type", "path", "alias", "title", "lead", "keywords", "image", "categories", "authors"))
-  assert_that(is.null(metadata$path) || assert_that(is.character(metadata$path), length(path) == 1))
+  assert_that(metadata %has_name% c("sender", "publication_type", "path", "alias", "title", "lead", "keywords", "image", "categories", "authors", "publication"))
+  assert_that(is.null(metadata$path) || assert_that(is.character(metadata$path), length(metadata$path) == 1))
   assert_that(is.null(metadata$alias) || assert_multi_language_string(metadata$alias, languages = languages))
   assert_that(is.null(metadata$title) || assert_multi_language_string(metadata$title, languages = languages))
   assert_that(is.null(metadata$lead) || assert_multi_language_string(metadata$lead, languages = languages))
   assert_that(is.null(metadata$keywords) || assert_multi_language_string(metadata$keywords, languages = languages))
   assert_that(is.null(metadata$image) || assert_that(is.list(metadata$image)))
   assert_that(is.null(metadata$categories) || assert_that(is.character(metadata$categories)))
-  assert_that(is.null(metadata$authors) || assert_multi_language_string(metadata$authors, languages = languages))            
-}
-
-set_metadata <- function(bulletin, metadata) {
-  assert_bulletin_metdata(metadata, languages = bulletin$languages)
-  bulletin[["metadata"]] <- metadata
-  bulletin
+  assert_that(is.null(metadata$authors) || assert_multi_language_string(metadata$authors, languages = languages))
+  assert_that(is.null(metadata$publication) || assert_multi_language_string(metadata$publication, languages = languages))      
 }
 
 bulletin_metadata_to_markdown <- function(element) {

@@ -9,6 +9,15 @@ image_element <- function(filepath, filename = basename(filepath), caption, alt,
   element
 }
 
+teaser_image <- function(filepath, filename = basename(filepath)) {
+  image_element(filepath = filepath, 
+                filename = filename, 
+                caption = NULL, 
+                alt = NULL, 
+                source = NULL, 
+                label = NULL)
+}
+
 #' add an image with caption to a bulletin
 #' 
 #' copies the image from the filepath to the bulletin directory and adds an image element

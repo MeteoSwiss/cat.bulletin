@@ -5,7 +5,11 @@
 \alias{flextable_to_markdown}
 \title{Render a bulletin to markdown}
 \usage{
-bulletin_to_markdown(bulletin, filename = tempfile(fileext = ".Rmd"))
+bulletin_to_markdown(
+  bulletin,
+  language = bulletin$language,
+  filename = tempfile(pattern = languaged("bulletin", language), fileext = ".Rmd")
+)
 
 flextable_to_markdown(element)
 }
@@ -20,6 +24,8 @@ flextable_to_markdown(element)
 Render a bulletin to markdown
 }
 \details{
+This function will set the current active language to language as a side effect.
+
 \code{flextable_to_markdown}: Rendering of flextables to markdown is not possible (only directly to either html or pdf). 
 The flextable object is thus stored by element_id in the bulletin environment and rendered in the final rendering step.
 }

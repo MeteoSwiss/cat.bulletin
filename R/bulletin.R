@@ -88,6 +88,18 @@ set_active_language <- function(bulletin, language = bulletin$languages[1]) {
   bulletin
 }
 
+#' Set the metadata object for a bulletin
+#' @rdname create_bulletin
+#' @inheritParams add_element
+#' @param metadata A list of metadata information created with \code{\link{bulletin_metadata}}.
+set_metadata <- function(bulletin, metadata) {
+  assert_bulletin_metdata(metadata, languages = bulletin$languages)
+  bulletin[["metadata"]] <- metadata
+  bulletin
+}
+
+
+
 #' Adds an element to a bulletin
 #' @rdname create_bulletin
 #' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
@@ -238,45 +250,6 @@ bulletin_to_pdf <- function(bulletin,
   log_debug("Expected pdf-file:", filename)
   rmarkdown::render(markdown_file, envir = bulletin$bulletin_envir, output_format = "pdf_document", output_file = filename, clean = FALSE)
 }
-
-#' @export
-bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
-  language = bulletin$language
-  xml <- xml2::xml_new_root(.value = "publication-page", 
-                            path="/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/neues-bulletin")
-  root_node <- xml2::xml_root(xml)
-  metadata_node <- xml2::xml_add_child(root_node, .value = "metadata")
-  content_node <- xml2::xml_add_child(root_node, .value = "content")
-  for (element in get_elements(bulletin)) {
-    log_debug("processing element", element$id)
-    function_name <- paste0(element$type, "_to_xml")
-    xml_node <- switch(element$type,
-                       title = root_node,
-                       content_node
-    )
-    
-    do.call(what = function_name, 
-            args = list(xml = xml_node, element = element, language = language))
-  }
-  xml2::write_xml(xml2::xml_root(xml), file = filename)
-  filename
-}
-
-#' @export
-bulletin_to_webzip <- function(bulletin, filename = tempfile(fileext = ".zip")) {
-  bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
-  bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
-  withr::with_dir(new = file.path(bulletin$bulletin_path, ".."),
-                  code = utils::zip(zipfile = filename, 
-                                    files = c(file.path(bulletin$bulletin_dir, "bulletin.xml"),
-                                              file.path(bulletin$bulletin_dir, "bulletin.pdf"),
-                                              file.path(bulletin$bulletin_dir, "images")
-                                    )
-                  )
-  )
-  filename
-}
-
 
 bulletin_pdfxmlzip <- function(bulletin) {
   

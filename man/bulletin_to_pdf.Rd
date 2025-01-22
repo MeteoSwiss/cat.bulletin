@@ -4,7 +4,11 @@
 \alias{bulletin_to_pdf}
 \title{Render a bulletin to pdf}
 \usage{
-bulletin_to_pdf(bulletin, filename = tempfile(fileext = ".pdf"))
+bulletin_to_pdf(
+  bulletin,
+  language = bulletin$language,
+  filename = tempfile(pattern = languaged("bulletin", language), fileext = ".pdf")
+)
 }
 \arguments{
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
@@ -13,4 +17,7 @@ bulletin_to_pdf(bulletin, filename = tempfile(fileext = ".pdf"))
 }
 \description{
 Render a bulletin to pdf
+}
+\details{
+This function will set the current active language to language as a side effect.
 }

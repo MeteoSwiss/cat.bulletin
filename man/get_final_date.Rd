@@ -7,6 +7,10 @@
 get_final_date(year, month, language)
 }
 \arguments{
+\item{year}{publication year}
+
+\item{month}{publication month}
+
 \item{language}{iso country id}
 }
 \value{
