@@ -40,13 +40,16 @@ create_bulletin <- function(bulletin_id,
   bulletin_path <- create_path(bulletin_path)
   
   # prepare data path
-  data_path <- create_path(bulletin_path, "data")
+  data_dir <- "data"
+  data_path <- create_path(bulletin_path, data_dir)
   
   # prepare image path
-  image_path <- create_path(bulletin_path, "images")
+  image_dir <- "images"
+  image_path <- create_path(bulletin_path, image_dir)
   
   # prepare cache path
-  cache_path <- create_path(bulletin_path, "cache")
+  cache_dir <- "cache"
+  cache_path <- create_path(bulletin_path, cache_dir)
   
   #
   assert_bulletin_metdata(metadata, languages = languagues)
@@ -55,8 +58,11 @@ create_bulletin <- function(bulletin_id,
                 list(bulletin_id = bulletin_id,
                      bulletin_dir = bulletin_dir,
                      bulletin_path = bulletin_path,
+                     data_dir = data_dir,
                      data_path = data_path,
+                     image_dir = image_dir,
                      image_path = image_path,
+                     cache_dir = cache_dir,
                      cache_path = cache_path,
                      bulletin_envir = new.env(),
                      stage = "prod",

@@ -27,7 +27,7 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
 
 xml_fill_element_publication_page <- function(xml, bulletin) {
   metadata = bulletin$metadata
-  xml %>%
+  xml <- xml %>%
     xml_set_attribute("sender", metadata$sender) %>%
     xml_set_attribute("path", 
                       paste0(
@@ -40,6 +40,17 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
     xml_set_attribute("title", metadata$title, languages = bulletin$languages) %>%
     xml_set_attribute("type", "complex") %>%
     xml_set_attribute("lead", metadata$lead, languages = bulletin$languages) 
+  
+  metadata_node <- xml2::xml_add_child(xml, .value = "metadata") %>%
+    xml_set_attribute("description", metadata$lead, languages = bulletin$languages) %>%
+    xml_set_attribute("keywords", metadata$keywords, languages = bulletin$languages) 
+  
+  # teaser image
+  file.copy(metadata$image$filepath, file.path(bulletin$image_path, metadata$image$filename))
+  image_node <- xml2::xml_add_child(xml, .value = "image") %>%
+    xml_set_attribute("fileName", paste0(bulletin$image_dir, "/", metadata$image$filename)) 
+  
+  xml
 }
 
 #' set attribute of xml node
