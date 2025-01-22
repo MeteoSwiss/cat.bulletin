@@ -2,7 +2,7 @@
 % Please edit documentation in R/bulletin.R
 \name{create_bulletin}
 \alias{create_bulletin}
-\alias{set_metdata}
+\alias{set_metadata}
 \alias{add_element}
 \alias{has_element}
 \title{Create a bulletin}
@@ -17,7 +17,7 @@ create_bulletin(
   metadata = bulletin_metadata()
 )
 
-set_metdata(bulletin, metadata)
+set_metadata(bulletin, metadata)
 
 add_element(bulletin, element, language = bulletin$language)
 

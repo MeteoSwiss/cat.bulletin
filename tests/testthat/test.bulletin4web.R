@@ -31,7 +31,8 @@ test_that("Create bulletin for web", {
       de = "MeteoSchweiz",
       fr = "MeteoSuisse",
       it = "MeteoSvizzera"
-    )
+    ),
+    publishedAt="2025-01-22"
   )
   
   bulletin <- bulletin %>% set_metadata(metadata)
@@ -46,4 +47,5 @@ test_that("Create bulletin for web", {
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = paste0(bulletin$bulletin_id, ".zip"))
   
+  expect_snapshot_file(file.path(bulletin$path, "publication.xml"))
 })

@@ -17,7 +17,8 @@ bulletin_metadata <- function(path = NULL,
                               image = NULL, 
                               categories = c("climate"),
                               authors = NULL,
-                              publication = NULL
+                              publication = NULL,
+                              publishedAt = Sys.Date()
                               ) {
   
   metadata <- list(
@@ -31,7 +32,8 @@ bulletin_metadata <- function(path = NULL,
     image = image, 
     categories = categories,
     authors = authors, 
-    publication = publication
+    publication = publication,
+    publishedAt = publishedAt
   )
   metadata
 }
@@ -57,7 +59,7 @@ update_metadata_element <- function(metadata, ...) {
 
 assert_bulletin_metdata <- function(metadata, languages = c("de", "fr", "it", "en")) {
   assert_that(is.list(metadata))
-  assert_that(metadata %has_name% c("sender", "publication_type", "path", "alias", "title", "lead", "keywords", "image", "categories", "authors", "publication"))
+  assert_that(metadata %has_name% c("sender", "publication_type", "path", "alias", "title", "lead", "keywords", "image", "categories", "authors", "publication", "publishedAt"))
   assert_that(is.null(metadata$path) || assert_that(is.character(metadata$path), length(metadata$path) == 1))
   assert_that(is.null(metadata$alias) || assert_multi_language_string(metadata$alias, languages = languages))
   assert_that(is.null(metadata$title) || assert_multi_language_string(metadata$title, languages = languages))

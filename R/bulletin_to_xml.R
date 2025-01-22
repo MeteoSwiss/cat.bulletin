@@ -1,28 +1,33 @@
 
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
-  language = bulletin$language
-  
   xml <- xml2::xml_new_root(.value = "publication-page")
   
   root_node <- xml2::xml_root(xml)
-  #metadata_node <- xml2::xml_add_child(root_node, .value = "metadata")
-  #content_node <- xml2::xml_add_child(root_node, .value = "content")
-  xml_fill_element_publication_page(xml, bulletin)
   
-  # for (element in get_elements(bulletin)) {
-  #   log_debug("processing element", element$id)
-  #   function_name <- paste0(element$type, "_to_xml")
-  #   xml_node <- switch(element$type,
-  #                      title = root_node,
-  #                      content_node
-  #   )
-  #   
-  #   do.call(what = function_name, 
-  #           args = list(xml = xml_node, element = element, language = language))
-  # }
+  xml_fill_element_publication_page(xml, bulletin = bulletin)
+  
+  content_node <- xml2::xml_add_child(root_node, .value = "content") %>%
+    xml_add_bulletin_elements(bulletin = bulletin)
+  
   xml2::write_xml(xml2::xml_root(xml), file = filename)
   filename
+}
+
+xml_add_bulletin_elements <- function(content_node, bulletin) {
+  for (language in bulletin$languages) {
+    log_debug("processing language", language)
+    bulletin <- set_active_language(bulletin, language = language)
+    for (element in get_elements(bulletin)) {
+      log_debug("processing element", element$id)
+      function_name <- paste0(element$type, "_to_xml")
+      xml_node <- content_node
+      
+      do.call(what = function_name, 
+              args = list(xml = xml_node, element = element, language = language))
+    }
+  }
+  content_node
 }
 
 xml_fill_element_publication_page <- function(xml, bulletin) {
@@ -55,7 +60,7 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   
   # publication node
   publication_node <- xml2::xml_add_child(xml, .value = "publication") %>%
-    xml_set_attribute("publishedAt", Sys.Date()) %>%
+    xml_set_attribute("publishedAt", metadata$publishedAt) %>%
     xml_set_attribute("categories", metadata$categories, languages = bulletin$languages) %>%
     xml_set_attribute("publicationType", metadata$publication_type) %>% 
     xml_set_attribute("authors", metadata$authors, languages = bulletin$languages) 
@@ -64,7 +69,7 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   document_node <- xml2::xml_add_child(publication_node, .value = "document") %>%
     xml_set_attribute("type", "downloadLink") %>%
     xml_set_attribute("fileName", metadata$publication, languages = bulletin$languages) 
-
+  
   xml
 }
 

@@ -7,14 +7,14 @@ bulletin_to_webzip <- function(bulletin, zipfilename = tempfile(fileext = ".zip"
   # generate all pdfs
   for (language in bulletin$languages) {
     tryCatch({
-      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, languaged_filename(metadata$path, language, "pdf")))
+      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, languaged_filename(bulletin$metadata$path, language, "pdf")))
        publication <- update_multi_language_string(publication, language, basename(filename))
     },
       error = function(e) stop(e)
     )
   }
   
-  bulletin$metadata <- bulletin$metadata %>% update_metadata_element(publication = publication)
+  bulletin$metadata <- update_metadata_element(metadata = bulletin$metadata, publication = publication)
 
   bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   

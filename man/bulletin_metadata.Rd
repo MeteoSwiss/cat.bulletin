@@ -12,7 +12,9 @@ bulletin_metadata(
   keywords = NULL,
   image = NULL,
   categories = c("climate"),
-  authors = NULL
+  authors = NULL,
+  publication = NULL,
+  publishedAt = Sys.Date()
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ bulletin_metadata(
 \item{categories}{a comma separated string with publication categories}
 
 \item{authors}{a multilanguage string denoting the authors of the publication}
+
+\item{publication}{the path to the publication file}
+
+\item{document}{the filepath to the publication to download}
 }
 \description{
 Create bulletin_metdata
