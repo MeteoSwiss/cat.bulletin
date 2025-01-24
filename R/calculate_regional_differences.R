@@ -104,8 +104,8 @@ calculate_regional_differences <- function(bulletin) {
   # - Monthly sums not yet computed in DWH because too early,
   #   monthly data is starting to be available from the 5th-last 
   #   day before the end of a month
-  high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
-  #low_temp_records <- process_extreme_values(param_short = "ths20m0n", bulletin)
+  high_temp_records <- process_extreme_values(param_short = "ths20m0x", unit = "°C", bulletin)
+  low_temp_records  <- process_extreme_values(param_short = "ths20m0n", unit = "°C", bulletin)
 
   ### PRECIPITATION ###
   # check whether all or a large fraction of the data
@@ -232,7 +232,7 @@ calculate_regional_differences <- function(bulletin) {
     quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
     selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, selhigh_abw = selhigh$Abw, sellow_abw = sellow$Abw, 
     diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab, 
-    high_temp_rec_avail = high_temp_records$rec_avail,
+    high_temp_rec_avail = high_temp_records$rec_avail, low_temp_rec_avail = low_temp_records$rec_avail, 
     # precipitation 
     allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
     anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
@@ -241,30 +241,34 @@ calculate_regional_differences <- function(bulletin) {
     subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
     rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
   )
-  if (!is.null(high_temp_records$rec_avail)) {
+  if (high_temp_records$rec_avail) {
     regional_differences <- c(regional_differences,
                               high_temp_highest_rank = high_temp_records$highest_rank, 
                               high_temp_count_hr = high_temp_records$count_hr, 
-                              high_temp_stations_with_new_temp_recs = high_temp_records$stations_with_new_temp_recs,
                               high_temp_shortest_period = high_temp_records$shortest_period, 
-                              high_temp_old_station_records = high_temp_records$old_station_records)
+                              high_temp_station_record_info = high_temp_records$station_record_info)
   } 
-
+  if (low_temp_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              low_temp_highest_rank = low_temp_records$highest_rank, 
+                              low_temp_count_hr = low_temp_records$count_hr, 
+                              low_temp_shortest_period = low_temp_records$shortest_period, 
+                              low_temp_station_record_info = low_temp_records$station_record_info)
+  } 
+  
   # cache the results
   saveRDS(regional_differences, cache_file)
   
   regional_differences
 }
 
-process_extreme_values <- function(param_short, bulletin) {
+process_extreme_values <- function(param_short, unit, bulletin) {
   # Initialize output parameters
   highest_rank <- NA
   count_hr <- NA
   shortest_period <- NA
-  old_station_records <- NA
-  stations_with_new_temp_recs <- NA
-  
-  # Main logic wrapped in tryCatch
+  station_record_info <- NA
+
   df <- NULL
   result <- tryCatch(
     {
@@ -293,47 +297,42 @@ process_extreme_values <- function(param_short, bulletin) {
     stations_by_rank <- lapply(ranks_rec, function(r) {
       df$nat_abbr[df$ranking == r]
     })
-    temperatures_by_rank <- lapply(ranks_rec, function(r) {
+    values_by_rank <- lapply(ranks_rec, function(r) {
       df$value[df$ranking == r]
     })
     names(stations_by_rank) <- ranks_rec
-    names(temperatures_by_rank) <- ranks_rec
+    names(values_by_rank) <- ranks_rec
     
     # Determine the highest (smallest) rank
     highest_rank <- min(as.numeric(names(rank_summary)[rank_summary > 0]), na.rm = TRUE)
     
-    # Get the count, stations, and temperatures for the highest rank
+    # Get the count, stations, and values for the highest rank
     count_hr <- rank_summary[[as.character(highest_rank)]]
     stations_longseries <- stations_by_rank[[as.character(highest_rank)]]
-    temperatures_longseries <- temperatures_by_rank[[as.character(highest_rank)]]
+    values_longseries <- values_by_rank[[as.character(highest_rank)]]
     
-    # Combine stations with their temperatures
-    station_with_temps <- paste0(
+    # Combine stations with their values
+    station_with_vals <- paste0(
       mchdwh::station_info(nat_abbr = stations_longseries)$station_name[
         order(mchdwh::station_info(nat_abbr = stations_longseries)$nat_abbr, stations_longseries)
-      ],
-      " (", sprintf("%.1f", temperatures_longseries), " °C)"
-    )
-    stations_with_new_temp_recs <- collapse_sentence(station_with_temps)
-    
+      ], " ", sprintf("%.1f", values_longseries), " ", unit)
+
     # Add information about previous records
     if (highest_rank == 1) {
       previous_records <- df2[df2$nat_abbr %in% stations_longseries, ]
+      word_record <- " (bisheriger Rekord: "
     } else {
       previous_records <- df1[df1$nat_abbr %in% stations_longseries, ]
+      word_record <- " (Rekord: "
     }
-    prevrec_stat_names <- mchdwh::station_info(nat_abbr = previous_records$nat_abbr)$station_name[
-      order(mchdwh::station_info(nat_abbr = previous_records$nat_abbr)$nat_abbr, previous_records$nat_abbr)
-    ]
     shortest_period <- as.numeric(substr(previous_records$till_date, 1, 4)) - 
       as.numeric(substr(previous_records$min_since_date, 1, 4)) + 1
     shortest_period <- trunc(shortest_period / 10) * 10
     shortest_period <- min(shortest_period)
-    previous_record_info <- paste0(
-      prevrec_stat_names, 
-      " (", sprintf("%.1f", previous_records$value), " °C, ", substr(previous_records$datetime, 1, 4), ")"
-    )
-    old_station_records <- collapse_sentence(previous_record_info)
+    previous_record_info <- paste0(word_record, sprintf("%.1f", previous_records$value), " ", unit, ", ", 
+                                   substr(previous_records$datetime, 1, 4), ")")
+    
+    station_record_info <- collapse_sentence(paste0(station_with_vals, previous_record_info))
   }
   
   rec_avail <- FALSE
@@ -345,8 +344,7 @@ process_extreme_values <- function(param_short, bulletin) {
       highest_rank = highest_rank,
       count_hr = count_hr,
       shortest_period = shortest_period,
-      old_station_records = old_station_records,
-      stations_with_new_temp_recs = stations_with_new_temp_recs
+      station_record_info = station_record_info
     ))
   } else {
     return(list(rec_avail = rec_avail))

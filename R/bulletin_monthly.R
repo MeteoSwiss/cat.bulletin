@@ -200,7 +200,10 @@ temporal_evolution <- function(bulletin, swissmean, regdiff) {
   bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p1")
   
   if (regdiff$high_temp_rec_avail) {
-    bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p2")
+    bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p2-1")
+  }
+  if (regdiff$low_temp_rec_avail) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p2-2")
   }
   
   bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p3")
