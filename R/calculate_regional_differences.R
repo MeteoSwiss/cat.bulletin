@@ -101,9 +101,7 @@ calculate_regional_differences <- function(bulletin) {
   # Local temperature ranking
   # There are two possible reasons for no records:
   # - Actually no values of rank 10 or lower for this parameter
-  # - Monthly sums not yet computed in DWH because too early,
-  #   monthly data is starting to be available from the 5th-last 
-  #   day before the end of a month
+  # - Monthly sums not yet computed in DWH because too early
   high_temp_records <- process_extreme_values(param_short = "ths20m0x", unit = "°C", bulletin)
   low_temp_records  <- process_extreme_values(param_short = "ths20m0n", unit = "°C", bulletin)
 
