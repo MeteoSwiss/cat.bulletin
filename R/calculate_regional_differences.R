@@ -93,7 +93,7 @@ calculate_regional_differences <- function(bulletin) {
   subset_climtab$Station <- sn$station_name
   subset_climtab$Abw[subset_climtab$Abw > 0] <- paste0("+", subset_climtab$Abw[subset_climtab$Abw > 0])
   rownames(subset_climtab) <- NULL
-  attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Referenz (°C)","Abweichung (°C)")
+  attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (\u00B0C)","Referenz (\u00B0C)","Abweichung (\u00B0C)")
   
   subset_climtab <- flextable::flextable(subset_climtab)
   subset_climtab <- flextable::set_caption(subset_climtab, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
@@ -102,8 +102,8 @@ calculate_regional_differences <- function(bulletin) {
   # There are two possible reasons for no records:
   # - Actually no values of rank 10 or lower for this parameter
   # - Monthly sums not yet computed in DWH because too early
-  high_temp_records <- process_extreme_values(param_short = "ths20m0x", unit = "°C", bulletin)
-  low_temp_records  <- process_extreme_values(param_short = "ths20m0n", unit = "°C", bulletin)
+  high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
+  low_temp_records  <- process_extreme_values(param_short = "ths20m0n", bulletin)
 
   ### PRECIPITATION ###
   # check whether all or a large fraction of the data
@@ -260,12 +260,14 @@ calculate_regional_differences <- function(bulletin) {
   regional_differences
 }
 
-process_extreme_values <- function(param_short, unit, bulletin) {
+process_extreme_values <- function(param_short, bulletin) {
   # Initialize output parameters
   highest_rank <- NA
   count_hr <- NA
   shortest_period <- NA
   station_record_info <- NA
+  
+  unit <- mchdwh::param_info(param_short = param_short)$unit
 
   df <- NULL
   result <- tryCatch(
@@ -313,7 +315,7 @@ process_extreme_values <- function(param_short, unit, bulletin) {
     station_with_vals <- paste0(
       mchdwh::station_info(nat_abbr = stations_longseries)$station_name[
         order(mchdwh::station_info(nat_abbr = stations_longseries)$nat_abbr, stations_longseries)
-      ], " ", sprintf("%.1f", values_longseries), " ", unit)
+      ], " ", sprintf("%.1f", values_longseries), "\u00A0", unit)
 
     # Add information about previous records
     if (highest_rank == 1) {
@@ -327,7 +329,7 @@ process_extreme_values <- function(param_short, unit, bulletin) {
       as.numeric(substr(previous_records$min_since_date, 1, 4)) + 1
     shortest_period <- trunc(shortest_period / 10) * 10
     shortest_period <- min(shortest_period)
-    previous_record_info <- paste0(word_record, sprintf("%.1f", previous_records$value), " ", unit, ", ", 
+    previous_record_info <- paste0(word_record, sprintf("%.1f", previous_records$value), "\u00A0", unit, ", ", 
                                    substr(previous_records$datetime, 1, 4), ")")
     
     station_record_info <- collapse_sentence(paste0(station_with_vals, previous_record_info))

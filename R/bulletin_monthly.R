@@ -101,13 +101,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in °C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 °C sind rot eingefärbt, Werte unter 0 °C sind blau."))
+                        caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot eingefärbt, Werte unter 0 \u00B0C sind blau."))
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in °C für den ",bulletin$month_str," ",bulletin$year,". Liegen die Temperaturen über der Referenz, sind die entsprechenden Bereiche rot eingefärbt, blaue Gebiete weisen Temperaturen unter der Referenz auf."))
+                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Liegen die Temperaturen über der Referenz, sind die entsprechenden Bereiche rot eingefärbt, blaue Gebiete weisen Temperaturen unter der Referenz auf."))
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
