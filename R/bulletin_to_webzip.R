@@ -18,11 +18,11 @@ bulletin_to_webzip <- function(bulletin, zipfilename = tempfile(fileext = ".zip"
 
   bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   
-  withr::with_dir(new = file.path(bulletin$bulletin_path, ".."),
+  withr::with_dir(new = file.path(bulletin$bulletin_path),
                   code = utils::zip(zipfile = zipfilename, 
-                                    files = c(file.path(bulletin$bulletin_dir, "publication.xml"),
-                                              file.path(bulletin$bulletin_dir, publication),
-                                              file.path(bulletin$bulletin_dir, "images")
+                                    files = c("publication.xml",
+                                              publication,
+                                              "images"
                                     )
                   )
   )
