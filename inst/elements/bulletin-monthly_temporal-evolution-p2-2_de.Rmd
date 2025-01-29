@@ -1,0 +1,12 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r echo=FALSE, results="hide"}
+# Determine singular or plural form
+station_word <- ifelse(regdiff$low_temp_count_hr == 1, "Messstation", "Messstationen")
+```
+
+`r ifelse(regdiff$low_temp_count_hr <= 5, glue::glue("Die Monatsmitteltemperatur im {bulletin$month_str} {bulletin$year} belegt an {regdiff$low_temp_count_hr} {station_word} mit Daten seit über {regdiff$low_temp_shortest_period} Jahren den {regdiff$low_temp_highest_rank}. Rang der kältesten {bulletin$month_str}monate: {regdiff$low_temp_station_record_info}."), glue::glue("Die Monatsmitteltemperatur im {bulletin$month_str} {bulletin$year} belegt an {regdiff$low_temp_count_hr} {station_word} mit Daten seit über {regdiff$low_temp_shortest_period} Jahren den {regdiff$low_temp_highest_rank}. Rang der kältesten {bulletin$month_str}monate."))``r ifelse(bulletin$provisional & regdiff$low_temp_count_hr==1, " Das ist ein provisorischer Rekordwert. Es ist möglich, dass sich der Messwert, der Rang und die Anzahl der Stationen mit Rekorden bis nach Ablauf des Monats noch ändert.", "")``r ifelse(bulletin$provisional & regdiff$low_temp_count_hr>1, " Das sind provisorische Rekordwerte. Es ist möglich, dass sich die Messwerte, die Ränge und die Anzahl der Stationen mit Rekorden bis nach Ablauf des Monats noch ändern.", "")`

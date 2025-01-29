@@ -9,7 +9,7 @@ calculate_regional_differences <- function(bulletin) {
   }
   
   # prepare climtable
-  stations <- c("BER","SMA","GVE","BAS","ENG","SIO","LUG","SAM")
+  stations <- c("BER","SMA","GVE","BAS","ENG","DAV","SIO","LUG","SAM")
   
   if (bulletin$month<10) {mondate <- paste0("0",bulletin$month)} else {mondate <- as.character(bulletin$month)}
   begdate <- paste0(bulletin$year,mondate,"01")
@@ -20,9 +20,10 @@ calculate_regional_differences <- function(bulletin) {
   data <- clim.table::climtable(period=c(begdate,enddate), outDir = bulletin$data_path)
   
   # set region every station is belonging to
+  regsort <- c("Mittelland","Alpennordhang","Westschweiz","Wallis","Nord- und Mittelbünden","Engadin","Alpensüdseite")
   vals <- data$dana$vals
   vals$Region <- rep("",length(vals$Station))
-  vals$Region[1:14] <- "Westschweiz"
+  vals$Region[1:14]  <- "Westschweiz"
   vals$Region[15:32] <- "Mittelland"
   vals$Region[33:55] <- "Alpennordhang"
   vals$Region[56:61] <- "Nord- und Mittelbünden"
@@ -32,34 +33,16 @@ calculate_regional_differences <- function(bulletin) {
   
   ### TEMPERATURE ###
   # check whether all or a large fraction of the data
-  # are either above, below or in the range of the norm
+  # are either above, below or in the range of the reference period
   acurr_all <- vals$Abw[!is.na(vals$Abw)]
   a_ueber <- length(which(acurr_all > 0.5)) / length(acurr_all)
   a_unter <- length(which(acurr_all < -0.5)) / length(acurr_all)
   a_bereich <- 1 - a_ueber - a_unter
   quac <- quantile(acurr_all,probs = c(0.16,0.84))
   quac[quac>0] <- paste0("+",quac[quac>0])
-  
-  # monthly mean temp ranks at stations
-  vals$Rank_T <- rep(NA,length(vals$Station))
-  vals$firstmeas_T <- rep(NA,length(vals$Station))
-  
-  for (s in 1:length(vals$Station)) {
-    if (vals$Station[s]=="AND") {
-      vals$Rank_T[s] <- NA
-      vals$firstmeas_T[s] <- NA
-    } else {
-      recstat <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="ths200m0",rectype="m")
-      vals$Rank_T[s] <- recstat$ranks_curryear
-      vals$firstmeas_T[s] <- recstat$firstmeas
-    }
-  }
-  
+
+  # temperature difference with altitude
   diff_highlow <- abs(median(vals$Abw[vals$Hoehe>=1500],na.rm=T))-abs(median(vals$Abw[vals$Hoehe<1500],na.rm=T))
-  
-  # stations with time series of more than 100 years
-  ranky100 <- vals$Rank_T[vals$firstmeas_T<(bulletin$year-100)]
-  r1y100 <- which(vals$firstmeas_T<(bulletin$year-100) & vals$Rank_T==1)
   
   # greatest deviations in all regions
   regs <- unique(vals$Region)
@@ -102,14 +85,26 @@ calculate_regional_differences <- function(bulletin) {
   subset_climtab <- vals[which(vals$Station %in% stations),]
   subset_climtab <- subset_climtab[order(match(subset_climtab$Station, stations)), ]
   subset_climtab <- rbind(subset_climtab,selreg)
-  subset_climtab <- subset_climtab[,c(1:5,16:17)]
+  subset_climtab$Region <- factor(subset_climtab$Region, levels = regsort, ordered = TRUE)
+  subset_climtab <- subset_climtab[order(subset_climtab$Region),]
+  subset_climtab <- subset_climtab[,c(1:5)]
   sn <- mchdwh::station_info(nat_abbr=subset_climtab$Station)
   sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
   subset_climtab$Station <- sn$station_name
   subset_climtab$Abw[subset_climtab$Abw > 0] <- paste0("+", subset_climtab$Abw[subset_climtab$Abw > 0])
   rownames(subset_climtab) <- NULL
-  attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (°C)","Norm (°C)","Abweichung (°C)","Rang","Messbeginn")
+  attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (\u00B0C)","Referenz (\u00B0C)","Abweichung (\u00B0C)")
   
+  subset_climtab <- flextable::flextable(subset_climtab)
+  subset_climtab <- flextable::set_caption(subset_climtab, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
+  
+  # Local temperature ranking
+  # There are two possible reasons for no records:
+  # - Actually no values of rank 10 or lower for this parameter
+  # - Monthly sums not yet computed in DWH because too early
+  high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
+  low_temp_records  <- process_extreme_values(param_short = "ths20m0n", bulletin)
+
   ### PRECIPITATION ###
   # check whether all or a large fraction of the data
   # are either above, below or in the range of the norm
@@ -124,19 +119,45 @@ calculate_regional_differences <- function(bulletin) {
   # monthly prec sum ranks at stations
   vals$Rank_R_wet <- rep(NA,length(vals$Station))
   vals$Rank_R_dry <- rep(NA,length(vals$Station))
-  vals$firstmeas_R <- rep(NA,length(vals$Station))
+  vals$firstmeas_R <- rep("",length(vals$Station))
   
+  # get precip ranks only for nbcn-p stations
+  # note: there are nbcn-p stations that are not part of the climtable, so the ranks should be calculated separately,
+  # not only for stations in vals$Station
+  nbcnpstats <- c(mchdwh::station_group_info(station_group_id=1007)$nat_abbr,  # nbcn
+                  mchdwh::station_group_info(station_group_id=1022)$nat_abbr)  # + nbcn-p
+  nbcnpstats <- nbcnpstats[!nbcnpstats %in% c("PAY", "JUN", "RAG")]
+  #CONTINUE IMPLEMENTATION OF NBCN-P station RANKS HERE
   for (s in 1:length(vals$Station)) {
-    if (vals$Station[s] %in% c("AND","LAE","HOE","JUN","GSB","BEH")) {
+    if (vals$Station[s] %in% nbcnpstats) {
+      print(vals$Station[s])
+      filename_stat_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", 
+                               paste0("climate-precipitation-evolution-station-abs_rhs150m0_abs_loess30_1864-today_08_station_", vals$Station[s],"_de.txt"), 
+                               package = "cat.bulletin")
+      print(filename_stat_abs)
+      data_stat_abs <- read.table(filename_stat_abs, header = TRUE)
+      # recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
+      vals$Rank_R_wet[s] <- data_stat_abs$rank.h[which(data_stat_abs$year == bulletin$year)]
+      vals$Rank_R_dry[s] <- data_stat_abs$rank.l[which(data_stat_abs$year == bulletin$year)]
+      vals$firstmeas_R[s] <- data_stat_abs$year[1]
+      # vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
+      # vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
+      # vals$firstmeas_R[s] <- recstat_R$firstmeas
+    } else {
       vals$Rank_R_wet[s] <- NA
       vals$Rank_R_dry[s] <- NA
-      vals$firstmeas_R[s] <- NA
-    } else {
-      recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
-      vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
-      vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
-      vals$firstmeas_R[s] <- recstat_R$firstmeas
+      vals$firstmeas_R[s] <- ""
     }
+    # if (vals$Station[s] %in% c("AND","LAE","HOE","JUN","GSB","BEH")) {
+    #   vals$Rank_R_wet[s] <- NA
+    #   vals$Rank_R_dry[s] <- NA
+    #   vals$firstmeas_R[s] <- NA
+    # } else {
+    #   recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
+    #   vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
+    #   vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
+    #   vals$firstmeas_R[s] <- recstat_R$firstmeas
+    # }
   }
   vals$Rank_R_comb <- ifelse(
     is.na(vals$Rank_R_wet) | is.na(vals$Rank_R_dry),
@@ -191,10 +212,12 @@ calculate_regional_differences <- function(bulletin) {
   
   # generate subset for a printable table
   # (reduced to the stations defined above)
+  # print(str(vals))
+  # print(dim(vals))
   subset_climtab_R <- vals[which(vals$Station %in% stations),]
   subset_climtab_R <- subset_climtab_R[order(match(subset_climtab_R$Station, stations)), ]
   subset_climtab_R <- rbind(subset_climtab_R,selreg_R)
-  subset_climtab_R <- subset_climtab_R[,c(1,11:13,21,20)]
+  subset_climtab_R <- subset_climtab_R[,c(1,11:13,19,18)]
   sn_R <- mchdwh::station_info(nat_abbr=subset_climtab_R$Station)
   sn_R <- sn_R[order(match(sn_R$nat_abbr, subset_climtab_R$Station)), ]
   subset_climtab_R$Station <- sn_R$station_name
@@ -205,8 +228,9 @@ calculate_regional_differences <- function(bulletin) {
     # temperature
     allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
     quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
-    selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, diff_highlow = diff_highlow, 
-    ranky100 = ranky100, climtab_vals = vals, rank1_longseries = r1y100, subset_climtab = subset_climtab,
+    selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, selhigh_abw = selhigh$Abw, sellow_abw = sellow$Abw, 
+    diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab, 
+    high_temp_rec_avail = high_temp_records$rec_avail, low_temp_rec_avail = low_temp_records$rec_avail, 
     # precipitation 
     allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
     anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
@@ -215,9 +239,114 @@ calculate_regional_differences <- function(bulletin) {
     subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
     rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
   )
+  if (high_temp_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              high_temp_highest_rank = high_temp_records$highest_rank, 
+                              high_temp_count_hr = high_temp_records$count_hr, 
+                              high_temp_shortest_period = high_temp_records$shortest_period, 
+                              high_temp_station_record_info = high_temp_records$station_record_info)
+  } 
+  if (low_temp_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              low_temp_highest_rank = low_temp_records$highest_rank, 
+                              low_temp_count_hr = low_temp_records$count_hr, 
+                              low_temp_shortest_period = low_temp_records$shortest_period, 
+                              low_temp_station_record_info = low_temp_records$station_record_info)
+  } 
   
   # cache the results
   saveRDS(regional_differences, cache_file)
   
   regional_differences
+}
+
+process_extreme_values <- function(param_short, bulletin) {
+  # Initialize output parameters
+  highest_rank <- NA
+  count_hr <- NA
+  shortest_period <- NA
+  station_record_info <- NA
+  
+  unit <- mchdwh::param_info(param_short = param_short)$unit
+
+  df <- NULL
+  result <- tryCatch(
+    {
+      df <- mchdwh::dwhget_extreme_values(
+        param_short = param_short, 
+        ref_period_id = 1, 
+        date_range_id = bulletin$month, 
+        year = bulletin$year
+      )
+    }, 
+    error = function(e) {
+      message("Keine Rekorde in diesem Monat zu diesem Parameter: ", e$message)
+      return(NULL)
+    }
+  )
+  # Proceed if data is available
+  if (!is.null(df)) {
+    df2 <- mchdwh::dwhget_extreme_values(param_short = param_short, ref_period_id = 1, date_range_id = bulletin$month, ranking = 2)
+    df1 <- mchdwh::dwhget_extreme_values(param_short = param_short, ref_period_id = 1, date_range_id = bulletin$month, ranking = 1)
+    
+    # Define ranks
+    ranks_rec <- 1:10
+    
+    # Summarize ranks
+    rank_summary <- table(factor(df$ranking, levels = ranks_rec))
+    stations_by_rank <- lapply(ranks_rec, function(r) {
+      df$nat_abbr[df$ranking == r]
+    })
+    values_by_rank <- lapply(ranks_rec, function(r) {
+      df$value[df$ranking == r]
+    })
+    names(stations_by_rank) <- ranks_rec
+    names(values_by_rank) <- ranks_rec
+    
+    # Determine the highest (smallest) rank
+    highest_rank <- min(as.numeric(names(rank_summary)[rank_summary > 0]), na.rm = TRUE)
+    
+    # Get the count, stations, and values for the highest rank
+    count_hr <- rank_summary[[as.character(highest_rank)]]
+    stations_longseries <- stations_by_rank[[as.character(highest_rank)]]
+    values_longseries <- values_by_rank[[as.character(highest_rank)]]
+    
+    # Combine stations with their values
+    station_with_vals <- paste0(
+      mchdwh::station_info(nat_abbr = stations_longseries)$station_name[
+        order(mchdwh::station_info(nat_abbr = stations_longseries)$nat_abbr, stations_longseries)
+      ], " ", sprintf("%.1f", values_longseries), "\u00A0", unit)
+
+    # Add information about previous records
+    if (highest_rank == 1) {
+      previous_records <- df2[df2$nat_abbr %in% stations_longseries, ]
+      word_record <- " (bisheriger Rekord: "
+    } else {
+      previous_records <- df1[df1$nat_abbr %in% stations_longseries, ]
+      word_record <- " (Rekord: "
+    }
+    shortest_period <- as.numeric(substr(previous_records$till_date, 1, 4)) - 
+      as.numeric(substr(previous_records$min_since_date, 1, 4)) + 1
+    shortest_period <- trunc(shortest_period / 10) * 10
+    shortest_period <- min(shortest_period)
+    previous_record_info <- paste0(word_record, sprintf("%.1f", previous_records$value), "\u00A0", unit, ", ", 
+                                   substr(previous_records$datetime, 1, 4), ")")
+    
+    station_record_info <- collapse_sentence(paste0(station_with_vals, previous_record_info))
+  }
+  
+  rec_avail <- FALSE
+  # Return results
+  if (!is.null(df)) {
+    rec_avail <- TRUE
+    return(list(
+      rec_avail = rec_avail, 
+      highest_rank = highest_rank,
+      count_hr = count_hr,
+      shortest_period = shortest_period,
+      station_record_info = station_record_info
+    ))
+  } else {
+    return(list(rec_avail = rec_avail))
+  }
 }

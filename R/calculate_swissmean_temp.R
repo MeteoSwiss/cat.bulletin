@@ -9,7 +9,8 @@ calculate_swissmean_temp <- function (bulletin) {
   }
   
   # Download data
-  filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
+  #filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
+  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.abs.txt", package = "cat.bulletin")
   data_abs <- read.table(filename_abs, header = TRUE)
   
   filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
@@ -33,16 +34,31 @@ calculate_swissmean_temp <- function (bulletin) {
   }
   
   # rank swissmean    
-  ranking <- sort.int(anom,decreasing=T,index.return=T)
-  rankcurr <- which(ranking$ix==poscurr)
-  
+  rankcurr <- data_abs$rank.h[poscurr]
+
+  # uncertainties from outlook (bulletin$provisional == TRUE)
+  if (bulletin$provisional) {
+    outl <- mmtpred::mmtpred(station = "swissmean", granul = "m", out.type = "val", include.extr = TRUE, ranking = "high")
+    outl_dev <- mmtpred::mmtpred(station = "swissmean", granul = "m", out.type = "val", include.extr = TRUE, ranking = "high", begin.normp = "1991", end.normp = "2020", write.dev = TRUE)
+    abs_uncertainty <- c(outl[["2.5%"]], outl[["97.5%"]])
+    dev_uncertainty <- c(outl_dev[["2.5%"]], outl_dev[["97.5%"]])
+    dev_uncertainty <- sapply(dev_uncertainty, function(x) {
+      sign <- if (x > 0) "+" else ""
+      sprintf("%s%.1f", sign, x)
+    })
+    abs_diff_neq_0 <- !all(abs_uncertainty==abs_uncertainty[1])
+    rank_uncertainty <- c(attributes(outl)$ranks[["97.5%"]], attributes(outl)$ranks[["2.5%"]])
+    rank_diff_neq_0 <- !all(rank_uncertainty==rank_uncertainty[1])
+    fcst_delay <- attributes(outl)$dd.fcst.delay
+  }
+
   if (rankcurr != 1) {
-    ind01 <- ranking$ix[1]
+    ind01 <- which(data_abs$rank.h==1)
     recy <- year[ind01]
     recval <- round(abs[ind01],1)
     reca <- round(anom[ind01],1)
   } else {
-    ind01 <- ranking$ix[2]
+    ind01 <- which(data_abs$rank.h==2)
     recy <- year[ind01]
     recval <- round(abs[ind01],1)
     reca <- round(anom[ind01],1)
@@ -53,11 +69,10 @@ calculate_swissmean_temp <- function (bulletin) {
   }
   recval_t <- format(recval, nsmall=1)
   
-  # years similar to current
-  diffc_t5 <- abs(ranking$x[which(ranking$ix==poscurr)]-ranking$x[1:5])
-  if (any(diffc_t5<0.1)) {
-    isim <- which(diffc_t5<0.1)
-    isimy <- ranking$ix[isim]
+  # years similar to current among the 5 warmest years
+  diffc_t5 <- abs(abs[poscurr] - abs)
+  if (any(diffc_t5<0.09)) {
+    isimy <- which(diffc_t5<0.09)
     isimy <- isimy[-which(isimy==poscurr)]
   } else {
     isimy <- NULL
@@ -65,7 +80,7 @@ calculate_swissmean_temp <- function (bulletin) {
   
   loess <- evoclim::loess.filt.knmi(x=abs,years=year,y1=1885,y2=ycurr,y1asmean=TRUE)
   signif <- as.numeric(loess$incr.pval)
-  diff <- round(as.numeric(c(loess$conf.l[poscurr]-loess$val1,loess$t.incr,loess$conf.u[poscurr]-loess$val1)),1)
+  diff <- round(c(loess$incr.cf[1],loess$t.incr,loess$incr.cf[2]),1)
   ydiff_ca <- round(ycurr-1885+1,-1)
   
   resid1 <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
@@ -73,7 +88,6 @@ calculate_swissmean_temp <- function (bulletin) {
   
   bounds1 <- format(round(c(loess$val2+resid1[1],loess$val2+resid1[2]),1), nsmall=1)
   bounds2 <- format(round(c(loess$val2+resid2[1],loess$val2+resid2[2]),1), nsmall=1)
-  
   
   swissmean_temp <- list(
     curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
@@ -85,6 +99,11 @@ calculate_swissmean_temp <- function (bulletin) {
     y_since_preind = ydiff_ca, loess_bounds1 = bounds1,
     loess_bounds2 = bounds2
   )
+  if (bulletin$provisional) {
+    swissmean_temp <- c(swissmean_temp, abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
+                        fcst_delay = fcst_delay, abs_diff_neq_0 = abs_diff_neq_0, 
+                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty)
+  }
   
   # cache the results
   saveRDS(swissmean_temp, cache_file)

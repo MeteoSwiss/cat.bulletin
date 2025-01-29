@@ -9,8 +9,10 @@ Sys.setlocale("LC_TIME", "de_DE.UTF-8")
 formatted_date <- format(Sys.Date(), "%d. %B %Y")
 ```
 
-## Hinweise zu diesem Bulletin
+Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Schweizer Klimas im aktuellen Monat, vergleicht diesen mit der momentan gültigen Referenzperiode 1991-2020 gemäss Vorgabe der Weltorganisation für Meteorologie WMO und ordnet ihn in den historischen Kontext seit Messbeginn 1864 ein. 
 
-Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Klimas im aktuellen Monat, vergleicht diesen mit der momentan gültigen Normperiode 1991-2020 gemäss Vorgabe der Weltorganisation für Meteorologie WMO und ordnet ihn in den historischen Kontext seit Messbeginn 1864 ein. Das Bulletin wird ab dem 22. Tag des Monats erstellt und täglich aufdatiert bis zum letzten Tag des Monats. Bis zu diesem Zeitpunkt basieren die Angaben im Bulletin auf provisorischen Daten. Das definitive Bulletin mit finalen Zahlen ist ab dem 10. Tag des Folgemonats hier auch als PDF zu finden.
+**Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.** `r ifelse(bulletin$provisional, "In dieser Phase basieren die Angaben im Bulletin auf provisorischen Daten. Landesweite Angaben zu Temperatur und Niederschlag berücksichtigen die Prognose bis zum Monatsende mit den dazugehörigen Unsicherheiten. Lokale Informationen beziehen sich auf den bisherigen Monatsverlauf.","")` 
 
-**Stand: `r formatted_date`**
+`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {bulletin$nextmonth_str} hier auch als PDF zu finden."), glue::glue("Dies ist das definitive Bulletin für den {bulletin$month_str} {bulletin$year}."))`
+
+**Publikationsdatum: `r formatted_date`**
