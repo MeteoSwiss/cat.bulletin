@@ -15,16 +15,30 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
 }
 
 xml_add_bulletin_elements <- function(content_node, bulletin) {
-  for (language in bulletin$languages) {
-    log_debug("processing language", language)
-    bulletin <- set_active_language(bulletin, language = language)
-    for (element in get_elements(bulletin)) {
-      log_debug("processing element", element$id)
-      function_name <- paste0(element$type, "_to_xml")
-      xml_node <- content_node
+  
+  default_language <- bulletin$languages[1]
+  xml_node <- content_node
+  
+  for (element in get_elements(bulletin, language = default_language)) {
+    log_debug("processing element", element$id)
+    bulletin <- set_active_language(bulletin, language = default_language)
+    function_name <- paste0(element$type, "_to_xml")
+    
+    xml_node <- do.call(what = function_name, 
+                        args = list(xml = xml_node, element = element, language = default_language))
+    
+    # process other languages
+    for (language in bulletin$languages[-1]) {
+      bulletin <- set_active_language(bulletin, language = language)
       
-      do.call(what = function_name, 
-              args = list(xml = xml_node, element = element, language = language))
+      # find element
+      if (has_element(bulletin, language = language, id = element$id)) {
+        lang_element <- get_elements(bulletin, language = language, id = element$id)[[1]]
+        do.call(what = function_name, 
+                args = list(xml = xml_node, element = lang_element, language = language))
+      } else {
+        warning(paste("no element with id ", element$id, "found for language", language))
+      }
     }
   }
   content_node
@@ -97,4 +111,18 @@ xml_set_attribute <- function(xml, attribute, value, languages = NULL) {
   }
   
   xml
+}
+
+#' Make sure that there is a node of the given type (i.e. given name)
+#' 
+#' If the given node is already of the type, no action is taken.
+#' If the given node is not of the type, a child node is added with value set to the type. 
+#' @examples 
+#' xml_node <- xml2::xml_new_root("root")
+#' xml_node <- assure_node_of_type("text")
+assure_node_of_type <- function(xml_node, type) {
+  if (xml2::xml_name(xml_node) != type) {
+    xml_node <- xml2::xml_add_child(xml_node, .value = type)
+  }
+  xml_node
 }

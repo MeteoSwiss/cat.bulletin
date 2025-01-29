@@ -40,13 +40,14 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   bulletin <- bulletin %>% set_metadata(metadata)
   
+  text_id <- generate_element_id("text")
   bulletin <- bulletin %>%
     set_active_language(language = "de") %>%
-    add_text("Das ist ein Text auf Deutsch mit ös und äs.") %>%
+    add_text("Das ist ein Text auf Deutsch mit ös und äs.", id = text_id) %>%
     set_active_language(language = "fr") %>%
-    add_text("C'est un texte en français avec é et è." )%>%
+    add_text("C'est un texte en français avec é et è.", id = text_id)%>%
     set_active_language(language = "it") %>%
-    add_text("Questo è un testo in italiano con & et %.")
+    add_text("Questo è un testo in italiano con & et %.", id = text_id)
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   

@@ -108,11 +108,22 @@ set_metadata <- function(bulletin, metadata) {
 
 #' Adds an element to a bulletin
 #' @rdname create_bulletin
-#' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
-#' @param element one of the bulletin elements
+#' @importFrom set_element
 add_element <- function(bulletin, element, language = bulletin$language) {
   slot <- languaged_elements(language)
   bulletin[[slot]] <- append(bulletin[[slot]], list(element))
+  bulletin
+}
+
+#' Adds or replaces an element in the bulletin
+#' @rdname create_bulletin
+#' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
+#' @param element one of the bulletin elements
+#' @importFrom bulletin_element
+set_element <- function(bulletin, element, language = bulletin$language, id = element$id) {
+  assert_that(is.string(id))
+  slot <- languaged_elements(language)
+  bulletin[[slot]][[id]] <- element
   bulletin
 }
 
