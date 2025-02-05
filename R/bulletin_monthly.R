@@ -130,7 +130,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   #                       filename = filename,
   #                       caption = "This is a caption.")
   
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab)
+  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
   bulletin
 }
 
@@ -173,6 +173,7 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
   
+  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
   bulletin
 }
 

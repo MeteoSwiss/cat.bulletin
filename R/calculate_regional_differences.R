@@ -9,241 +9,58 @@ calculate_regional_differences <- function(bulletin) {
   }
   
   # prepare climtable
-  stations <- c("BER","SMA","GVE","BAS","ENG","DAV","SIO","LUG","SAM")
-  
   mondate <- formatC(bulletin$month,width=2, flag="0")
   begdate <- paste0(bulletin$year,mondate,"01")
   enddate <- paste0(bulletin$year,mondate,datefuns::days.of.mon(bulletin$year, bulletin$month))
   
   data <- clim.table::climtable(period=c(begdate,enddate), outDir = bulletin$data_path)
   
-  # set region every station is belonging to
-  
-  
-  ### Vielleicht regionen aus mchdwh ziehen anstelle von hardcoden? 
-  #station_info <- mchdwh::station_info(nat_abbr = vals$Station, region_type_id = 1)
-  #rownames(station_info) <- station_info$nat_abbr
-  #vals$Region <- station_info[vals$Station, "region_name_G"]
-  #assert_that(length(intersect(regsort, vals$Region)) == 0, msg = "The regsort vector does not correspond to region values of the stations")
-  
-  
-  regsort <- c("Mittelland","Alpennordhang","Westschweiz","Wallis","Nord- und Mittelbünden","Engadin","Alpensüdseite")
+  # set region "every station is belonging to
+  regsort <- c("Jura","Mittelland","Alpennordhang","Wallis","Nord- und Mittelbünden","Engadin","Alpensüdseite")
   vals <- data$dana$vals
-  vals$Region <- rep("",length(vals$Station))
-  vals$Region[1:14]  <- "Westschweiz"
-  vals$Region[15:32] <- "Mittelland"
-  vals$Region[33:55] <- "Alpennordhang"
-  vals$Region[56:61] <- "Nord- und Mittelbünden"
-  vals$Region[62:70] <- "Wallis"
-  vals$Region[71:76] <- "Engadin"
-  vals$Region[77:88] <- "Alpensüdseite"
+
+  station_info <- mchdwh::station_info(nat_abbr = vals$Station, region_type_id = 1)
+  rownames(station_info) <- station_info$nat_abbr
+  vals$Region <- station_info[vals$Station, "region_name_G"]
+  vals$Region <- clean_region_names(vals$Region)
+  assert_that(all(vals$Region %in% regsort), msg = "The regsort vector does not correspond to region values of the stations")
 
   ### TEMPERATURE ###
-  # check whether all or a large fraction of the data
-  # are either above, below or in the range of the reference period
-  acurr_all <- vals$Abw[!is.na(vals$Abw)]
-  a_ueber <- length(which(acurr_all > 0.5)) / length(acurr_all)
-  a_unter <- length(which(acurr_all < -0.5)) / length(acurr_all)
-  a_bereich <- 1 - a_ueber - a_unter
-  quac <- quantile(acurr_all,probs = c(0.16,0.84))
-  quac[quac>0] <- paste0("+",quac[quac>0])
-
-  # temperature difference with altitude
-  diff_highlow <- abs(median(vals$Abw[vals$Hoehe>=1500],na.rm=T))-abs(median(vals$Abw[vals$Hoehe<1500],na.rm=T))
-  
-  # greatest deviations in all regions
-  regs <- unique(vals$Region)
-  vhighest <- 1
-  vlowest <- 1
-  for (r in 1:length(regs)) {
-    indr <- which(vals$Region == regs[r])
-    vhighest[r] <- quantile(abs(vals$Abw[indr]),0.75,na.rm=TRUE)
-    vlowest[r] <- quantile(abs(vals$Abw[indr]),0.25,na.rm=TRUE)
-  }
-  member_h <- cutree(hclust(dist(vhighest)),3)
-  member_l <- cutree(hclust(dist(vlowest)),3)
-  mr_h <- 0
-  mr_l <- 0
-  for (i in 1:3) {
-    indm_h <- which(member_h == i)
-    mr_h[i] <- mean(vhighest[indm_h])
-    indm_l <- which(member_l == i)
-    mr_l[i] <- mean(vlowest[indm_l])
-  }
-  mhigh <- which(mr_h==max(mr_h))
-  mhigh <- which(member_h == mhigh)
-  regshigh <- collapse_sentence(regs[mhigh])
-  mlow <- which(mr_l==min(mr_l))
-  mlow <- which(member_l == mlow)
-  regslow <- collapse_sentence(regs[mlow])
-  # add a few relevant stations to the list below
-  selhigh <- vals[which(vals$Region %in% regs[mhigh]),]
-  selhigh <- selhigh[order(match(selhigh$Abw, sort(selhigh$Abw,decreasing = TRUE))), ]
-  selhigh <- selhigh[1:2,]
-  sellow <- vals[which(vals$Region %in% regs[mlow]),]
-  sellow <- sellow[order(match(sellow$Abw, sort(sellow$Abw,decreasing = FALSE))), ]
-  sellow <- sellow[1:2,]
-  selreg <- rbind(selhigh,sellow)
-  sellow_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow$Station)$station_name)
-  selhigh_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh$Station)$station_name)
-  
-  # generate subset for a printable table
-  # (reduced to the stations defined above)
-  subset_climtab <- vals[which(vals$Station %in% stations),]
-  subset_climtab <- subset_climtab[order(match(subset_climtab$Station, stations)), ]
-  subset_climtab <- rbind(subset_climtab,selreg)
-  subset_climtab$Region <- factor(subset_climtab$Region, levels = regsort, ordered = TRUE)
-  subset_climtab <- subset_climtab[order(subset_climtab$Region),]
-  subset_climtab <- subset_climtab[,c(1:5)]
-  sn <- mchdwh::station_info(nat_abbr=subset_climtab$Station)
-  sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
-  subset_climtab$Station <- sn$station_name
-  subset_climtab$Abw[subset_climtab$Abw > 0] <- paste0("+", subset_climtab$Abw[subset_climtab$Abw > 0])
-  rownames(subset_climtab) <- NULL
-  attributes(subset_climtab)$names <- c("Station","Höhe (m)","Monatsmittel (\u00B0C)","Referenz (\u00B0C)","Abweichung (\u00B0C)")
-  
-  subset_climtab <- flextable::flextable(subset_climtab)
-  subset_climtab <- flextable::set_caption(subset_climtab, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
+  regdiff_T <- comp_regdiff(parameter = "T", vals = vals, regsort = regsort)
+  subset_climtab_T <- flextable::flextable(regdiff_T$subset_climtab)
+  subset_climtab_T <- flextable::set_caption(subset_climtab_T, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
   
   # Local temperature ranking
-  # There are two possible reasons for no records:
-  # - Actually no values of rank 10 or lower for this parameter
-  # - Monthly sums not yet computed in DWH because too early
   high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
   low_temp_records  <- process_extreme_values(param_short = "ths20m0n", bulletin)
 
   ### PRECIPITATION ###
-  # check whether all or a large fraction of the data
-  # are either above, below or in the range of the norm
-  acurr_all_prec <- vals$R.dev[!is.na(vals$R.dev)]
-  a_ueber_prec <- length(which(acurr_all_prec > 105)) / length(acurr_all_prec)
-  a_unter_prec <- length(which(acurr_all_prec < 95)) / length(acurr_all_prec)
-  a_bereich_prec <- 1 - a_ueber_prec - a_unter_prec
-  quac_prec <- quantile(acurr_all_prec,probs = c(0.16,0.84))
-  # round values to next 5 for precip
-  quac_prec <- round(quac_prec/5)*5
+  regdiff_P <- comp_regdiff(parameter = "P", vals = vals, regsort = regsort)
+  subset_climtab_P <- flextable::flextable(regdiff_P$subset_climtab)
+  subset_climtab_P <- flextable::set_caption(subset_climtab_P, caption = paste0("Monatsniederschläge für den ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+
+  # Local precipitation ranking
+  high_prec_records <- process_extreme_values(param_short = "rhs15m0x", bulletin)
+  low_prec_records  <- process_extreme_values(param_short = "rhs15m0n", bulletin)
   
-  # monthly prec sum ranks at stations
-  vals$Rank_R_wet <- rep(NA,length(vals$Station))
-  vals$Rank_R_dry <- rep(NA,length(vals$Station))
-  vals$firstmeas_R <- rep("",length(vals$Station))
-  
-  # get precip ranks only for nbcn-p stations
-  # note: there are nbcn-p stations that are not part of the climtable, so the ranks should be calculated separately,
-  # not only for stations in vals$Station
-  nbcnpstats <- mchdwh::station_group_info(station_group_id = c(1007, 1022))$nat_abbr  # nbcn + nbcn-p
-  nbcnpstats <- nbcnpstats[!nbcnpstats %in% c("PAY", "JUN", "RAG")]
-  #CONTINUE IMPLEMENTATION OF NBCN-P station RANKS HERE
-  for (s in 1:length(vals$Station)) {
-    if (vals$Station[s] %in% nbcnpstats) {
-      print(vals$Station[s])
-      filename_stat_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", 
-                               paste0("climate-precipitation-evolution-station-abs_rhs150m0_abs_loess30_1864-today_08_station_", vals$Station[s],"_de.txt"), 
-                               package = "cat.bulletin")
-      print(filename_stat_abs)
-      data_stat_abs <- read.table(filename_stat_abs, header = TRUE)
-      # recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
-      vals$Rank_R_wet[s] <- data_stat_abs$rank.h[which(data_stat_abs$year == bulletin$year)]
-      vals$Rank_R_dry[s] <- data_stat_abs$rank.l[which(data_stat_abs$year == bulletin$year)]
-      vals$firstmeas_R[s] <- data_stat_abs$year[1]
-      # vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
-      # vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
-      # vals$firstmeas_R[s] <- recstat_R$firstmeas
-    } else {
-      vals$Rank_R_wet[s] <- NA
-      vals$Rank_R_dry[s] <- NA
-      vals$firstmeas_R[s] <- ""
-    }
-    # if (vals$Station[s] %in% c("AND","LAE","HOE","JUN","GSB","BEH")) {
-    #   vals$Rank_R_wet[s] <- NA
-    #   vals$Rank_R_dry[s] <- NA
-    #   vals$firstmeas_R[s] <- NA
-    # } else {
-    #   recstat_R <- rekorde(top=10,minmax="max",year=bulletin$year,month=bulletin$month,station=vals$Station[s],parameter="rhs150m0",rectype="m")
-    #   vals$Rank_R_wet[s] <- recstat_R$ranks_curryear
-    #   vals$Rank_R_dry[s] <- bulletin$year-recstat_R$firstmeas+2-recstat_R$ranks_curryear
-    #   vals$firstmeas_R[s] <- recstat_R$firstmeas
-    # }
-  }
-  vals$Rank_R_comb <- ifelse(
-    is.na(vals$Rank_R_wet) | is.na(vals$Rank_R_dry),
-    "",
-    ifelse (
-      vals$Rank_R_wet <= vals$Rank_R_dry,
-      paste0(vals$Rank_R_wet, "\u2193"),
-      paste0(vals$Rank_R_dry, "\u2191")
-    )
-  )
-  
-  # stations with time series of more than 100 years
-  ranky100_R_wet <- vals$Rank_R_wet[vals$firstmeas_R<(bulletin$year-100)]
-  ranky100_R_dry <- vals$Rank_R_dry[vals$firstmeas_R<(bulletin$year-100)]
-  r1y100_R_wet <- which(vals$firstmeas_R<(bulletin$year-100) & vals$Rank_R_wet==1)
-  r1y100_R_dry <- which(vals$firstmeas_R<(bulletin$year-100) & vals$Rank_R_dry==1)
-  
-  # greatest deviations in all regions
-  vhighest_R <- 1
-  vlowest_R <- 1
-  for (r in 1:length(regs)) {
-    indr <- which(vals$Region == regs[r])
-    vhighest_R[r] <- quantile(vals$R.dev[indr],0.75,na.rm=TRUE)
-    vlowest_R[r] <- quantile(vals$R.dev[indr],0.25,na.rm=TRUE)
-  }
-  member_h_R <- cutree(hclust(dist(vhighest_R)),3)
-  member_l_R <- cutree(hclust(dist(vlowest_R)),3)
-  mr_h_R <- 0
-  mr_l_R <- 0
-  for (i in 1:3) {
-    indm_h_R <- which(member_h_R == i)
-    mr_h_R[i] <- mean(vhighest_R[indm_h_R])
-    indm_l_R <- which(member_l_R == i)
-    mr_l_R[i] <- mean(vlowest_R[indm_l_R])
-  }
-  mhigh_R <- which(mr_h_R==max(mr_h_R))
-  mhigh_R <- which(member_h_R == mhigh_R)
-  regshigh_R <- collapse_sentence(regs[mhigh_R])
-  mlow_R <- which(mr_l_R==min(mr_l_R))
-  mlow_R <- which(member_l_R == mlow_R)
-  regslow_R <- collapse_sentence(regs[mlow_R])
-  # add a few relevant stations to the list below
-  selhigh_R <- vals[which(vals$Region %in% regs[mhigh_R]),]
-  selhigh_R <- selhigh_R[order(match(selhigh_R$R.dev, sort(selhigh_R$R.dev,decreasing = TRUE))), ]
-  selhigh_R <- selhigh_R[1:2,]
-  sellow_R <- vals[which(vals$Region %in% regs[mlow_R]),]
-  sellow_R <- sellow_R[order(match(sellow_R$R.dev, sort(sellow_R$R.dev,decreasing = FALSE))), ]
-  sellow_R <- sellow_R[1:2,]
-  selreg_R <- rbind(selhigh_R,sellow_R)
-  sellow_stats_R <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow_R$Station)$station_name)
-  selhigh_stats_R <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh_R$Station)$station_name)
-  
-  # generate subset for a printable table
-  # (reduced to the stations defined above)
-  # print(str(vals))
-  # print(dim(vals))
-  subset_climtab_R <- vals[which(vals$Station %in% stations),]
-  subset_climtab_R <- subset_climtab_R[order(match(subset_climtab_R$Station, stations)), ]
-  subset_climtab_R <- rbind(subset_climtab_R,selreg_R)
-  subset_climtab_R <- subset_climtab_R[,c(1,11:13,19,18)]
-  sn_R <- mchdwh::station_info(nat_abbr=subset_climtab_R$Station)
-  sn_R <- sn_R[order(match(sn_R$nat_abbr, subset_climtab_R$Station)), ]
-  subset_climtab_R$Station <- sn_R$station_name
-  rownames(subset_climtab_R) <- NULL
-  attributes(subset_climtab_R)$names <- c("Station","Monatssumme (mm)","Norm (mm)","% der Norm","Rang","Messbeginn")
-  
+  # Output
   regional_differences <- list(
     # temperature
-    allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
-    quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
-    selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, selhigh_abw = selhigh$Abw, sellow_abw = sellow$Abw, 
-    diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab, 
+    allvalues = regdiff_T$allvalues, anteil_ueber = regdiff_T$anteil_ueber, anteil_unter = regdiff_T$anteil_unter, 
+    anteil_bereich = regdiff_T$anteil_bereich, quantiles = regdiff_T$quantiles, 
+    numb_stats_high = regdiff_T$numb_stats_high, regshigh = regdiff_T$regshigh, numb_stats_low = regdiff_T$numb_stats_low, 
+    regslow = regdiff_T$regslow, selhigh_stats = regdiff_T$selhigh_stats, sellow_stats = regdiff_T$sellow_stats, 
+    selhigh_abw = regdiff_T$selhigh_abw, sellow_abw = regdiff_T$sellow_abw, diff_highlow = regdiff_T$diff_highlow, 
+    climtab_vals = regdiff_T$climtab_vals, subset_climtab_T = subset_climtab_T, 
     high_temp_rec_avail = high_temp_records$rec_avail, low_temp_rec_avail = low_temp_records$rec_avail, 
     # precipitation 
-    allvalues_R = acurr_all_prec, anteil_ueber_R = a_ueber_prec, anteil_unter_R = a_unter_prec, 
-    anteil_bereich_R = a_bereich_prec, quantiles_R = quac_prec, numb_stats_high_R = mhigh_R, 
-    regshigh_R = regshigh_R, numb_stats_low_R = mlow_R, regslow_R = regslow_R, 
-    selhigh_stats_R = selhigh_stats_R, sellow_stats_R = sellow_stats_R, 
-    subset_climtab_R = subset_climtab_R, ranky100_R_wet = ranky100_R_wet, ranky100_R_dry = ranky100_R_dry,
-    rank1_longseries_R_wet = r1y100_R_wet, rank1_longseries_R_dry = r1y100_R_dry
+    allvalues_P = regdiff_P$allvalues, anteil_ueber_P = regdiff_P$anteil_ueber, anteil_unter_P = regdiff_P$anteil_unter, 
+    anteil_bereich_P = regdiff_P$anteil_bereich, quantiles_P = regdiff_P$quantiles, 
+    numb_stats_high_P = regdiff_P$numb_stats_high, regshigh_P = regdiff_P$regshigh, numb_stats_low_P = regdiff_P$numb_stats_low, 
+    regslow_P = regdiff_P$regslow, selhigh_stats_P = regdiff_P$selhigh_stats, sellow_stats_P = regdiff_P$sellow_stats, 
+    selhigh_abw_P = regdiff_P$selhigh_abw, sellow_abw_P = regdiff_P$sellow_abw, 
+    climtab_vals_P = regdiff_P$climtab_vals, subset_climtab_P = subset_climtab_P,
+    high_prec_rec_avail = high_prec_records$rec_avail, low_prec_rec_avail = low_prec_records$rec_avail
   )
   if (high_temp_records$rec_avail) {
     regional_differences <- c(regional_differences,
@@ -258,6 +75,20 @@ calculate_regional_differences <- function(bulletin) {
                               low_temp_count_hr = low_temp_records$count_hr, 
                               low_temp_shortest_period = low_temp_records$shortest_period, 
                               low_temp_station_record_info = low_temp_records$station_record_info)
+  } 
+  if (high_prec_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              high_prec_highest_rank = high_prec_records$highest_rank, 
+                              high_prec_count_hr = high_prec_records$count_hr, 
+                              high_prec_shortest_period = high_prec_records$shortest_period, 
+                              high_prec_station_record_info = high_prec_records$station_record_info)
+  } 
+  if (low_prec_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              low_prec_highest_rank = low_prec_records$highest_rank, 
+                              low_prec_count_hr = low_prec_records$count_hr, 
+                              low_prec_shortest_period = low_prec_records$shortest_period, 
+                              low_prec_station_record_info = low_prec_records$station_record_info)
   } 
   
   # cache the results
@@ -286,7 +117,7 @@ process_extreme_values <- function(param_short, bulletin) {
       )
     }, 
     error = function(e) {
-      message("Keine Rekorde in diesem Monat zu diesem Parameter: ", e$message)
+      message("No records were found in this month for this parameter: ", e$message)
       return(NULL)
     }
   )
@@ -355,4 +186,116 @@ process_extreme_values <- function(param_short, bulletin) {
   } else {
     return(list(rec_avail = rec_avail))
   }
+}
+
+# Computation of regional differences in temperature, precipitation and sunshine duration
+comp_regdiff <- function(parameter, vals, regsort) {
+  
+  # Fixed input, parameter-independent
+  dev_probs <- c(0.16, 0.84)
+  alt_limit <- 1500
+  standard_stations <- c("BER","SMA","GVE","BAS","ENG","DAV","SIO","LUG","SAM")
+  
+  if (parameter == "T") {
+    # Fixed input for temperature
+    deviations <- "Abw"
+    norm_range <- c(-0.5,0.5)
+    tab_columns <- c(1:5)
+    climtab_names <- c("Station","Höhe (m)","Monatsmittel (\u00B0C)","Referenz (\u00B0C)","Abweichung (\u00B0C)")
+  }
+  if (parameter == "P") {
+    # Fixed input for precipitation
+    deviations <- "R.dev"
+    norm_range <- c(95,105)
+    tab_columns <- c(1,11:13)
+    climtab_names <- c("Station","Monatssumme (mm)","Referenz (mm)","Verhältnis zur Referenz (%)")
+  }
+  if (parameter == "S") {
+    # Fixed input for sunshine duration
+    deviations <- "S.dev"
+    norm_range <- c(95,105)
+    tab_columns <- c(1,7:9)
+    climtab_names <- c("Station","Monatssumme (h)","Referenz (h)","Verhältnis zur Referenz (%)")
+  }
+  
+  acurr_all <- vals[[deviations]][!is.na(vals[[deviations]])]
+  a_ueber <- length(which(acurr_all > norm_range[2])) / length(acurr_all)
+  a_unter <- length(which(acurr_all < norm_range[1])) / length(acurr_all)
+  a_bereich <- 1 - a_ueber - a_unter
+  quac <- quantile(acurr_all,probs = dev_probs)
+  if (parameter == "T") {
+    quac <- round(quac, digits=1)
+    quac[quac>0] <- paste0("+",quac[quac>0])
+  } else {
+    quac <- round(quac, digits=0)
+  }
+  
+  # temperature difference with altitude
+  diff_highlow <- abs(median(vals[[deviations]][vals$Hoehe>=alt_limit],na.rm=T))-abs(median(vals[[deviations]][vals$Hoehe<alt_limit],na.rm=T))
+  
+  # greatest vals[[deviations]] in all regions
+  regs <- unique(vals$Region)
+  vhighest <- 1
+  vlowest <- 1
+  for (r in 1:length(regs)) {
+    indr <- which(vals$Region == regs[r])
+    vhighest[r] <- quantile(abs(vals[[deviations]][indr]),0.75,na.rm=TRUE)
+    vlowest[r] <- quantile(abs(vals[[deviations]][indr]),0.25,na.rm=TRUE)
+  }
+  member_h <- cutree(hclust(dist(vhighest)),3)
+  member_l <- cutree(hclust(dist(vlowest)),3)
+  mr_h <- 0
+  mr_l <- 0
+  for (i in 1:3) {
+    indm_h <- which(member_h == i)
+    mr_h[i] <- mean(vhighest[indm_h])
+    indm_l <- which(member_l == i)
+    mr_l[i] <- mean(vlowest[indm_l])
+  }
+  mhigh <- which(mr_h==max(mr_h))
+  mhigh <- which(member_h == mhigh)
+  regshigh <- collapse_sentence(regs[mhigh])
+  mlow <- which(mr_l==min(mr_l))
+  mlow <- which(member_l == mlow)
+  regslow <- collapse_sentence(regs[mlow])
+  # add a few relevant stations to the list below
+  selhigh <- vals[which(vals$Region %in% regs[mhigh]),]
+  selhigh <- selhigh[order(match(selhigh[[deviations]], sort(selhigh[[deviations]],decreasing = TRUE))), ]
+  selhigh <- selhigh[1:2,]
+  sellow <- vals[which(vals$Region %in% regs[mlow]),]
+  sellow <- sellow[order(match(sellow[[deviations]], sort(sellow[[deviations]],decreasing = FALSE))), ]
+  sellow <- sellow[1:2,]
+  sellow_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow$Station)$station_name)
+  selhigh_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh$Station)$station_name)
+  selreg <- rbind(selhigh,sellow)
+  selreg <- selreg[!(selreg$Station %in% standard_stations), ]
+  
+  # generate subset for a printable table
+  # (reduced to the stations defined above)
+  subset_climtab <- vals[which(vals$Station %in% standard_stations),]
+  subset_climtab <- subset_climtab[order(match(subset_climtab$Station, standard_stations)), ]
+  subset_climtab <- rbind(subset_climtab,selreg)
+  subset_climtab$Region <- factor(subset_climtab$Region, levels = regsort, ordered = TRUE)
+  subset_climtab <- subset_climtab[order(subset_climtab$Region),]
+  subset_climtab <- subset_climtab[,tab_columns]
+  sn <- mchdwh::station_info(nat_abbr=subset_climtab$Station)
+  sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
+  subset_climtab$Station <- sn$station_name
+  if (parameter == "T") {
+    subset_climtab[[deviations]][subset_climtab[[deviations]] > 0] <- paste0("+", subset_climtab[[deviations]][subset_climtab[[deviations]] > 0])
+  }
+  rownames(subset_climtab) <- NULL
+  attributes(subset_climtab)$names <- climtab_names
+  
+  # Output
+  return(list(allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
+              quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
+              selhigh_stats = selhigh_stats, sellow_stats = sellow_stats, selhigh_abw = selhigh[[deviations]], 
+              sellow_abw = sellow[[deviations]], diff_highlow = diff_highlow, climtab_vals = vals, subset_climtab = subset_climtab))
+  
+}
+
+clean_region_names <- function(regions) {
+  regions <- sub(".*(Alpennordhang|Mittelland|Jura).*", "\\1", regions)
+  return(regions)
 }
