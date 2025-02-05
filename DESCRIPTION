@@ -2,7 +2,7 @@ Package: cat.bulletin
 Type: Package
 Title: Automation of bulletion creation for publication on the MeteoSwiss website
 Version: 0.3.0
-Authors@R: c(person(given="Elias", family="Zubler", email="elias.zubler@meteoswiss.ch", role=c("aut", "cre")),
+Authors@R: c(person(given="Elias", family="Zubler", email="elias.zubler@meteoswiss.ch", role=c("aut")),
     person(given="Felix", family="Maurer", email="felix.maurer@meteoswiss.ch", role=c("aut","cre"))
     )
 Description: Bulletins are prepared as zip file containing the bulletin as pdf in several languages and an xml file that is processed by the CMS of the website.

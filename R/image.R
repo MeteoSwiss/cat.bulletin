@@ -1,5 +1,5 @@
-image_element <- function(filepath, filename = basename(filepath), caption, alt, source, label) {
-  element <- bulletin_element(type = "image")
+image_element <- function(filepath, filename = basename(filepath), caption, alt, source, label, id = NULL) {
+  element <- bulletin_element(type = "image", id = id)
   element[["caption"]] <- caption
   element[["filename"]] <- filename
   element[["filepath"]] <- filepath
@@ -34,12 +34,13 @@ teaser_image <- function(filepath, filename = basename(filepath)) {
 #'   add_image(filepath = image_filepath, caption = "An example figure.")
 #' @export
 add_image <- function(bulletin, filepath, filename = basename(filepath), 
-                      caption = NULL, alt = NULL, source = NULL, label = NULL) {
+                      caption = NULL, alt = NULL, source = NULL, label = NULL,
+                      id = NULL) {
   assert_that(file.exists(filepath))
-  newpath <- file.path(bulletin$bulletin_path, filename)
+  newpath <- file.path(bulletin$image_path, filename)
   file.copy(filepath, newpath, overwrite = TRUE)
   add_element(bulletin, image_element(filename = filename, filepath = newpath, caption = caption, 
-                                      alt = alt, source = source, label = label))
+                                      alt = alt, source = source, label = label, id = id))
 }
 
 image_to_markdown <- function(element) {
@@ -60,9 +61,8 @@ image_to_markdown2 <- function(element) {
 }
 
 image_to_xml <- function(xml, element, language) {
-  image_node <- xml2::xml_add_child(xml, .value = "image")
-  image_node <- image_node %>%
-    set_languaged_attribute("image", language, element$filename) %>%
+  image_node <- assure_node_of_type(xml, type = "image") %>%
+    set_languaged_attribute("fileName", language, paste0(bulletin$image_dir, "/", element$filename)) %>%
     set_languaged_attribute("legend", language, element$caption) %>%
     set_languaged_attribute("alt", language, element$alt) %>%
     set_languaged_attribute("source", language, element$source) %>%

@@ -45,7 +45,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   bulletin <- bulletin %>% set_metadata(metadata)
   
-  ## A text element
+  ## Text element
   
   text_id <- generate_element_id("text")
   bulletin <- bulletin %>%
@@ -56,7 +56,27 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     set_active_language(language = "it") %>%
     add_text("Questo è un testo in italiano con & et %.", id = text_id)
   
-  ## A 
+  ## Image element
+  
+  image_id <- "my_first_image"
+  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
+  bulletin <- bulletin %>%
+    set_active_language(language = "de") %>%
+    add_image(filepath = filepath, 
+              filename = "image1_de.png", 
+              caption = "Bildlegende",
+              id = image_id)  %>%
+    set_active_language(language = "fr") %>%
+    add_image(filepath = filepath, 
+              filename = "image1_fr.png", 
+              caption = "Légende de l'image",
+              id = image_id)  %>%
+    set_active_language(language = "it") %>%
+    add_image(filepath = filepath, 
+              filename = "image1_it.png", 
+              caption = "Legenda",
+              id = image_id)
+
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   

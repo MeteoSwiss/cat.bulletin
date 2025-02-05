@@ -17,7 +17,6 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
 xml_add_bulletin_elements <- function(content_node, bulletin) {
   
   default_language <- bulletin$languages[1]
-  xml_node <- content_node
   
   for (element in get_elements(bulletin, language = default_language)) {
     log_debug("processing element", element$id)
@@ -25,7 +24,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
     function_name <- paste0(element$type, "_to_xml")
     
     xml_node <- do.call(what = function_name, 
-                        args = list(xml = xml_node, element = element, language = default_language))
+                        args = list(xml = content_node, element = element, language = default_language))
     
     # process other languages
     for (language in bulletin$languages[-1]) {
