@@ -43,6 +43,14 @@ calculate_regional_differences <- function(bulletin) {
   high_prec_records <- process_extreme_values(param_short = "rhs15m0x", bulletin)
   low_prec_records  <- process_extreme_values(param_short = "rhs15m0n", bulletin)
   
+  ### SUNSHINE DURATION ###
+  regdiff_S <- comp_regdiff(parameter = "S", vals = vals, regsort = regsort)
+  subset_climtab_S <- flextable::flextable(regdiff_S$subset_climtab)
+  subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",bulletin$month_str," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  # Local sunshine duration ranking
+  high_sun_records <- process_extreme_values(param_short = "sh200m0x", bulletin)
+  low_sun_records  <- process_extreme_values(param_short = "sh200m0n", bulletin)
+  
   # Output
   regional_differences <- list(
     # temperature
@@ -60,7 +68,15 @@ calculate_regional_differences <- function(bulletin) {
     regslow_P = regdiff_P$regslow, selhigh_stats_P = regdiff_P$selhigh_stats, sellow_stats_P = regdiff_P$sellow_stats, 
     selhigh_abw_P = regdiff_P$selhigh_abw, sellow_abw_P = regdiff_P$sellow_abw, 
     climtab_vals_P = regdiff_P$climtab_vals, subset_climtab_P = subset_climtab_P,
-    high_prec_rec_avail = high_prec_records$rec_avail, low_prec_rec_avail = low_prec_records$rec_avail
+    high_prec_rec_avail = high_prec_records$rec_avail, low_prec_rec_avail = low_prec_records$rec_avail,
+    # sunshine 
+    allvalues_S = regdiff_S$allvalues, anteil_ueber_S = regdiff_S$anteil_ueber, anteil_unter_S = regdiff_S$anteil_unter, 
+    anteil_bereich_S = regdiff_S$anteil_bereich, quantiles_S = regdiff_S$quantiles, 
+    numb_stats_high_S = regdiff_S$numb_stats_high, regshigh_S = regdiff_S$regshigh, numb_stats_low_S = regdiff_S$numb_stats_low, 
+    regslow_S = regdiff_S$regslow, selhigh_stats_S = regdiff_S$selhigh_stats, sellow_stats_S = regdiff_S$sellow_stats, 
+    selhigh_abw_S = regdiff_S$selhigh_abw, sellow_abw_S = regdiff_S$sellow_abw, 
+    climtab_vals_S = regdiff_S$climtab_vals, subset_climtab_S = subset_climtab_S,
+    high_sun_rec_avail = high_sun_records$rec_avail, low_sun_rec_avail = low_sun_records$rec_avail
   )
   if (high_temp_records$rec_avail) {
     regional_differences <- c(regional_differences,
@@ -89,6 +105,20 @@ calculate_regional_differences <- function(bulletin) {
                               low_prec_count_hr = low_prec_records$count_hr, 
                               low_prec_shortest_period = low_prec_records$shortest_period, 
                               low_prec_station_record_info = low_prec_records$station_record_info)
+  } 
+  if (high_sun_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              high_sun_highest_rank = high_sun_records$highest_rank, 
+                              high_sun_count_hr = high_sun_records$count_hr, 
+                              high_sun_shortest_period = high_sun_records$shortest_period, 
+                              high_sun_station_record_info = high_sun_records$station_record_info)
+  } 
+  if (low_sun_records$rec_avail) {
+    regional_differences <- c(regional_differences,
+                              low_sun_highest_rank = low_sun_records$highest_rank, 
+                              low_sun_count_hr = low_sun_records$count_hr, 
+                              low_sun_shortest_period = low_sun_records$shortest_period, 
+                              low_sun_station_record_info = low_sun_records$station_record_info)
   } 
   
   # cache the results

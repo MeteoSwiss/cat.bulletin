@@ -32,7 +32,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
     monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
     temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
     monatsbilanz_precip(regdiff = regdiff) %>%
-    monatsbilanz_sun() %>%
+    monatsbilanz_sun(regdiff = regdiff) %>%
     monatsbulletin_daily_timeseries() %>%
     monatsbulletin_more_info()
   
@@ -177,7 +177,7 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
   bulletin
 }
 
-monatsbilanz_sun <- function(bulletin) {
+monatsbilanz_sun <- function(bulletin, regdiff) {
   log_info("monatsbilanz_sun")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun")
@@ -196,6 +196,7 @@ monatsbilanz_sun <- function(bulletin) {
                         caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
   
 
+  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
   bulletin  
 }
 
