@@ -27,16 +27,40 @@ test_that("Create markdown file from bulletin", {
 })
 
 test_that("Create pdf from bulletin", {
-  text <- c("# This is a title",
+  text <- c("## This is a level two title",
             "This is normal text."
   )
   bulletin <- create_bulletin() %>%
     add_text(text[1]) %>%
     add_text(text[2])
   
-  filename <- bulletin_to_pdf(bulletin)
+  filename <- bulletin_to_pdf(bulletin, language = "de")
   expect_snapshot_file(filename)
 })
+
+
+test_that("Create pdf from bulletin with metadata", {
+  text <- c("## This is a level two title",
+            "This is normal text."
+  )
+  bulletin <- create_bulletin(
+    languages = "en",
+    metadata = publication_metadata(
+     title = c(en = "This is the bulletin title"),
+     lead = c(en = "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."),
+     teaser_image = monthlybulletin_teaser_image(yearmonth = format(Sys.Date(), "%Y%m")),
+     teaser_source = c(
+       en = monthlybulletin_teaser_text(yearmonth = format(Sys.Date(), "%Y%m"), language = "de")
+     )
+    )
+  ) %>%
+    add_text(text[1]) %>%
+    add_text(text[2])
+  
+  filename <- bulletin_to_pdf(bulletin, language = "en")
+  expect_snapshot_file(filename)
+})
+
 
 test_that("has_element", {
   title <- "# This is a title"

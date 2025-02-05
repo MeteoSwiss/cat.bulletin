@@ -1,5 +1,5 @@
 test_that("Update metadata element", {
-  m <- bulletin_metadata(path = "path1")
+  m <- publication_metadata(path = "path1")
   m <- update_metdata_element(m, path = "path2")
   expect_equal(m$path, "path2")
   expect_warning(update_metdata_element(m, foo = "new element"))

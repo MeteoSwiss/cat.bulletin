@@ -3,8 +3,6 @@
 #' @param id a string giving a unique identifier. The id must be unique within one language but can (should) 
 #' be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
 #' The default is a composition of type and a random string.
-#' @details 
-#' 
 bulletin_element <- function(type, id) {
   if (missing(id) || is.null(id))
     id <- generate_element_id(type = type)

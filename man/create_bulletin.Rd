@@ -4,6 +4,7 @@
 \alias{create_bulletin}
 \alias{set_metadata}
 \alias{add_element}
+\alias{set_element}
 \alias{has_element}
 \title{Create a bulletin}
 \usage{
@@ -14,12 +15,14 @@ create_bulletin(
   bulletin_dir = "bulletin",
   workdir = tempdir(),
   bulletin_path = file.path(workdir, bulletin_dir),
-  metadata = bulletin_metadata()
+  metadata = publication_metadata()
 )
 
 set_metadata(bulletin, metadata)
 
 add_element(bulletin, element, language = bulletin$language)
+
+set_element(bulletin, element, language = bulletin$language, id = element$id)
 
 has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 }
@@ -34,15 +37,15 @@ has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 
 \item{bulletin_path}{the path to the directory where the bulletin will be created in}
 
-\item{metadata}{A list of metadata information created with \code{\link{bulletin_metadata}}.}
+\item{metadata}{A list of metadata information created with \code{\link{publication_metadata}}.}
 
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{element}{one of the bulletin elements}
 
-\item{type}{string The type of the element(s)}
-
 \item{id}{string The id of the element}
+
+\item{type}{string The type of the element(s)}
 }
 \value{
 an object that represents the bulletin content
@@ -53,6 +56,8 @@ Create a bulletin
 Set the metadata object for a bulletin
 
 Adds an element to a bulletin
+
+Adds or replaces an element in the bulletin
 
 Checks if the bulletin has an element in the given language
 }

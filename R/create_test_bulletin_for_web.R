@@ -9,7 +9,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     workdir = workdir
   ) 
   
-  metadata <- bulletin_metadata(
+  metadata <- publication_metadata(
     path = "webtest",
     title = c(
       de = "Klimabulletin - Testpublikation",
@@ -17,9 +17,9 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       it = "Bolletino del clima - test"
     ),
     lead = c(
-      de = "Damit Ihr indess erkennt, woher dieser ganze Irrthum gekommen ist, und weshalb man die Lust anklagt und den Schmerz lobet, so will ich Euch Alles eröffnen und auseinander setzen, was jener Begründer der Wahrheit und gleichsam Baumeister des glücklichen Lebens selbst darüber gesagt hat. Niemand, sagt er, verschmähe, oder hasse, oder fliehe die Lust als solche, sondern weil grosse Schmerzen ihr folgen, wenn man nicht mit Vernunft ihr nachzugehen verstehe. Ebenso werde der Schmerz als solcher von Niemand geliebt, gesucht und verlangt, sondern weil mitunter solche Zeiten eintreten, dass man mittelst Arbeiten und Schmerzen eine grosse Lust sich zu verschaften suchen müsse. Um hier gleich bei dem Einfachsten stehen zu bleiben, so würde Niemand von uns anstrengende körperliche Übungen vornehmen, wenn er nicht einen Vortheil davon erwartete. Wer dürfte aber wohl Den tadeln, der nach einer Lust verlangt, welcher keine Unannehmlichkeit folgt, oder der einem Schmerze ausweicht, aus dem keine Lust hervorgeht?",
-      it = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-      fr = "Cependant, afin que vous sachiez d'où vient toute cette erreur, et pourquoi l'on accuse le plaisir et l'on loue la douleur, je vais vous exposer et vous expliquer tout ce qu'a dit à ce sujet le fondateur de la vérité et, pour ainsi dire, l'architecte de la vie heureuse. Personne, dit-il, ne dédaigne, ne hait, ne fuit le plaisir en tant que tel, mais parce que de grandes douleurs le suivent, si l'on ne sait pas le suivre par la raison. De même, personne n'aime, ne recherche et ne désire la douleur en tant que telle, mais parce qu'il arrive parfois que l'on doive chercher à se procurer un grand plaisir au moyen de travaux et de douleurs. Pour s'en tenir ici au plus simple, aucun d'entre nous ne se livrerait à des exercices physiques fatigants s'il n'en attendait un avantage. Mais qui pourrait blâmer celui qui demande un plaisir qui n'est pas suivi d'un désagrément, ou celui qui évite une douleur qui n'est pas suivie d'un plaisir?"
+      de = lore_ipsum("de"),
+      it = lore_ipsum("it"),
+      fr = lore_ipsum("fr")
     ),
     categories = c(
       de = "Klima",

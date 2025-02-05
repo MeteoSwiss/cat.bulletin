@@ -1,7 +1,7 @@
 
 
 #' Try to load specific teaser image for given yearmonth. If not successful, return default teaser image for the given month.
-#' @importFrom monthlybulletin_teaser_text
+#' @inheritParams monthlybulletin_teaser_text
 monthlybulletin_teaser_image <- function(yearmonth) {
   image <- tryCatch({
     bulletinpath <- file.path(get_config_value("bulletin_prod_path"), yearmonth)

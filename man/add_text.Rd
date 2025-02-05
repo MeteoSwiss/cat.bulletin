@@ -4,7 +4,7 @@
 \alias{add_text}
 \title{add text to a bulletin}
 \usage{
-add_text(bulletin, text)
+add_text(bulletin, text, id = NULL)
 }
 \description{
 add text to a bulletin
