@@ -15,6 +15,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
+                              workdir = ".",
                               bulletin_args = list(year = year,
                                                    month = month,
                                                    month_str = month_str,
