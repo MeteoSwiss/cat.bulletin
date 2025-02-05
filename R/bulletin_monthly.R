@@ -7,6 +7,10 @@
 #' @export
 create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE, ...) {
   
+  cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
+  cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12)  
+  assert_that(is.logical(provisional) && length(provisional) == 1)
+  
   month_str <- cat.lang::get.text(paste("month", month, sep="."))
   nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
   

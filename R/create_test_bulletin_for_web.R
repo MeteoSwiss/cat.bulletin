@@ -26,8 +26,13 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       it = "Clima",
       fr = "Climat"
     ),
-    image = teaser_image(
+    teaser_image = teaser_image(
       filepath = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
+    ),
+    teaser_source = c(
+      de = "Foto: ",
+      it = "Foto: ",
+      fr = "Photo: "
     ),
     keywords = c(),
     authors = c(
@@ -40,6 +45,8 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   bulletin <- bulletin %>% set_metadata(metadata)
   
+  ## A text element
+  
   text_id <- generate_element_id("text")
   bulletin <- bulletin %>%
     set_active_language(language = "de") %>%
@@ -48,6 +55,8 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     add_text("C'est un texte en français avec é et è.", id = text_id)%>%
     set_active_language(language = "it") %>%
     add_text("Questo è un testo in italiano con & et %.", id = text_id)
+  
+  ## A 
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   
