@@ -1,0 +1,18 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Première section
+
+```{r calcP, include=FALSE}
+p <- 3 + 4
+```
+C'est une sortie de test avec le résultat de p : `r p`.
+
+
+## Deuxième section
+
+Ceci est une deuxième section. 
+
+Ceci est un test avec une variable externe x : `r x`.

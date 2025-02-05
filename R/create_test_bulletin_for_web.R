@@ -76,7 +76,16 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
               filename = "image1_it.png", 
               caption = "Legenda",
               id = image_id)
-
+  
+  ## R-Markdown element
+  
+  element_id <- "my_first_Rmd"
+  x <- 22 # needed by webtest_element_??.Rmd
+  for (language in bulletin$languages)
+    bulletin <- bulletin %>%
+    set_active_language(language = language) %>%
+    add_Rmd(element_id = "element",
+            id = element_id)
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   
