@@ -11,15 +11,22 @@ calculate_regional_differences <- function(bulletin) {
   # prepare climtable
   stations <- c("BER","SMA","GVE","BAS","ENG","DAV","SIO","LUG","SAM")
   
-  if (bulletin$month<10) {mondate <- paste0("0",bulletin$month)} else {mondate <- as.character(bulletin$month)}
+  mondate <- formatC(bulletin$month,width=2, flag="0")
   begdate <- paste0(bulletin$year,mondate,"01")
-  dpm <- c(31,28,31,30,31,30,31,31,30,31,30,31)
-  if (bulletin$year %% 4 == 0) {dpm <- c(31,29,31,30,31,30,31,31,30,31,30,31)}
-  enddate <- paste0(bulletin$year,mondate,dpm[bulletin$month])
+  enddate <- paste0(bulletin$year,mondate,datefuns::days.of.mon(bulletin$year, bulletin$month))
   
   data <- clim.table::climtable(period=c(begdate,enddate), outDir = bulletin$data_path)
   
   # set region every station is belonging to
+  
+  
+  ### Vielleicht regionen aus mchdwh ziehen anstelle von hardcoden? 
+  #station_info <- mchdwh::station_info(nat_abbr = vals$Station, region_type_id = 1)
+  #rownames(station_info) <- station_info$nat_abbr
+  #vals$Region <- station_info[vals$Station, "region_name_G"]
+  #assert_that(length(intersect(regsort, vals$Region)) == 0, msg = "The regsort vector does not correspond to region values of the stations")
+  
+  
   regsort <- c("Mittelland","Alpennordhang","Westschweiz","Wallis","Nord- und Mittelbünden","Engadin","Alpensüdseite")
   vals <- data$dana$vals
   vals$Region <- rep("",length(vals$Station))
@@ -30,7 +37,7 @@ calculate_regional_differences <- function(bulletin) {
   vals$Region[62:70] <- "Wallis"
   vals$Region[71:76] <- "Engadin"
   vals$Region[77:88] <- "Alpensüdseite"
-  
+
   ### TEMPERATURE ###
   # check whether all or a large fraction of the data
   # are either above, below or in the range of the reference period
@@ -124,8 +131,7 @@ calculate_regional_differences <- function(bulletin) {
   # get precip ranks only for nbcn-p stations
   # note: there are nbcn-p stations that are not part of the climtable, so the ranks should be calculated separately,
   # not only for stations in vals$Station
-  nbcnpstats <- c(mchdwh::station_group_info(station_group_id=1007)$nat_abbr,  # nbcn
-                  mchdwh::station_group_info(station_group_id=1022)$nat_abbr)  # + nbcn-p
+  nbcnpstats <- mchdwh::station_group_info(station_group_id = c(1007, 1022))$nat_abbr  # nbcn + nbcn-p
   nbcnpstats <- nbcnpstats[!nbcnpstats %in% c("PAY", "JUN", "RAG")]
   #CONTINUE IMPLEMENTATION OF NBCN-P station RANKS HERE
   for (s in 1:length(vals$Station)) {
