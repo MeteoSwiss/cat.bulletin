@@ -158,7 +158,7 @@ regdata_example_table <- function(bulletin) {
 monatsbilanz_precip <- function(bulletin, regdiff) {
   log_info("monatsbilanz_precip")
   
-  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p1")
   
   # Add images 
   filename = "monatsbilanz_prec_map_abs.png"
@@ -172,6 +172,14 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
+
+  if (regdiff$high_prec_rec_avail) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-1")
+  }
+  if (regdiff$low_prec_rec_avail) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-2")
+  }
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p3")
   
   bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
   bulletin
@@ -180,7 +188,7 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
 monatsbilanz_sun <- function(bulletin, regdiff) {
   log_info("monatsbilanz_sun")
   
-  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun")
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p1")
   
   # Add images 
   filename = "monatsbilanz_sunshine_map_abs.png"
@@ -194,7 +202,13 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
                         caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
-  
+
+  if (regdiff$high_sun_rec_avail) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
+  }
+  if (regdiff$low_sun_rec_avail) {
+    bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-2")
+  }
 
   bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
   bulletin  

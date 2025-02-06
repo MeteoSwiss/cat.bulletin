@@ -30,7 +30,7 @@ calculate_regional_differences <- function(bulletin) {
   subset_climtab_T <- flextable::flextable(regdiff_T$subset_climtab)
   subset_climtab_T <- flextable::set_caption(subset_climtab_T, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
   
-  # Local temperature ranking
+  # Local temperature rankin
   high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
   low_temp_records  <- process_extreme_values(param_short = "ths20m0n", bulletin)
 
@@ -42,11 +42,12 @@ calculate_regional_differences <- function(bulletin) {
   # Local precipitation ranking
   high_prec_records <- process_extreme_values(param_short = "rhs15m0x", bulletin)
   low_prec_records  <- process_extreme_values(param_short = "rhs15m0n", bulletin)
-  
+
   ### SUNSHINE DURATION ###
   regdiff_S <- comp_regdiff(parameter = "S", vals = vals, regsort = regsort)
   subset_climtab_S <- flextable::flextable(regdiff_S$subset_climtab)
   subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",bulletin$month_str," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  
   # Local sunshine duration ranking
   high_sun_records <- process_extreme_values(param_short = "sh200m0x", bulletin)
   low_sun_records  <- process_extreme_values(param_short = "sh200m0n", bulletin)
@@ -120,7 +121,6 @@ calculate_regional_differences <- function(bulletin) {
                               low_sun_shortest_period = low_sun_records$shortest_period, 
                               low_sun_station_record_info = low_sun_records$station_record_info)
   } 
-  
   # cache the results
   saveRDS(regional_differences, cache_file)
   

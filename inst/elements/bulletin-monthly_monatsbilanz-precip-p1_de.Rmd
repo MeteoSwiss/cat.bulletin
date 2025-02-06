@@ -18,3 +18,4 @@ maxval <- max(regdiff$allvalues_P)
 Die grössten Niederschlagsmengen im Vergleich zur Norm 1991-2020 `r if (length(regdiff$numb_stats_high_P)==1) {"verzeichnet die Region"} else {"verzeichnen die Regionen"}` `r regdiff$regshigh_P`. Beispiele für Messstandorte mit vergleichweise grossen Niederschlagssummen sind `r regdiff$selhigh_stats_P` (siehe Tabelle 2). Die geringsten Niederschlagsmengen im Vergleich zur Norm `r if (length(regdiff$numb_stats_low_P)==1) {"stammen aus der Region"} else {"stammen aus den Regionen"}` `r regdiff$regslow_P` (z.B. die Stationen `r regdiff$sellow_stats_P`).
 
 Abbildung 3 zeigt die monatliche Niederschlagssumme und die Abweichung zum Mittel über die Referenzperiode 1991-2020 für den `r bulletin$month_str` `r bulletin$year`.
+
