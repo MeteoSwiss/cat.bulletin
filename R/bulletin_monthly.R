@@ -209,7 +209,8 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
   if (regdiff$low_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-2")
   }
-
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p3")
+  
   bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
   bulletin  
 }
