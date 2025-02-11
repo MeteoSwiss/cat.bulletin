@@ -255,7 +255,7 @@ comp_regdiff <- function(parameter, vals, regsort) {
   quac <- quantile(acurr_all,probs = dev_probs)
   if (parameter == "T") {
     quac <- round(quac, digits=1)
-    quac[quac>0] <- paste0("+",quac[quac>0])
+    quac <- sprintf("%+.1f",quac)
   } else {
     quac <- round(quac, digits=0)
   }
@@ -312,7 +312,8 @@ comp_regdiff <- function(parameter, vals, regsort) {
   sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
   subset_climtab$Station <- sn$station_name
   if (parameter == "T") {
-    subset_climtab[[deviations]][subset_climtab[[deviations]] > 0] <- paste0("+", subset_climtab[[deviations]][subset_climtab[[deviations]] > 0])
+    # subset_climtab[[deviations]] <- paste0("+", subset_climtab[[deviations]][subset_climtab[[deviations]] > 0])
+    subset_climtab[[deviations]] <- sprintf("%+.1f", subset_climtab[[deviations]])
   }
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- climtab_names
