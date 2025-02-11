@@ -147,7 +147,7 @@ process_extreme_values <- function(param_short, bulletin) {
       )
     }, 
     error = function(e) {
-      message("No records were found in this month for this parameter: ", e$message)
+      message(paste0(param_short,": "), e$message)
       return(NULL)
     }
   )
@@ -312,12 +312,11 @@ comp_regdiff <- function(parameter, vals, regsort) {
   sn <- sn[order(match(sn$nat_abbr, subset_climtab$Station)), ]
   subset_climtab$Station <- sn$station_name
   if (parameter == "T") {
-    # subset_climtab[[deviations]] <- paste0("+", subset_climtab[[deviations]][subset_climtab[[deviations]] > 0])
     subset_climtab[[deviations]] <- sprintf("%+.1f", subset_climtab[[deviations]])
   }
   rownames(subset_climtab) <- NULL
   attributes(subset_climtab)$names <- climtab_names
-  
+
   # Output
   return(list(allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,
               quantiles = quac, numb_stats_high = mhigh, regshigh = regshigh, numb_stats_low = mlow, regslow = regslow,
