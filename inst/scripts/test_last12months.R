@@ -6,15 +6,15 @@ devtools::load_all(".")
 y1 <- 2024
 y2 <- 2025
 
-m <- 1
+mx <- 8
 
-#for (m in 1:12) {
+#for (mx in 1:12) {
   dir_path <- "/prod/zue/climate/others/zue/klimainformation/automatisierung_monatsbulletin/texfiles/bulletin"
   items <- list.files(dir_path, full.names = TRUE)
   unlink(items, recursive = TRUE)
   
   y <- y1
-  if (m == 1){
+  if (mx == 1){
     y <- y2
   }
   if (mx < 10) {
