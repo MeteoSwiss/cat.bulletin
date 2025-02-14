@@ -27,7 +27,7 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   regdiff <- calculate_regional_differences(bulletin)
   
   bulletin <- bulletin %>%
-    monatsbulletin_head() %>%
+    monatsbulletin_head(swissmean, regdiff) %>%
     monatsbulletin_disclaimer() %>%
     monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
     temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
@@ -42,15 +42,18 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   bulletin_to_webzip(bulletin)
 }
 
-monatsbulletin_head <- function(bulletin) {
+monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
   
   log_info("bulletin head")
   
   title <- paste("# Klimabulletin", bulletin$month_str, bulletin$year)
   bulletin <- bulletin %>% add_title(title) 
   
-  leadtext <- "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."
-  bulletin <- bulletin %>% add_text(leadtext) 
+  # Change the succession of these sentences based on a weight
+  bulletin <- bulletin %>% add_Rmd(element_id = "leadtext")
+  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-temp")
+  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-precip")
+  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-sun")
   
   basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
   yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))

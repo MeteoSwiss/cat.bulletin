@@ -6,9 +6,8 @@ devtools::load_all(".")
 y1 <- 2024
 y2 <- 2025
 
-mx <- 8
-
-#for (mx in 1:12) {
+#mx <- 8
+for (mx in c(1,2,3,4,5,6,7,8,9,10,12)) {
   dir_path <- "/prod/zue/climate/others/zue/klimainformation/automatisierung_monatsbulletin/texfiles/bulletin"
   items <- list.files(dir_path, full.names = TRUE)
   unlink(items, recursive = TRUE)
@@ -30,4 +29,4 @@ mx <- 8
   
   # Copy the file
   file.copy(source_file, destination_dir)
-#}
+}
