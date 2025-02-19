@@ -23,6 +23,8 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
                                                    provisional = provisional),
                               ...)
   
+  bulletin <- set_monthly_bulletin_status(bulletin)
+
   swissmean <- calculate_swissmean_temp(bulletin)
   regdiff <- calculate_regional_differences(bulletin)
   
@@ -342,4 +344,28 @@ get_final_date <- function(year, month, language) {
     code = format(last_date, "%d. %B %Y")
   )
   return(last_date)
+}
+
+set_monthly_bulletin_status <- function(bulletin) {
+  current_date <- Sys.Date()
+  current_year <- as.integer(format(current_date, "%Y"))
+  current_month <- as.integer(format(current_date, "%m"))
+  
+  # Check if predefined month is in the future
+  if (bulletin$year > current_year || 
+      (bulletin$year == current_year && bulletin$month > current_month)) {
+    stop("Error: You cannot create a bulletin for a month in the future.\n
+         Please make sure bulletin$year and bulletin$month either correspond to 
+         the current or any past month.")
+  }
+  
+  # If bulletin$year and $month == current --> provisional
+  if (bulletin$year == current_year && bulletin$month == current_month) {
+    bulletin$provisional <- TRUE
+  } else {
+    # otherwise --> definitive
+    bulletin$provisional <- FALSE
+  }
+  
+  return(bulletin)
 }

@@ -9,10 +9,10 @@ calculate_swissmean_temp <- function (bulletin) {
   }
   
   # Download data
-  #filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
+  filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
   # Test other months
-  mshort <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
-  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", paste0("ths200m0.swissmean.m.",mshort[bulletin$month],".1864.",bulletin$year,".abs.txt"), package = "cat.bulletin")
+  #mshort <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
+  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", paste0("ths200m0.swissmean.m.",mshort[bulletin$month],".1864.",bulletin$year,".abs.txt"), package = "cat.bulletin")
   #
   data_abs <- read.table(filename_abs, header = TRUE)
   

@@ -100,7 +100,7 @@ download_monatsbilanz_temp <- function(bulletin,
   if (provisional) {
     download_realization(
       bulletin = bulletin,
-      product = "climate-evolution-series-outlook",
+      product = "climate-temperature-evolution-outlook",
       filter = c(attributevalues, list(timeGranularity="month")),
       filename = filename
     )
