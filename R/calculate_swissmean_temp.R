@@ -97,9 +97,10 @@ calculate_swissmean_temp <- function (bulletin) {
     loess_bounds2 = bounds2
   )
   if (bulletin$provisional) {
-    swissmean_temp <- c(swissmean_temp, abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
+    swissmean_temp <- c(swissmean_temp, list(
+                        abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
                         fcst_delay = fcst_delay, abs_diff_neq_0 = abs_diff_neq_0, 
-                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty)
+                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty))
   }
   
   # cache the results
