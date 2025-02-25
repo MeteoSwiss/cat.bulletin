@@ -9,7 +9,7 @@ Sys.setlocale("LC_TIME", "de_DE.UTF-8")
 formatted_date <- format(Sys.Date(), "%d. %B %Y")
 
 current_date <- Sys.Date()
-last_day_of_month <- lubridate::ceiling_date(current_date, "month") - days(1)
+last_day_of_month <- lubridate::ceiling_date(current_date, "month") - lubridate::days(1)
 
 days_to_eom <- as.numeric(difftime(last_day_of_month, current_date, units = "days"))
 

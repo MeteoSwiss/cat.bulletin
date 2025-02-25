@@ -69,7 +69,7 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
         warning("teaser_text.txt contains more than one line. Using only the first.")
       lines[1]
     } else {
-      log_debug("Did not found a teaser text for the current month. Using default...")
+      log_debug("Did not find a teaser text for the current month. Using default...")
     }
   }
   
@@ -82,7 +82,7 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
     if (assertthat::is.readable(filepath)) {
       filepath
     } else {
-      log_debug("Did not found a teaser image for the current month. Using default...")
+      log_debug("Did not find a teaser image for the current month. Using default...")
       system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
     }
   }
@@ -111,29 +111,15 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot eingefärbt, Werte unter 0 \u00B0C sind blau."))
+                        caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt."))
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Liegen die Temperaturen über der Referenz, sind die entsprechenden Bereiche rot eingefärbt, blaue Gebiete weisen Temperaturen unter der Referenz auf."))
+                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
-  
-  # filename = "monatsbilanz_temp_abs.png"
-  # bulletin <- bulletin %>% add_image(
-  #   filepath = download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
-  #   filename = filename,
-  #   caption = "This is a caption.",
-  #   label = "monatsbilanz_temp_abs"
-  # )
-  # 
-  # filename = "monatsbilanz_temp_anom.png"
-  # bulletin <- bulletin %>% add_image(
-  #                       filepath = download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, mediaType = "image/png", filename = filename),
-  #                       filename = filename,
-  #                       caption = "This is a caption.")
   
   bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
   bulletin
@@ -176,7 +162,7 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
 
   if (regdiff$high_prec_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-1")
@@ -200,13 +186,13 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Prozent der maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
+                        caption = paste0("Verhältnis der effektiven Sonnenscheindauer zur maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_sunshine_map_anom.png"
   bulletin <- bulletin %>% add_image(
                         filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
                         filename = filename,
-                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Norm 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in Prozent der Norm."))
+                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
 
   if (regdiff$high_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
