@@ -9,7 +9,7 @@ most_sun_devs_normal <- regdiff$anteil_bereich_S > 0.7 & regdiff$anteil_bereich_
 qr_low <- round(quantile(regdiff$allvalues_S,probs=0.2)/10, digits=0)*10
 qr_high <- round(quantile(regdiff$allvalues_S,probs=0.8)/10, digits=0)*10
 
-moment01 <- ifelse(bulletin$provisional, "bis zum aktuellen Datum ", "") 
+moment01 <- ifelse(bulletin$provisional, "bis gestern ", "") 
 moment02 <- ifelse(bulletin$provisional, "bis kurz vor Monatsende ", "")
 ```
 
