@@ -50,10 +50,6 @@ bulletin_to_markdown <- function(bulletin,
     error = function(e) {
       warning_message <- paste("Could not process element", element$id, ":", e)
       warning(warning_message)
-      #readr::write_lines(paste('<span style="color:red">',  warning_message, '</span>'),
-      #                   file = file_conn)
-      #readr::write_lines( paste("Could not process element", element$id),
-      #                   file = file_conn)     
     }
     )
   }
