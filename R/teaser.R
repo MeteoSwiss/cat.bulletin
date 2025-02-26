@@ -1,5 +1,3 @@
-
-
 #' Try to load specific teaser image for given yearmonth. If not successful, return default teaser image for the given month.
 #' @inheritParams monthlybulletin_teaser_text
 monthlybulletin_teaser_image <- function(yearmonth) {
@@ -17,6 +15,30 @@ monthlybulletin_teaser_image <- function(yearmonth) {
   image
 }
 
+find_monthlybulletin_teaser_image <- function(path) {
+  filepath <- file.path(path, paste0("teaser_image.jpg"))
+  if (assertthat::is.readable(filepath)) {
+    filepath
+  } else {
+    stop(paste("Cannot find teaser image file", filepath))
+  }
+}
+
+
+copy_teaser_image <- function(filepath, filename = basename(filepath), bulletin) {
+  assert_that(file.exists(filepath))
+  newpath <- file.path(bulletin$image_path, filename)
+  file.copy(filepath, newpath)
+  
+  image_element(filename = filename, 
+                image_dir = bulletin$image_dir,
+                filepath = newpath,
+                caption = NULL, 
+                alt = NULL, 
+                source = NULL, 
+                label = NULL)
+}
+
 
 #' Try to load specific teaser text for given yearmonth. If not successful, return default teaser for the given month.
 #' @param yearmonth single string giving year and month of the bulletin as "yyyymm" 
@@ -25,13 +47,13 @@ monthlybulletin_teaser_text <- function(yearmonth, language) {
   text <- tryCatch({
     bulletinpath <- file.path(get_config_value("bulletin_prod_path"), yearmonth)
     read_monthlybulletin_teaser_text(path = bulletinpath, language = language)
-      },
-    error = function(e) {
-      month <- substr(yearmonth, 5, 6)
-      log_info(paste(e$message, "Using default teaser text for month", month, "."))
-      path <- system.file(package = "cat.bulletin", "example-data", "bulletin_monthly", "default_teaser", month)
-      read_monthlybulletin_teaser_text(path = path, language = language)
-    }
+  },
+  error = function(e) {
+    month <- substr(yearmonth, 5, 6)
+    log_info(paste(e$message, "Using default teaser text for month", month, "."))
+    path <- system.file(package = "cat.bulletin", "example-data", "bulletin_monthly", "default_teaser", month)
+    read_monthlybulletin_teaser_text(path = path, language = language)
+  }
   )
   text
 }
@@ -49,14 +71,3 @@ read_monthlybulletin_teaser_text <- function(path, language) {
   text
 }
 
-find_monthlybulletin_teaser_image <- function(path) {
-  filepath <- file.path(path, paste0("teaser_image.jpg"))
-  image <- if (assertthat::is.readable(filepath)) {
-    teaser_image(
-      filepath = filepath
-    )
-  } else {
-    stop(paste("Cannot find teaser image file", filepath))
-  }
-  image
-}

@@ -11,7 +11,8 @@ add_image(
   caption = NULL,
   alt = NULL,
   source = NULL,
-  label = NULL
+  label = NULL,
+  id = NULL
 )
 }
 \arguments{

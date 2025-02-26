@@ -32,7 +32,7 @@ update_metadata_element(metadata, ...)
 
 \item{keywords}{multilanguage vector of comma separated strings with keywords for each language}
 
-\item{teaser_image}{an image element for the teaser image}
+\item{teaser_image}{a path to the teaser image. It will be copied to the bulletins image folder during processing.}
 
 \item{teaser_source}{a multilanguage string denoting the source of the teaser image}
 

@@ -1,21 +1,13 @@
-image_element <- function(filepath, filename = basename(filepath), caption, alt, source, label, id = NULL) {
+image_element <- function(filename, image_dir, filepath, caption, alt, source, label, id = NULL) {
   element <- bulletin_element(type = "image", id = id)
   element[["caption"]] <- caption
   element[["filename"]] <- filename
+  element[["image_dir"]] <- image_dir
   element[["filepath"]] <- filepath
   element[["alt"]] <- alt
   element[["source"]] <- source
   element[["label"]] <- label
   element
-}
-
-teaser_image <- function(filepath, filename = basename(filepath)) {
-  image_element(filepath = filepath, 
-                filename = filename, 
-                caption = NULL, 
-                alt = NULL, 
-                source = NULL, 
-                label = NULL)
 }
 
 #' add an image with caption to a bulletin
@@ -39,7 +31,8 @@ add_image <- function(bulletin, filepath, filename = basename(filepath),
   assert_that(file.exists(filepath))
   newpath <- file.path(bulletin$image_path, filename)
   file.copy(filepath, newpath, overwrite = TRUE)
-  add_element(bulletin, image_element(filename = filename, filepath = newpath, caption = caption, 
+  add_element(bulletin, image_element(filename = filename, image_dir = bulletin$image_dir, 
+                                      filepath = newpath, caption = caption, 
                                       alt = alt, source = source, label = label, id = id))
 }
 
@@ -62,7 +55,7 @@ image_to_markdown2 <- function(element) {
 
 image_to_xml <- function(xml, element, language) {
   image_node <- assure_node_of_type(xml, type = "image") %>%
-    set_languaged_attribute("fileName", language, paste0(bulletin$image_dir, "/", element$filename)) %>%
+    set_languaged_attribute("fileName", language, paste0(element$image_dir, "/", element$filename)) %>%
     set_languaged_attribute("legend", language, element$caption) %>%
     set_languaged_attribute("alt", language, element$alt) %>%
     set_languaged_attribute("source", language, element$source) %>%

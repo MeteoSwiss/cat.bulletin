@@ -4,7 +4,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                                          zipfilename = "climate-bulletin-webtest.zip") {
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
-    language = c("de", "fr", "it"),
+    languages = c("de", "fr", "it"),
     bulletin_dir = "webtest",
     workdir = workdir
   ) 
@@ -26,9 +26,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       it = "Clima",
       fr = "Climat"
     ),
-    teaser_image = teaser_image(
-      filepath = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
-    ),
+    teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
     teaser_source = c(
       de = "Foto: ",
       it = "Foto: ",
@@ -86,6 +84,19 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     set_active_language(language = language) %>%
     add_Rmd(element_id = "element",
             id = element_id)
+  
+  
+  ## Table element
+  element_id <- "my_first_table"
+  regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
+  for (language in bulletin$languages)
+    bulletin <- bulletin %>%
+    set_active_language(language = language) %>%
+    add_table(regdata,
+            id = element_id,
+            caption = paste(language, "caption"))
+  
+  ## Generate pdfs in all languages and the xml and zip everything up
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   

@@ -5,7 +5,7 @@
 #' @param path a string denoting the CMS path
 #' @param title multilanguage string with bulletin titles for each language
 #' @param lead multilanguage string with lead text for each language
-#' @param teaser_image an image element for the teaser image
+#' @param teaser_image a path to the teaser image. It will be copied to the bulletins image folder during processing.
 #' @param teaser_source a multilanguage string denoting the source of the teaser image
 #' @param categories a comma separated string with publication categories
 #' @param authors a multilanguage string denoting the authors of the publication
@@ -80,27 +80,11 @@ assert_publication_metdata <- function(metadata, languages = c("de", "fr", "it",
   assert_that(is.null(metadata$title) || assert_multi_language_string(metadata$title, languages = languages))
   assert_that(is.null(metadata$lead) || assert_multi_language_string(metadata$lead, languages = languages))
   assert_that(is.null(metadata$keywords) || assert_multi_language_string(metadata$keywords, languages = languages))
-  assert_that(is.null(metadata$teaser_image) || assert_that(is.list(metadata$teaser_image)))
+  assert_that(is.null(metadata$teaser_image) || assert_that(is.character(metadata$teaser_image)))
   assert_that(is.null(metadata$teaser_source) || assert_multi_language_string(metadata$teaser_source, languages = languages))
   assert_that(is.null(metadata$categories) || assert_that(is.character(metadata$categories)))
   assert_that(is.null(metadata$authors) || assert_multi_language_string(metadata$authors, languages = languages))
   assert_that(is.null(metadata$publication) || assert_multi_language_string(metadata$publication, languages = languages))      
-}
-
-publication_metadata_metadata_to_markdown <- function(element) {
-  paste0(element$text, "\n")
-}
-
-# not used
-publication_metadata_to_xml <- function(xml, element, language) {
-  md_in <- tempfile()
-  html_out <- tempfile()
-  writeLines(text_to_markdown(element), con = md_in)
-  markdown::markdownToHTML(file = md_in, output = html_out, fragment.only = TRUE)
-  html <- readr::read_lines(html_out)
-  text_node <- xml2::xml_add_child(xml, .value = "text")
-  xml2::xml_attr(text_node, languaged("html", language)) <- html
-  xml
 }
 
 lore_ipsum <- function(language) {

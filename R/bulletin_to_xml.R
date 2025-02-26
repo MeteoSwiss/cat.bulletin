@@ -67,9 +67,9 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   
   # teaser node 
   
-  file.copy(metadata$teaser_image$filepath, file.path(bulletin$image_path, metadata$teaser_image$filename))
+  teaser_image_element <- copy_teaser_image(filepath = metadata$teaser_image, bulletin = bulletin)
   teaser_node <- xml2::xml_add_child(xml, .value = "image") %>%
-    xml_set_attribute("fileName", paste0(bulletin$image_dir, "/", metadata$teaser_image$filename)) %>%
+    xml_set_attribute("fileName", paste0(teaser_image_element$image_dir, "/", teaser_image_element$filename)) %>%
     xml_set_attribute("source", metadata$teaser_source, languages = bulletin$languages)
   
   # publication node

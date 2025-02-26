@@ -117,11 +117,11 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   
   # Teaser image
   if (!is.null(metadata$teaser_image)) {
-    image <- metadata$teaser_image
+    image_element <- copy_teaser_image(filepath = metadata$teaser_image, bulletin = bulletin)
     if (!is.null(metadata$teaser_source)) {
-      image$source <- metadata$teaser_source[language]
+      image_element$source <- metadata$teaser_source[language]
     }
-    lines <- image_to_markdown(element = image)
+    lines <- image_to_markdown(element = image_element)
     write_lines(lines)
   }
   
