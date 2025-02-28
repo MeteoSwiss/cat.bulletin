@@ -38,7 +38,6 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
     set_metadata(metadata) 
   
   for (language in bulletin[["languages"]]) {
-    set_active_language(bulletin, language = language)
     bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
   }
@@ -175,13 +174,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   # }
   
   # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
+  bulletin <- bulletin %>% set_active_language(language = language)
   
   # Add images 
   image_id <- "monatsbilanz_temp_map_abs"
   filename_in <- paste0(image_id,".png")
   filename_out <- paste0(image_id,"_",language,".png")
   bulletin <- bulletin %>% 
-    set_active_language(language = language) %>%
     add_image(
       filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
       filename = filename_out,
