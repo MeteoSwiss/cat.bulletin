@@ -168,13 +168,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
+  bulletin <- bulletin %>% set_active_language(language = language)
   # if (bulletin$language != "de"){
   #   month <- sapply(bulletin$month_str,add_article)
   #   month <- as.character(month)
   # }
   
   # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
-  bulletin <- bulletin %>% set_active_language(language = language)
   
   # Add images 
   image_id <- "monatsbilanz_temp_map_abs"
