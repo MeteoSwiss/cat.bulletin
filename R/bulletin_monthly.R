@@ -37,9 +37,9 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
   
-  for (language in bulletin$languages) {
-    set_active_language(language)
-    bulletin <- bulletin %>% 
+  for (language in bulletin[["languages"]]) {
+    set_active_language(bulletin, language = language)
+    bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
   }
   
@@ -174,26 +174,52 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   #   month <- as.character(month)
   # }
   
-  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
+  # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
   # Add images 
-  filename = "monatsbilanz_temp_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-    filename = filename,
-    # caption = glue(cat.lang::get.text("bulletin_monthly_temp_map_abs"), year = ......)
-    caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt.")
-  )
+  image_id <- "monatsbilanz_temp_map_abs"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs", lang = cat.func::isolang2dwhlang(language))),
+      # caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt."),
+      id = image_id
+    )
+
+  # image_id <- "my_first_image"
+  # filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
+  # bulletin <- bulletin %>%
+  #   set_active_language(language = "de") %>%
+  #   add_image(filepath = filepath, 
+  #             filename = "image1_de.png", 
+  #             caption = "Bildlegende",
+  #             id = image_id)  %>%
+  #   set_active_language(language = "fr") %>%
+  #   add_image(filepath = filepath, 
+  #             filename = "image1_fr.png", 
+  #             caption = "Légende de l'image",
+  #             id = image_id)  %>%
+  #   set_active_language(language = "it") %>%
+  #   add_image(filepath = filepath, 
+  #             filename = "image1_it.png", 
+  #             caption = "Legenda",
+  #             id = image_id)
   
-  filename = "monatsbilanz_temp_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-    filename = filename,
-    caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
   
-  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
+    
+  # filename = "monatsbilanz_temp_map_anom.png"
+  # bulletin <- bulletin %>% add_image(
+  #   filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
+  #   filename = filename,
+  #   caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
+  # 
+  # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
+  # 
+  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
   bulletin
 }
 
