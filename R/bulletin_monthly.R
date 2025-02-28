@@ -181,6 +181,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   filename_in <- paste0(image_id,".png")
   filename_out <- paste0(image_id,"_",language,".png")
   bulletin <- bulletin %>% 
+    set_active_language(language = language) %>%
     add_image(
       filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
       filename = filename_out,
