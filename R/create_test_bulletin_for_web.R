@@ -3,9 +3,9 @@
 create_test_bulletin_for_web <- function(workdir = tempdir(),
                                          zipfilename = "climate-bulletin-webtest.zip") {
   bulletin <- create_bulletin(
-    bulletin_id = "webtest",
+    bulletin_id = "bulletin",
     languages = c("de", "fr", "it"),
-    bulletin_dir = "webtest",
+    bulletin_dir = "bulletin",
     workdir = workdir
   ) 
   

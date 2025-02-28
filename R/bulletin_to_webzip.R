@@ -7,7 +7,7 @@ bulletin_to_webzip <- function(bulletin, zipfilename = tempfile(fileext = ".zip"
   # generate all pdfs
   for (language in bulletin$languages) {
     tryCatch({
-      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, languaged_filename(bulletin$metadata$path, language, "pdf")), language = language)
+      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
        publication <- update_multi_language_string(publication, language, basename(filename))
     },
       error = function(e) stop(e)

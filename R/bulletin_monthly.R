@@ -16,32 +16,102 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               workdir = ".",
+                              languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
                                                    month = month,
                                                    month_str = month_str,
                                                    nextmonth_str = nextmonth_str,
-                                                   provisional = provisional),
+                                                   provisional = provisional,
+                                                   yearmonth = paste0(year, sprintf("%02d", month))
+                              ),
                               ...)
   
   bulletin <- set_monthly_bulletin_status(bulletin)
-
+  
   swissmean <- calculate_swissmean_temp(bulletin)
   regdiff <- calculate_regional_differences(bulletin)
   
-  bulletin <- bulletin %>%
-    monatsbulletin_head(swissmean, regdiff) %>%
-    monatsbulletin_disclaimer() %>%
-    monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
-    temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
-    monatsbilanz_precip(regdiff = regdiff) %>%
-    monatsbilanz_sun(regdiff = regdiff) %>%
-    monatsbulletin_daily_timeseries() %>%
-    monatsbulletin_more_info()
+  metadata <- monatsbulletin_metadata(bulletin = bulletin,
+                                      swissmean = swissmean,
+                                      regdiff = regdiff)
+  bulletin <- bulletin %>% 
+    set_metadata(metadata) 
+  
+  for (language in bulletin$languages) {
+    set_active_language(language)
+    bulletin <- bulletin %>% 
+      monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
+  }
+  
+  
+  # bulletin <- bulletin %>%
+  #   monatsbulletin_head(swissmean, regdiff) %>%
+  #   monatsbulletin_disclaimer() %>%
+  #   monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
+  #   temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
+  #   monatsbilanz_precip(regdiff = regdiff) %>%
+  #   monatsbilanz_sun(regdiff = regdiff) %>%
+  #   monatsbulletin_daily_timeseries() %>%
+  #   monatsbulletin_more_info()
   
   #bulletin_pdfxmlzip(bulletin)
   #bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
   #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
   bulletin_to_webzip(bulletin)
+}
+
+monatsbulletin_metadata <- function(bulletin, swissmean, regdiff) {
+  
+  bulletin_path <- function(bulletin) {
+    path <- paste0("reports-and-bulletins", "/",
+                   bulletin$year, "/", 
+                   "klimabulletin", "-", bulletin$month_str, "-", bulletin$year)
+    tolower(path)
+  }
+  
+  bulletin_title <- function(bulletin) {
+    title = c(
+      de = "Klimabulletin",
+      fr = "Bulletin climatologique",
+      it = "Bolletino del clima"
+    )
+    
+    for (lang in names(title)) {
+      title[lang] <- paste(title[lang], cat.lang::get.text(paste0("month.", bulletin$month), lang = cat.func::isolang2dwhlang(lang)))
+      title[lang] <- paste(title[lang], bulletin$year)
+    }
+    
+    title
+  }
+  
+  metadata <- publication_metadata(
+    path = bulletin_path(bulletin),
+    title = bulletin_title(bulletin),
+    lead = c(
+      de = lore_ipsum("de"),
+      it = lore_ipsum("it"),
+      fr = lore_ipsum("fr")
+    ),
+    categories = c(
+      de = "Klima",
+      it = "Clima",
+      fr = "Climat"
+    ),
+    teaser_image = monthlybulletin_teaser_image(yearmonth = bulletin$yearmonth),
+    teaser_source = sapply(c("de", "it", "fr"), 
+                           function(lang) 
+                             monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
+    ),
+    keywords = c(),
+    authors = c(
+      de = "MeteoSchweiz",
+      fr = "MeteoSuisse",
+      it = "MeteoSvizzera"
+    ),
+    publishedAt = Sys.Date()
+  )
+  
+  metadata
 }
 
 monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
@@ -95,7 +165,7 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
   bulletin
 }
 
-monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
+monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
@@ -109,15 +179,17 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
   # Add images 
   filename = "monatsbilanz_temp_map_abs.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-                        filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt."))
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
+    filename = filename,
+    # caption = glue(cat.lang::get.text("bulletin_monthly_temp_map_abs"), year = ......)
+    caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt.")
+  )
   
   filename = "monatsbilanz_temp_map_anom.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
+    filename = filename,
+    caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
@@ -154,16 +226,16 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
   # Add images 
   filename = "monatsbilanz_prec_map_abs.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-                        filename = filename,
-                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
+    filename = filename,
+    caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_prec_map_anom.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
-
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
+    filename = filename,
+    caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
+  
   if (regdiff$high_prec_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-1")
   }
@@ -184,16 +256,16 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
   # Add images 
   filename = "monatsbilanz_sunshine_map_abs.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-                        filename = filename,
-                        caption = paste0("Verhältnis der effektiven Sonnenscheindauer zur maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
+    filename = filename,
+    caption = paste0("Verhältnis der effektiven Sonnenscheindauer zur maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
   
   filename = "monatsbilanz_sunshine_map_anom.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
-
+    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
+    filename = filename,
+    caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
+  
   if (regdiff$high_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
   }
@@ -232,9 +304,9 @@ monatsbulletin_daily_timeseries <- function(bulletin) {
   
   filename = "witterungsverlauf.png"
   bulletin <- bulletin %>% add_image(
-                        filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language=bulletin$language, filename = filename),
-                        filename = filename,
-                        caption = "This is a caption.")
+    filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language=bulletin$language, filename = filename),
+    filename = filename,
+    caption = "This is a caption.")
   
   bulletin
 }
