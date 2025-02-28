@@ -1,2 +1,2 @@
 key;G;F;I;E
-bulletin_monthly_temp_map_abs;gluetext;gluetext;gluetext;
+bulletin_monthly_temp_map_abs;Monatsmitteltemperaturen in \u00B0C für den {bulletin$month_str} {bulletin$year}. Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt.;Un texte en français;Un testo in italiano;
