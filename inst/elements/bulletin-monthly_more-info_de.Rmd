@@ -6,7 +6,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Weiterführende Informationen
 
-Unter folgenden Links finden Sie weitere Informationen und Daten zum Klima und Klimawandel in der Schweiz, sowie den hier verwendeten Methoden:
+Unter folgenden Links finden Sie weitere Informationen und Daten zum Klima und Klimawandel in der Schweiz, sowie zu den hier verwendeten Methoden:
 
 * [Klimabulletins](https://www.meteoschweiz.admin.ch/service-und-publikationen/publikationen.html#order=date-desc&page=1&pageGroup=publication&type=reportOrBulletin&category=climate)
 * [Klima der Schweiz](https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz.html)

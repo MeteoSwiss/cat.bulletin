@@ -1,7 +1,7 @@
 Package: cat.bulletin
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.1.0
+Version: 0.2.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
@@ -15,8 +15,11 @@ Config/testthat/edition: 3
 Imports: 
     readr,
     rmarkdown,
+    glue,
     xml2,
-    cat.func (>= 0.17.0),
+    cat.func (>= 0.17.1),
     flextable,
-    cat.lang
+    cat.lang,
+    magrittr,
+    assertthat
 RoxygenNote: 7.2.3

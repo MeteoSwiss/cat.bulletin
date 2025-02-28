@@ -1,0 +1,18 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+#### Entwicklung seit Messbeginn 1864
+
+```{r echo=FALSE, results="hide"}
+numb_similar_years_eq1 <- length(swissmean$ind_simyears) == 1
+numb_similar_years_gt1 <- length(swissmean$ind_simyears) > 1
+if (length(swissmean$ind_simyears) >= 1) {
+  similar_years <- collapse_sentence(swissmean$all_years[swissmean$ind_simyears])  
+}
+not_new_record <- swissmean$curr_rank != 1
+```
+
+Die landesweite Monatsmitteltemperatur im `r bulletin$month_str` `r bulletin$year` belegte `r ifelse(bulletin$provisional, "bis zum aktuellen Datum ", "")`den `r swissmean$curr_rank`. Rang seit Messbeginn `r swissmean$meas_start`. `r ifelse(numb_similar_years_eq1, glue::glue("Der {bulletin$month_str} {similar_years} zeigte eine ähnliche Temperaturabweichung zur Referenz."), ""); ifelse(numb_similar_years_gt1, glue::glue("Ähnliche Temperaturabweichungen für den Monat {bulletin$month_str} wurden in den Jahren {similar_years} registriert. "), "")``r ifelse(bulletin$provisional & swissmean$rank_diff_neq_0, glue::glue("Gemäss der Prognose bis zum Monatsende kann zur Zeit noch ein Rang zwischen {swissmean$rank_uncertainty[1]} und {swissmean$rank_uncertainty[2]} resultieren. "), "")` Der bisher wärmste `r bulletin$month_str` `r ifelse(not_new_record, "stammt", "stammte")` aus dem Jahr `r swissmean$year_form_rec`. Der damalige `r bulletin$month_str` erreichte eine Monatsmitteltemperatur von `r swissmean$val_form_rec`&nbsp;°C, bei einer Abweichung von `r swissmean$dev_form_rec`&nbsp;°C zur Referenzperiode 1991-2020.

@@ -92,7 +92,7 @@ download_monatsbilanz_temp <- function(bulletin,
       valueBase = valueBase,
       normalPeriod= "1991-2020",
       location= "regSwiss",
-      language = "de",
+      language = bulletin$language,
       plotPeriod = "1864-today",
       mediaType = mediaType
     )
@@ -121,7 +121,7 @@ download_witterungsverlauf <- function(bulletin,
                                        month = 10,
                                        year = 2024, 
                                        location = "SMA",
-                                       language = "de") {
+                                       language = bulletin$language) {
   
 #  valueBase = match.arg(valueBase)
 

@@ -3,8 +3,13 @@ flextable_element <- function(flextable, bulletin_envir) {
   flextable_element <- bulletin_element(type = "flextable")
   # save the table by element_id in the bulletin markdown environment so that it can be accessed later in the rendering process
   assign(flextable_element$id, flextable, envir = bulletin_envir)
-
+  flextable_element[["bulletin_envir"]] <- bulletin_envir
+  
   flextable_element
+}
+
+get_flextable <- function(flextable_element) {
+  get(flextable_element$id, envir = flextable_element[["bulletin_envir"]])
 }
 
 #' Add a flextable to a bulletin
@@ -40,11 +45,24 @@ flextable_to_markdown <- function(element) {
                element$id,
                "```", 
                sep = "\n"
-               )
+  )
   md
 }
 
 
 flextable_to_xml <- function(xml, element) {
-  warning("table_to_xml not yet implemented")
+  # get the flextable 
+  flextable <- get_flextable(element)
+  
+  # write the flextable out as html
+  file = tempfile(fileext = ".html")
+  flextable::save_as_html(flextable, path = file)
+  
+  # reread the file and extract the table node, convert it to xml and add it to the document
+  html <- xml2::read_html(file)
+  node <- xml2::xml_find_first(html, '//table')
+  nodelist <- xml2::as_list(node)
+  xmlnode <- xml2::as_xml_document(list(table = nodelist))
+  xml2::xml_add_child(xml, .value = xmlnode)
+  xml
 }

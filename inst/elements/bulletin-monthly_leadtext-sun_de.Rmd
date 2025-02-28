@@ -1,0 +1,16 @@
+``` {r echo=FALSE, results = "hide"}
+all_sun_devs_above_norm <- all(regdiff$allvalues_S > 105)
+all_sun_devs_below_norm <- all(regdiff$allvalues_S < 95)
+all_sun_devs_normal <- all(regdiff$allvalues_S <= 105) & all(regdiff$allvalues_S >= 95)
+most_sun_devs_above_norm <- regdiff$anteil_ueber_S > 0.7 & regdiff$anteil_ueber_S < 1
+most_sun_devs_below_norm <- regdiff$anteil_unter_S > 0.7 & regdiff$anteil_unter_S < 1
+most_sun_devs_normal <- regdiff$anteil_bereich_S > 0.7 & regdiff$anteil_bereich_S < 1
+
+qr_low <- round(quantile(regdiff$allvalues_S,probs=0.2)/10, digits=0)*10
+qr_high <- round(quantile(regdiff$allvalues_S,probs=0.8)/10, digits=0)*10
+
+moment01 <- ifelse(bulletin$provisional, "bis gestern ", "") 
+moment02 <- ifelse(bulletin$provisional, "bis kurz vor Monatsende ", "")
+```
+
+`r ifelse(all_sun_devs_above_norm, glue::glue("Die Sonnenscheindauer im {bulletin$month_str} {bulletin$year} war {moment01}im ganzen Land überdurchschnittlich."), "")``r ifelse(all_sun_devs_below_norm, glue::glue("Der {bulletin$month_str} {bulletin$year} brachte {moment01}schweizweit weniger Sonnenschein als in der Referenzperiode 1991-2020."), "")``r ifelse(all_sun_devs_normal, glue::glue("Die monatliche Sonnenscheindauer im {bulletin$month_str} {bulletin$year} lag {moment01}im ganzen Land im Bereich der Referenzperiode 1991-2020."), "")``r ifelse(most_sun_devs_above_norm, glue::glue("Die monatliche Sonnenscheindauer im {bulletin$month_str} {bulletin$year} war {moment01}verbreitet über dem vieljährigen Durchschnitt."), "")``r ifelse(most_sun_devs_below_norm, glue::glue("Der {bulletin$month_str} {bulletin$year} brachte {moment01}verbreitet unterdurchschnittliche Besonnung."), "")``r ifelse(most_sun_devs_normal, glue::glue("Die monatliche Sonnenscheindauer im {bulletin$month_str} {bulletin$year} lag {moment01}verbreitet im Bereich des Mittels über Referenzperiode 1991-2020."), "")` `r ifelse(qr_low <= 50, glue::glue("Regional wurden im {bulletin$month_str} {moment02}weniger als {qr_low}&nbsp;% der durchschnittlichen Sonnenstunden gemessen."), "")``r ifelse(qr_high >= 130, glue::glue("Mancherorts gab es {moment02}mehr als {qr_high}&nbsp;% der Sonnenscheindauer der Referenzperiode."), "")`

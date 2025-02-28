@@ -1,0 +1,28 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+``` {r echo=FALSE, results = "hide"}
+number_regions_temp_high_eq1 <- length(regdiff$numb_stats_high)==1
+number_regions_temp_low_eq1 <- length(regdiff$numb_stats_low)==1
+
+higher_values_at_high_altitude <- regdiff$diff_highlow >= 0.5
+higher_values_at_low_altitude <- regdiff$diff_highlow <= -0.5
+
+high_dev_gt0 <- max(regdiff$selhigh_abw) > 0
+low_dev_gt0 <- min(regdiff$sellow_abw) > 0
+```
+
+Die `r ifelse(high_dev_gt0, "höchsten positiven Abweichungen", "geringsten negativen Abweichungen")` zur Referenzperiode 1991-2020 `r if (number_regions_temp_high_eq1) {"verzeichnete die Region"} else {"verzeichneten die Regionen"}` `r regdiff$regshigh`. Beispiele für Messstandorte sind `r regdiff$selhigh_stats` (siehe Tabelle 1). Die `r ifelse(low_dev_gt0, "kleinsten positiven Abweichungen", "grössten negativen Abweichungen")` `r if (number_regions_temp_low_eq1) {"stammten aus der Region"} else {"stammten aus den Regionen"}` `r regdiff$regslow` (z.B. die Stationen `r regdiff$sellow_stats`). `r if (higher_values_at_high_altitude) {"In höheren Lagen waren die Abweichungen zur Referenzperiode grösser als in den tiefergelegenen Regionen der Schweiz."} else if (higher_values_at_low_altitude) {"In tieferen Lagen waren die Abweichungen zur Referenzperiode grösser als in den höhergelegenen Gebieten der Schweiz."}`
+
+<!-- Alte Version mit Bezeichnung positive/negative Abweichungen
+Die stärksten `r ifelse(high_dev_gt0, "positiven", "negativen")` Abweichungen zur Referenzperiode 1991-2020 `r if (number_regions_temp_high_eq1) {"verzeichnete die Region"} else {"verzeichneten die Regionen"}` `r regdiff$regshigh`. Beispiele für Messstandorte mit grossen Abweichungen sind `r regdiff$selhigh_stats` (siehe Tabelle 1). Die geringsten `r ifelse(low_dev_gt0, "positiven", "negativen")` Abweichungen `r if (number_regions_temp_low_eq1) {"stammten aus der Region"} else {"stammten aus den Regionen"}` `r regdiff$regslow` (z.B. die Stationen `r regdiff$sellow_stats`). `r if (higher_values_at_high_altitude) {"In höheren Lagen waren die Abweichungen zur Referenzperiode grösser als in den tiefergelegenen Regionen der Schweiz."} else if (higher_values_at_low_altitude) {"In tieferen Lagen waren die Abweichungen zur Referenzperiode grösser als in den höhergelegenen Gebieten der Schweiz."}`
+-->
+
+<!-- Alte Version im Präsens
+Die stärksten `r ifelse(high_dev_gt0, "positiven", "negativen")` Abweichungen zur Referenzperiode 1991-2020 `r if (number_regions_temp_high_eq1) {"verzeichnet die Region"} else {"verzeichnen die Regionen"}` `r regdiff$regshigh`. Beispiele für Messstandorte mit grossen Abweichungen sind `r regdiff$selhigh_stats` (siehe Tabelle 1). Die geringsten `r ifelse(low_dev_gt0, "positiven", "negativen")` Abweichungen `r if (number_regions_temp_low_eq1) {"stammen aus der Region"} else {"stammen aus den Regionen"}` `r regdiff$regslow` (z.B. die Stationen `r regdiff$sellow_stats`). `r if (higher_values_at_high_altitude) {"In höheren Lagen sind die Abweichungen zur Referenzperiode grösser als in den tiefergelegenen Regionen der Schweiz."} else if (higher_values_at_low_altitude) {"In tieferen Lagen sind die Abweichungen zur Referenzperiode grösser als in den höhergelegenen Gebieten der Schweiz."}`
+-->
+
+Die folgende Tabelle zeigt Monatsmittelwerte der Temperatur an ausgewählten Stationen.
