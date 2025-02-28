@@ -9,8 +9,11 @@ calculate_swissmean_temp <- function (bulletin) {
   }
   
   # Download data
-  #filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
-  filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "ths200m0.swissmean.m.aug.1864.2024.abs.txt", package = "cat.bulletin")
+  filename_abs <- download_monatsbilanz_temp(bulletin, valueBase = "abs", provisional = bulletin$provisional, filename = "monatsbilanz_temp_abs.txt")
+  # Test other months
+  #mshort <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
+  #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", paste0("ths200m0.swissmean.m.",mshort[bulletin$month],".1864.",bulletin$year,".abs.txt"), package = "cat.bulletin")
+  #
   data_abs <- read.table(filename_abs, header = TRUE)
   
   filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
@@ -28,11 +31,8 @@ calculate_swissmean_temp <- function (bulletin) {
   # anomaly temperature, swissmean
   anom <- data_anom$val
   acurr <- round(anom[poscurr],1)
-  acurr_t <- format(acurr, nsmall=1)
-  if (acurr_t > 0) {
-    acurr_t <- paste0("+", acurr_t)
-  }
-  
+  acurr_t <- sprintf("%+.1f",acurr)
+
   # rank swissmean    
   rankcurr <- data_abs$rank.h[poscurr]
 
@@ -63,10 +63,7 @@ calculate_swissmean_temp <- function (bulletin) {
     recval <- round(abs[ind01],1)
     reca <- round(anom[ind01],1)
   }
-  reca_t <- format(reca, nsmall=1)
-  if (reca_t > 0) {
-    reca_t <- paste0("+", reca_t)
-  }
+  reca_t <- sprintf("%+.1f",reca)
   recval_t <- format(recval, nsmall=1)
   
   # years similar to current among the 5 warmest years
@@ -100,9 +97,10 @@ calculate_swissmean_temp <- function (bulletin) {
     loess_bounds2 = bounds2
   )
   if (bulletin$provisional) {
-    swissmean_temp <- c(swissmean_temp, abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
+    swissmean_temp <- c(swissmean_temp, list(
+                        abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,
                         fcst_delay = fcst_delay, abs_diff_neq_0 = abs_diff_neq_0, 
-                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty)
+                        rank_diff_neq_0 = rank_diff_neq_0, dev_uncertainty = dev_uncertainty))
   }
   
   # cache the results

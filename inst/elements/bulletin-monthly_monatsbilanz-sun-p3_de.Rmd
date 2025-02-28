@@ -1,0 +1,8 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Die folgende Tabelle zeigt die monatliche Sonnenscheindauer und deren Abweichung zur Referenzperiode an ausgewählten Stationen im Messnetz von MeteoSchweiz.
+
