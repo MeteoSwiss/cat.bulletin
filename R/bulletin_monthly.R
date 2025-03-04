@@ -37,7 +37,9 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
       bulletin$month_str <- cat.lang::get.text(paste("month", month, sep="."))
       bulletin$nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
       bulletin <- bulletin %>%
-        monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
+        monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
+        monatsbilanz_precip(regdiff = regdiff, language = language) %>%
+        monatsbilanz_sun(regdiff = regdiff, language = language)
   }
   
   
@@ -171,7 +173,6 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   #   month <- sapply(bulletin$month_str,add_article)
   #   month <- as.character(month)
   # }
-  element_id <- "monatsbilanz-temp-p1"
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
 
   # Add image for absolute temperatures
@@ -198,9 +199,20 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
       id = image_id
     )
   
-  # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
-  # 
-  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
+
+  ## Add table
+  temp_table <- regdiff$subset_climtab_T
+  attributes(temp_table)$names <- c(cat.lang::get.text("climtab_stat"),
+                                    cat.lang::get.text("climtab_altitude"),
+                                    cat.lang::get.text("climtab_temp_mean"),
+                                    cat.lang::get.text("climtab_temp_ref"),
+                                    cat.lang::get.text("climtab_temp_dev"))
+  print(temp_table)
+  bulletin <- bulletin %>%
+    add_table(temp_table, id = "monatsbilanz_temp_table",
+              caption = paste("Die Caption funktioniert noch nicht:",language))
+
   bulletin
 }
 
@@ -225,23 +237,34 @@ regdata_example_table <- function(bulletin) {
   table
 }
 
-monatsbilanz_precip <- function(bulletin, regdiff) {
+monatsbilanz_precip <- function(bulletin, regdiff, language) {
   log_info("monatsbilanz_precip")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p1")
   
-  # Add images 
-  filename = "monatsbilanz_prec_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-    filename = filename,
-    caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
+  # Add image for absolute precipitation
+  image_id <- "monatsbilanz_prec_map_abs"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_abs")),
+      id = image_id
+    )
   
-  filename = "monatsbilanz_prec_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-    filename = filename,
-    caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
+  # Add image for precipitation anomalies
+  image_id <- "monatsbilanz_prec_map_anom"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_anom")),
+      id = image_id
+    )
   
   if (regdiff$high_prec_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-1")
@@ -250,28 +273,39 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-2")
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p3")
-  
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
+  # 
+  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
   bulletin
 }
 
-monatsbilanz_sun <- function(bulletin, regdiff) {
+monatsbilanz_sun <- function(bulletin, regdiff, language) {
   log_info("monatsbilanz_sun")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p1")
   
-  # Add images 
-  filename = "monatsbilanz_sunshine_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-    filename = filename,
-    caption = paste0("Verhältnis der effektiven Sonnenscheindauer zur maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
+  # Add image for absolute precipitation
+  image_id <- "monatsbilanz_sunshine_map_abs"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_abs")),
+      id = image_id
+    )
   
-  filename = "monatsbilanz_sunshine_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-    filename = filename,
-    caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
+  # Add image for precipitation anomalies
+  image_id <- "monatsbilanz_sunshine_map_anom"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_anom")),
+      id = image_id
+    )
   
   if (regdiff$high_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
@@ -281,7 +315,7 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p3")
   
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
+#  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
   bulletin  
 }
 
