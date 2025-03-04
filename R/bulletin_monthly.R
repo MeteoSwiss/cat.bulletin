@@ -171,8 +171,8 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   #   month <- sapply(bulletin$month_str,add_article)
   #   month <- as.character(month)
   # }
-  
-  # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
+  element_id <- "monatsbilanz-temp-p1"
+  bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
 
   # Add image for absolute temperatures
   image_id <- "monatsbilanz_temp_map_abs"
@@ -198,13 +198,6 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
       id = image_id
     )
   
-  
-  # filename = "monatsbilanz_temp_map_anom.png"
-  # bulletin <- bulletin %>% add_image(
-  #   filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-  #   filename = filename,
-  #   caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
-  # 
   # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   # 
   # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
