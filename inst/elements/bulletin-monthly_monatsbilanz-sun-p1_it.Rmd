@@ -25,5 +25,5 @@ number_regions_sun_low_eq1 <- length(regdiff$numb_stats_low_S)==1
 
 Am meisten Sonnenschein im Vergleich zur Referenzperiode 1991-2020 `r if (number_regions_sun_high_eq1) {"erhielt die Region"} else {"erhielten die Regionen"}` `r regdiff$regshigh_S`. Beispiele für Messstandorte mit mehr Sonnenschein sind `r regdiff$selhigh_stats_S` (siehe Tabelle 2). Die geringste Sonnenscheindauer im Vergleich zur Referenz `r if (number_regions_sun_low_eq1) {"verzeichnete die Region"} else {"verzeichneten die Regionen"}` `r regdiff$regslow_S` (z.B. die Stationen `r regdiff$sellow_stats_S`).
 
-Abbildung 3 zeigt die monatliche Sonnenscheindauer und die Abweichung zum Mittel über die Referenzperiode 1991-2020 für den `r bulletin$month_str` `r bulletin$year`.
+`r ifelse(!bulletin$provisional, glue::glue("Abbildung 3 zeigt die monatliche Sonnenscheindauer und die Abweichung zum Mittel über die Referenzperiode 1991-2020 für den {bulletin$month_str} {bulletin$year}.","")`
 

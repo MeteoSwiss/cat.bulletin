@@ -283,29 +283,31 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p1")
   
-  # Add image for absolute precipitation
-  image_id <- "monatsbilanz_sunshine_map_abs"
-  filename_in <- paste0(image_id,".png")
-  filename_out <- paste0(image_id,"_",language,".png")
-  bulletin <- bulletin %>% 
-    add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
-      filename = filename_out,
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_abs")),
-      id = image_id
-    )
-  
-  # Add image for precipitation anomalies
-  image_id <- "monatsbilanz_sunshine_map_anom"
-  filename_in <- paste0(image_id,".png")
-  filename_out <- paste0(image_id,"_",language,".png")
-  bulletin <- bulletin %>% 
-    add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
-      filename = filename_out,
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_anom")),
-      id = image_id
-    )
+  if (!bulletin$provisional) {
+    # Add image for sunshine duration relative to maximum
+    image_id <- "monatsbilanz_sunshine_map_abs"
+    filename_in <- paste0(image_id,".png")
+    filename_out <- paste0(image_id,"_",language,".png")
+    bulletin <- bulletin %>% 
+      add_image(
+        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+        filename = filename_out,
+        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_abs")),
+        id = image_id
+      )
+    
+    # Add image for sunshine duration anomalies
+    image_id <- "monatsbilanz_sunshine_map_anom"
+    filename_in <- paste0(image_id,".png")
+    filename_out <- paste0(image_id,"_",language,".png")
+    bulletin <- bulletin %>% 
+      add_image(
+        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+        filename = filename_out,
+        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_anom")),
+        id = image_id
+      )
+  }
   
   if (regdiff$high_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
