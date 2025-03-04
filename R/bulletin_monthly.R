@@ -11,16 +11,11 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
   cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12)  
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
-  month_str <- cat.lang::get.text(paste("month", month, sep="."))
-  nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
-  
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               workdir = ".",
                               languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
                                                    month = month,
-                                                   month_str = month_str,
-                                                   nextmonth_str = nextmonth_str,
                                                    provisional = provisional,
                                                    yearmonth = paste0(year, sprintf("%02d", month))
                               ),
@@ -38,8 +33,11 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
     set_metadata(metadata) 
   
   for (language in bulletin[["languages"]]) {
-    bulletin <- bulletin %>%
-      monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
+      bulletin <- bulletin %>% set_active_language(language = language)
+      bulletin$month_str <- cat.lang::get.text(paste("month", month, sep="."))
+      bulletin$nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
+      bulletin <- bulletin %>%
+        monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language)
   }
   
   
@@ -154,7 +152,7 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
       log_debug("Did not find a teaser image for the current month. Using default...")
       system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
     }
-  }
+  } 
   
   bulletin <- bulletin %>% 
     add_image(filename = "teaser_image.jpg", 
@@ -168,15 +166,15 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
-  bulletin <- bulletin %>% set_active_language(language = language)
+  # bulletin <- bulletin %>% set_active_language(language = language)
   # if (bulletin$language != "de"){
   #   month <- sapply(bulletin$month_str,add_article)
   #   month <- as.character(month)
   # }
   
   # bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
-  
-  # Add images 
+
+  # Add image for absolute temperatures
   image_id <- "monatsbilanz_temp_map_abs"
   filename_in <- paste0(image_id,".png")
   filename_out <- paste0(image_id,"_",language,".png")
@@ -184,33 +182,23 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
     add_image(
       filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
       filename = filename_out,
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs", lang = cat.func::isolang2dwhlang(language))),
-      # caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt."),
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
       id = image_id
     )
-
-  # image_id <- "my_first_image"
-  # filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
-  # bulletin <- bulletin %>%
-  #   set_active_language(language = "de") %>%
-  #   add_image(filepath = filepath, 
-  #             filename = "image1_de.png", 
-  #             caption = "Bildlegende",
-  #             id = image_id)  %>%
-  #   set_active_language(language = "fr") %>%
-  #   add_image(filepath = filepath, 
-  #             filename = "image1_fr.png", 
-  #             caption = "Légende de l'image",
-  #             id = image_id)  %>%
-  #   set_active_language(language = "it") %>%
-  #   add_image(filepath = filepath, 
-  #             filename = "image1_it.png", 
-  #             caption = "Legenda",
-  #             id = image_id)
+  
+  # Add image for temperature anomalies
+  image_id <- "monatsbilanz_temp_map_anom"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom")),
+      id = image_id
+    )
   
   
-  
-    
   # filename = "monatsbilanz_temp_map_anom.png"
   # bulletin <- bulletin %>% add_image(
   #   filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
