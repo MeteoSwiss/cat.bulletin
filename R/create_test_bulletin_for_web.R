@@ -1,7 +1,7 @@
 #' Create a test bulletin publication zip file for the website
 #' @export
 create_test_bulletin_for_web <- function(workdir = tempdir(),
-                                         zipfilename = "climate-bulletin-webtest.zip") {
+                                         zipfilename = "climate-bulletin.zip") {
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
     languages = c("de", "fr", "it"),

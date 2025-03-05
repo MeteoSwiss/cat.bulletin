@@ -51,6 +51,10 @@ create_bulletin <- function(bulletin_id,
   image_dir <- "images"
   image_path <- create_path(bulletin_path, image_dir)
   
+  # prepare files path
+  files_dir <- "files"
+  files_path <- create_path(bulletin_path, files_dir)
+  
   # prepare cache path
   cache_dir <- "cache"
   cache_path <- create_path(bulletin_path, cache_dir)
@@ -66,6 +70,8 @@ create_bulletin <- function(bulletin_id,
                      data_path = data_path,
                      image_dir = image_dir,
                      image_path = image_path,
+                     files_dir = files_dir,
+                     files_path = files_path,
                      cache_dir = cache_dir,
                      cache_path = cache_path,
                      bulletin_envir = new.env(),
