@@ -6,13 +6,14 @@
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @param metadata a publication_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}.
 #' @return an object that represents the bulletin content
+#' @details 
+#' The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}. 
 #' @export
 create_bulletin <- function(bulletin_id,
                             languages = c("de", "en", "fr", "it"),
                             bulletin_args = list(),
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
-                            bulletin_path = file.path(workdir, bulletin_dir),
                             metadata = publication_metadata()
                             ) {
   
@@ -23,6 +24,9 @@ create_bulletin <- function(bulletin_id,
   languages = match.arg(languages, several.ok = TRUE)
   
   bulletin <- bulletin_args
+  
+  assert_that(is.dir(workdir), is.writeable(workdir))
+  workdir = suppressWarnings(normalizePath(workdir)) # expand ~, ".", etc. 
   
   create_path <- function(path, subpath = NULL) {
     if (!is.null(subpath)) path <- file.path(bulletin_path, subpath)
@@ -36,7 +40,7 @@ create_bulletin <- function(bulletin_id,
   }
   
   # prepare bulletin dir
-  bulletin_path <- suppressWarnings(normalizePath(bulletin_path)) # expand ~, ".", etc. 
+  bulletin_path <- file.path(workdir, bulletin_dir)
   bulletin_path <- create_path(bulletin_path)
   
   # prepare data path

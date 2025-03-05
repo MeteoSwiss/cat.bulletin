@@ -3,14 +3,14 @@
 create_test_bulletin_for_web <- function(workdir = tempdir(),
                                          zipfilename = "climate-bulletin-webtest.zip") {
   bulletin <- create_bulletin(
-    bulletin_id = "bulletin",
+    bulletin_id = "webtest",
     languages = c("de", "fr", "it"),
     bulletin_dir = "bulletin",
     workdir = workdir
   ) 
   
   metadata <- publication_metadata(
-    path = "webtest",
+    path = "reports-and-bulletins/test-bulletin",
     title = c(
       de = "Klimabulletin - Testpublikation",
       fr = "Bulletin climatologique - test",

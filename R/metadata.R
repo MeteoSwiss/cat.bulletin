@@ -2,7 +2,8 @@
 #' 
 #' The publication metadata contains all the metadata information required for publication as webpage 
 #' on the MeteoSwiss website.
-#' @param path a string denoting the CMS path
+#' @param path a string denoting the CMS path. If the path does not start with a \code{/}, 
+#' it will be interpreted as relative to \code{/meteoswiss/homepage/service-and-publications/publications/}.
 #' @param title multilanguage string with bulletin titles for each language
 #' @param lead multilanguage string with lead text for each language
 #' @param teaser_image a path to the teaser image. It will be copied to the bulletins image folder during processing.
@@ -26,6 +27,9 @@ publication_metadata <- function(path = NULL,
                                  publication = NULL,
                                  publishedAt = Sys.Date()
 ) {
+  
+  if (!is.null(path) && !startsWith(path, "/"))
+    path <- paste0("/meteoswiss/homepage/service-and-publications/publications/", path)
   
   metadata <- list(
     sender = "Climate Analysis Tools (CATs)",
@@ -75,7 +79,7 @@ update_metadata_element <- function(metadata, ...) {
 assert_publication_metdata <- function(metadata, languages = c("de", "fr", "it", "en")) {
   assert_that(is.list(metadata))
   assert_that(metadata %has_name% c("sender", "publication_type", "path", "alias", "title", "lead", "keywords", "teaser_image", "teaser_source", "categories", "authors", "publication", "publishedAt"))
-  assert_that(is.null(metadata$path) || assert_that(is.character(metadata$path), length(metadata$path) == 1))
+  assert_that(is.null(metadata$path) || assert_that(is.character(metadata$path), length(metadata$path) == 1, startsWith(metadata$path, "/")))
   assert_that(is.null(metadata$alias) || assert_multi_language_string(metadata$alias, languages = languages))
   assert_that(is.null(metadata$title) || assert_multi_language_string(metadata$title, languages = languages))
   assert_that(is.null(metadata$lead) || assert_multi_language_string(metadata$lead, languages = languages))
