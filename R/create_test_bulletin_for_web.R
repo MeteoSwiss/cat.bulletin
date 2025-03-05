@@ -1,7 +1,15 @@
 #' Create a test bulletin publication zip file for the website
 #' @export
 create_test_bulletin_for_web <- function(workdir = tempdir(),
-                                         zipfilename = "climate-bulletin.zip") {
+                                         zipfilename = paste0(
+                                           "webtest_",
+                                           format(Sys.time(), format = "%Y%m%d%H%M"),
+                                           ".zip"
+                                         ),
+                                         sections = c("text", "image", "markdown", "table")) {
+  
+  sections <- match.arg(sections, several.ok = TRUE)
+  
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
     languages = c("de", "fr", "it"),
@@ -10,7 +18,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   ) 
   
   metadata <- publication_metadata(
-    path = "reports-and-bulletins/test-bulletin",
+    path = "test-bulletin",
     title = c(
       de = "Klimabulletin - Testpublikation",
       fr = "Bulletin climatologique - test",
@@ -45,57 +53,62 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   ## Text element
   
-  text_id <- generate_element_id("text")
-  bulletin <- bulletin %>%
-    set_active_language(language = "de") %>%
-    add_text("Das ist ein Text auf Deutsch mit ös und äs.", id = text_id) %>%
-    set_active_language(language = "fr") %>%
-    add_text("C'est un texte en français avec é et è.", id = text_id)%>%
-    set_active_language(language = "it") %>%
-    add_text("Questo è un testo in italiano con & et %.", id = text_id)
+  if ("text" %in% sections) {
+    text_id <- generate_element_id("text")
+    bulletin <- bulletin %>%
+      set_active_language(language = "de") %>%
+      add_text("Das ist ein Text auf Deutsch mit ös und äs.", id = text_id) %>%
+      set_active_language(language = "fr") %>%
+      add_text("C'est un texte en français avec é et è.", id = text_id)%>%
+      set_active_language(language = "it") %>%
+      add_text("Questo è un testo in italiano con & et %.", id = text_id)
+  }
   
   ## Image element
   
-  image_id <- "my_first_image"
-  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
-  bulletin <- bulletin %>%
-    set_active_language(language = "de") %>%
-    add_image(filepath = filepath, 
-              filename = "image1_de.png", 
-              caption = "Bildlegende",
-              id = image_id)  %>%
-    set_active_language(language = "fr") %>%
-    add_image(filepath = filepath, 
-              filename = "image1_fr.png", 
-              caption = "Légende de l'image",
-              id = image_id)  %>%
-    set_active_language(language = "it") %>%
-    add_image(filepath = filepath, 
-              filename = "image1_it.png", 
-              caption = "Legenda",
-              id = image_id)
-  
+  if ("image" %in% sections) {
+    image_id <- "my_first_image"
+    filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
+    bulletin <- bulletin %>%
+      set_active_language(language = "de") %>%
+      add_image(filepath = filepath, 
+                filename = "image1_de.png", 
+                caption = "Bildlegende",
+                id = image_id)  %>%
+      set_active_language(language = "fr") %>%
+      add_image(filepath = filepath, 
+                filename = "image1_fr.png", 
+                caption = "Légende de l'image",
+                id = image_id)  %>%
+      set_active_language(language = "it") %>%
+      add_image(filepath = filepath, 
+                filename = "image1_it.png", 
+                caption = "Legenda",
+                id = image_id)
+  }
   ## R-Markdown element
   
-  element_id <- "my_first_Rmd"
-  x <- 22 # needed by webtest_element_??.Rmd
-  for (language in bulletin$languages)
-    bulletin <- bulletin %>%
-    set_active_language(language = language) %>%
-    add_Rmd(element_id = "element",
-            id = element_id)
-  
+  if ("markdown" %in% sections) {
+    element_id <- "my_first_Rmd"
+    x <- 22 # needed by webtest_element_??.Rmd
+    for (language in bulletin$languages)
+      bulletin <- bulletin %>%
+      set_active_language(language = language) %>%
+      add_Rmd(element_id = "element",
+              id = element_id)
+  }
   
   ## Table element
-  element_id <- "my_first_table"
-  regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
-  for (language in bulletin$languages)
-    bulletin <- bulletin %>%
-    set_active_language(language = language) %>%
-    add_table(regdata,
-            id = element_id,
-            caption = paste(language, "caption"))
-  
+  if ("table" %in% sections) {
+    element_id <- "my_first_table"
+    regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
+    for (language in bulletin$languages)
+      bulletin <- bulletin %>%
+      set_active_language(language = language) %>%
+      add_table(regdata,
+                id = element_id,
+                caption = paste(language, "caption"))
+  }
   ## Generate pdfs in all languages and the xml and zip everything up
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)

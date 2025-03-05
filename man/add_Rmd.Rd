@@ -4,7 +4,7 @@
 \alias{add_Rmd}
 \title{add text to a bulletin}
 \usage{
-add_Rmd(bulletin, element_id, envir = parent.frame(), id = NULL)
+add_Rmd(bulletin, element_id, envir = parent.frame(), id = element_id)
 }
 \description{
 add text to a bulletin

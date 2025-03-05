@@ -29,7 +29,7 @@ publication_metadata <- function(path = NULL,
 ) {
   
   if (!is.null(path) && !startsWith(path, "/"))
-    path <- paste0("/meteoswiss/homepage/service-and-publications/publications/", path)
+    path <- paste0("/meteoswiss/homepage/service-and-publications/reports-and-bulletins/climate-bulletins", path)
   
   metadata <- list(
     sender = "Climate Analysis Tools (CATs)",
