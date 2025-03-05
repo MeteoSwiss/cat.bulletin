@@ -4,7 +4,18 @@
 \alias{add_Rmd}
 \title{add text to a bulletin}
 \usage{
-add_Rmd(bulletin, element_id, envir = parent.frame(), id = element_id)
+add_Rmd(
+  bulletin,
+  element_id,
+  envir = parent.frame(),
+  id = element_id,
+  hidden = FALSE
+)
+}
+\arguments{
+\item{element_id}{the name of the Rmd file in the elements folder of the package.}
+
+\item{envir}{environment in which to knit the Rmd later.}
 }
 \description{
 add text to a bulletin

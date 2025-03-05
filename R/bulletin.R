@@ -15,7 +15,7 @@ create_bulletin <- function(bulletin_id,
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
                             metadata = publication_metadata()
-                            ) {
+) {
   
   # use a random string for id when no is given (testing purposes)
   if (missing(bulletin_id))
@@ -161,25 +161,32 @@ has_element <- function(bulletin, language = bulletin$language, type = NULL, id 
   length(bulletin[[slot]]) > 0
 }
 
-get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {
+get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL, hidden = NULL) {
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
   
   slot <- languaged_elements(language)
   
-  if (!is.null(type)) {
-    types = unique(sapply(bulletin[[slot]], "[[", "type"))
-    i <- which(sapply(types, "%in%", type))
-    return(bulletin[[slot]][i])
+  elements <- 
+    if (!is.null(type)) {
+      types = unique(sapply(bulletin[[slot]], "[[", "type"))
+      i <- which(sapply(types, "%in%", type))
+      bulletin[[slot]][i]
+    } else  if (!is.null(id)) {
+      ids = unique(sapply(bulletin[[slot]], "[[", "id"))
+      i <- which(sapply(ids, "%in%", id))
+      bulletin[[slot]][i]
+    } else {
+      bulletin[[slot]]
+    }
+  
+  #hidden
+  if (!is.null(hidden)) {
+    i = which(sapply(elements, function(element) element[["hidden"]] == hidden))
+    elements <- elements[i]
   }
   
-  if (!is.null(id)) {
-    ids = unique(sapply(bulletin[[slot]], "[[", "id"))
-    i <- which(sapply(ids, "%in%", id))
-    return(bulletin[[slot]][i])
-  }
-  
-  return(bulletin[[slot]])
+  return(elements)
 }
 
 bulletin_pdfxmlzip <- function(bulletin) {

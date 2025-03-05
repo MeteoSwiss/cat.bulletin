@@ -4,14 +4,15 @@
 \alias{create_bulletin_monthly}
 \title{Create the monthly bulletin}
 \usage{
-create_bulletin_monthly(year = 2024, month = 8, provisional = FALSE, ...)
+create_bulletin_monthly(year = 2024, month = 8, provisional, ...)
 }
 \arguments{
 \item{year}{Bulletin year}
 
 \item{month}{Bulletin month}
 
-\item{provisional}{boolean indicating if the provisional version of the bulletin shall be created}
+\item{provisional}{boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
+\code{get_bulletin_monthly_provisional}.}
 
 \item{...}{further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc.}
 }
