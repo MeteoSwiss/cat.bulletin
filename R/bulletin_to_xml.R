@@ -18,7 +18,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
   
   default_language <- bulletin$languages[1]
   
-  for (element in get_elements(bulletin, language = default_language)) {
+  for (element in get_elements(bulletin, language = default_language, hidden = FALSE)) {
     log_debug("processing element", element$id)
     bulletin <- set_active_language(bulletin, language = default_language)
     function_name <- paste0(element$type, "_to_xml")
@@ -63,12 +63,7 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   metadata = bulletin$metadata
   xml <- xml %>%
     xml_set_attribute("sender", metadata$sender) %>%
-    xml_set_attribute("path", 
-                      paste0(
-                        "/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/",
-                        metadata$path
-                      )
-    ) %>%
+    xml_set_attribute("path", metadata$path) %>%
     xml_set_attribute("alias", metadata$alias) %>%
     xml_set_attribute("enabledLocales", paste0(bulletin$languages, collapse = ",")) %>%  
     xml_set_attribute("title", metadata$title, languages = bulletin$languages) %>%

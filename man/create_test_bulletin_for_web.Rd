@@ -6,7 +6,9 @@
 \usage{
 create_test_bulletin_for_web(
   workdir = tempdir(),
-  zipfilename = "climate-bulletin-webtest.zip"
+  zipfilename = paste0("webtest_", format(Sys.time(), format = "\%Y\%m\%d\%H\%M"),
+    ".zip"),
+  sections = c("text", "image", "markdown", "table")
 )
 }
 \description{

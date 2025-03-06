@@ -42,7 +42,8 @@ bulletin_to_markdown <- function(bulletin,
   write_markdown_metadata(bulletin = bulletin, file_conn = file_conn)
   
   # add markdown for all elements
-  for (element in bulletin[[languaged_elements(language)]]) {
+  for (element in get_elements(bulletin, hidden = FALSE)) {
+    if (!element$hidden) {
     tryCatch({
       lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
       readr::write_lines(lines, file = file_conn)
@@ -52,6 +53,7 @@ bulletin_to_markdown <- function(bulletin,
       warning(warning_message)
     }
     )
+    }
   }
   
   filename

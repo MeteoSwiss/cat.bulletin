@@ -6,15 +6,16 @@
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @param metadata a publication_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}.
 #' @return an object that represents the bulletin content
+#' @details 
+#' The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}. 
 #' @export
 create_bulletin <- function(bulletin_id,
                             languages = c("de", "en", "fr", "it"),
                             bulletin_args = list(),
                             bulletin_dir = "bulletin", 
                             workdir = tempdir(),
-                            bulletin_path = file.path(workdir, bulletin_dir),
                             metadata = publication_metadata()
-                            ) {
+) {
   
   # use a random string for id when no is given (testing purposes)
   if (missing(bulletin_id))
@@ -23,6 +24,9 @@ create_bulletin <- function(bulletin_id,
   languages = match.arg(languages, several.ok = TRUE)
   
   bulletin <- bulletin_args
+  
+  assert_that(is.dir(workdir), is.writeable(workdir))
+  workdir = suppressWarnings(normalizePath(workdir)) # expand ~, ".", etc. 
   
   create_path <- function(path, subpath = NULL) {
     if (!is.null(subpath)) path <- file.path(bulletin_path, subpath)
@@ -36,7 +40,7 @@ create_bulletin <- function(bulletin_id,
   }
   
   # prepare bulletin dir
-  bulletin_path <- suppressWarnings(normalizePath(bulletin_path)) # expand ~, ".", etc. 
+  bulletin_path <- file.path(workdir, bulletin_dir)
   bulletin_path <- create_path(bulletin_path)
   
   # prepare data path
@@ -46,6 +50,10 @@ create_bulletin <- function(bulletin_id,
   # prepare image path
   image_dir <- "images"
   image_path <- create_path(bulletin_path, image_dir)
+  
+  # prepare files path
+  files_dir <- "files"
+  files_path <- create_path(bulletin_path, files_dir)
   
   # prepare cache path
   cache_dir <- "cache"
@@ -62,6 +70,8 @@ create_bulletin <- function(bulletin_id,
                      data_path = data_path,
                      image_dir = image_dir,
                      image_path = image_path,
+                     files_dir = files_dir,
+                     files_path = files_path,
                      cache_dir = cache_dir,
                      cache_path = cache_path,
                      bulletin_envir = new.env(),
@@ -151,25 +161,32 @@ has_element <- function(bulletin, language = bulletin$language, type = NULL, id 
   length(bulletin[[slot]]) > 0
 }
 
-get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {
+get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL, hidden = NULL) {
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
   
   slot <- languaged_elements(language)
   
-  if (!is.null(type)) {
-    types = unique(sapply(bulletin[[slot]], "[[", "type"))
-    i <- which(sapply(types, "%in%", type))
-    return(bulletin[[slot]][i])
+  elements <- 
+    if (!is.null(type)) {
+      types = unique(sapply(bulletin[[slot]], "[[", "type"))
+      i <- which(sapply(types, "%in%", type))
+      bulletin[[slot]][i]
+    } else  if (!is.null(id)) {
+      ids = unique(sapply(bulletin[[slot]], "[[", "id"))
+      i <- which(sapply(ids, "%in%", id))
+      bulletin[[slot]][i]
+    } else {
+      bulletin[[slot]]
+    }
+  
+  #hidden
+  if (!is.null(hidden)) {
+    i = which(sapply(elements, function(element) element[["hidden"]] == hidden))
+    elements <- elements[i]
   }
   
-  if (!is.null(id)) {
-    ids = unique(sapply(bulletin[[slot]], "[[", "id"))
-    i <- which(sapply(ids, "%in%", id))
-    return(bulletin[[slot]][i])
-  }
-  
-  return(bulletin[[slot]])
+  return(elements)
 }
 
 bulletin_pdfxmlzip <- function(bulletin) {
