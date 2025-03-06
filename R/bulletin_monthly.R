@@ -39,7 +39,8 @@ create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE,
       bulletin <- bulletin %>%
         monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
         monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-        monatsbilanz_sun(regdiff = regdiff, language = language)
+        monatsbilanz_sun(regdiff = regdiff, language = language) %>%
+        monatsbulletin_daily_timeseries(language = language)
   }
   
   
@@ -339,18 +340,27 @@ temporal_evolution <- function(bulletin, swissmean, regdiff) {
   bulletin
 }
 
-monatsbulletin_daily_timeseries <- function(bulletin) {
+monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   log_info("monatsbulletin_daily_timeseries")
-  
+
+  station <- c(de = "SMA", fr = "GVE", it = "LUG")
+  station_name <- mchdwh::station_info(nat_abbr=station[language])$station_name
+
   bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
-  
-  filename = "witterungsverlauf.png"
-  bulletin <- bulletin %>% add_image(
-    filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language=bulletin$language, filename = filename),
-    filename = filename,
-    caption = "This is a caption.")
-  
+
+  # Add image for daily weather conditions
+  image_id <- "witterungsverlauf"
+  filename_in  <- paste0(image_id,"_",language,"_in.png")
+  filename_out <- paste0(image_id,"_",language,"_out.png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(station[language]), language=language, filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("daily_timeseries")),
+      id = image_id
+    )
+
   bulletin
 }
 
