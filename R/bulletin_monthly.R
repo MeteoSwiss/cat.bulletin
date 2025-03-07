@@ -82,6 +82,11 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     )
   }
   
+  bulletin_edition <- function(language, provisional) {
+    id <- ifelse(provisional, "edition_provisional", "edition_definitive")
+    cat.lang::get.text(id, lang = cat.func::isolang2dwhlang(language))
+  }
+  
   bulletin_path <- function(bulletin) {
     path <- paste0("klimabulletin", "-", month_str(bulletin$month, language = "de"), "-", bulletin$year)
     tolower(path)
@@ -110,6 +115,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
                                                lead_element_id = lead_element_id,
                                                language = lang)
     ),
+    edition = sapply(bulletin$languages, bulletin_edition, provisional = bulletin$provisional),
     categories = c(
       de = "Klima",
       it = "Clima",

@@ -13,6 +13,7 @@
 #' @param alias multilanguage vector with alias to use in the path for each language
 #' @param keywords multilanguage vector of comma separated strings with keywords for each language
 #' @param publication multilanguage vector of paths to the publication files (made avaailable as download)
+#' @param edition multilanguage vector of edition field in xml publication.
 #' @example inst/examples/metadata_examples.R
 #' @export
 publication_metadata <- function(path = NULL, 
@@ -25,11 +26,12 @@ publication_metadata <- function(path = NULL,
                                  categories = c("climate"),
                                  authors = NULL,
                                  publication = NULL,
-                                 publishedAt = Sys.Date()
+                                 publishedAt = Sys.Date(),
+                                 edition = NULL
 ) {
   
   if (!is.null(path) && !startsWith(path, "/"))
-    path <- paste0("/meteoswiss/homepage/service-and-publications/reports-and-bulletins/climate-bulletins", path)
+    path <- paste0("/meteoswiss/homepage/service-and-publications/reports-and-bulletins/climate-bulletins/", path)
   
   metadata <- list(
     sender = "Climate Analysis Tools (CATs)",
@@ -44,7 +46,8 @@ publication_metadata <- function(path = NULL,
     categories = categories,
     authors = authors, 
     publication = publication,
-    publishedAt = publishedAt
+    publishedAt = publishedAt,
+    edition = edition
   )
   metadata
 }
@@ -88,7 +91,8 @@ assert_publication_metdata <- function(metadata, languages = c("de", "fr", "it",
   assert_that(is.null(metadata$teaser_source) || assert_multi_language_string(metadata$teaser_source, languages = languages))
   assert_that(is.null(metadata$categories) || assert_that(is.character(metadata$categories)))
   assert_that(is.null(metadata$authors) || assert_multi_language_string(metadata$authors, languages = languages))
-  assert_that(is.null(metadata$publication) || assert_multi_language_string(metadata$publication, languages = languages))      
+  assert_that(is.null(metadata$publication) || assert_multi_language_string(metadata$publication, languages = languages))
+  assert_that(is.null(metadata$edition) || assert_multi_language_string(metadata$edition, languages = languages))  
 }
 
 lore_ipsum <- function(language) {
