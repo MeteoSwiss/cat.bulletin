@@ -37,7 +37,7 @@ calculate_regional_differences <- function(bulletin) {
   regdiff_P <- comp_regdiff(parameter = "P", vals = vals, regsort = regsort)
   subset_climtab_P <- regdiff_P$subset_climtab
   # subset_climtab_P <- flextable::flextable(regdiff_P$subset_climtab)
-  # subset_climtab_P <- flextable::set_caption(subset_climtab_P, caption = paste0("Monatsniederschläge für den ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  # subset_climtab_P <- flextable::set_caption(subset_climtab_P, caption = paste0("Monatsniederschläge für den ",month_str(bulletin$month)," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
   
   # Local precipitation ranking
   high_prec_records <- process_extreme_values(param_short = "rhs15m0x", bulletin)
@@ -47,7 +47,7 @@ calculate_regional_differences <- function(bulletin) {
   regdiff_S <- comp_regdiff(parameter = "S", vals = vals, regsort = regsort)
   subset_climtab_S <- regdiff_S$subset_climtab
   # subset_climtab_S <- flextable::flextable(regdiff_S$subset_climtab)
-  # subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",bulletin$month_str," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  # subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",month_str(bulletin$month)," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
   
   # Local sunshine duration ranking
   high_sun_records <- process_extreme_values(param_short = "sh200m0x", bulletin)

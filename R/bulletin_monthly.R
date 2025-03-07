@@ -26,14 +26,12 @@ create_bulletin_monthly <- function(year = 2024,
                                                    yearmonth = paste0(year, sprintf("%02d", month))
                               ),
                               ...)
-  
+
   swissmean <- calculate_swissmean_temp(bulletin)
   regdiff <- calculate_regional_differences(bulletin)
   
   for (language in bulletin[["languages"]]) {
     bulletin <- bulletin %>% set_active_language(language = language)
-    bulletin$month_str <- cat.lang::get.text(paste("month", month, sep="."))
-    bulletin$nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
     
     # add lead (add default if no Rmd element exists)
     bulletin <- tryCatch({
@@ -48,8 +46,8 @@ create_bulletin_monthly <- function(year = 2024,
     bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language) %>%
-      monatsbulletin_daily_timeseries(language = language)
+      monatsbilanz_sun(regdiff = regdiff, language = language) 
+      #monatsbulletin_daily_timeseries(language = language)
   }
   
   metadata <- monatsbulletin_metadata(bulletin = bulletin,
@@ -61,19 +59,6 @@ create_bulletin_monthly <- function(year = 2024,
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
   
-  # bulletin <- bulletin %>%
-  #   monatsbulletin_head(swissmean, regdiff) %>%
-  #   monatsbulletin_disclaimer() %>%
-  #   monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
-  #   temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
-  #   monatsbilanz_precip(regdiff = regdiff) %>%
-  #   monatsbilanz_sun(regdiff = regdiff) %>%
-  #   monatsbulletin_daily_timeseries() %>%
-  #   monatsbulletin_more_info()
-  
-  #bulletin_pdfxmlzip(bulletin)
-  #bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
-  #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
   bulletin_to_webzip(bulletin)
 }
 
@@ -89,7 +74,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   bulletin_lead <- function(bulletin, lead_element_id, language) {
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
-    
+    bulletin = set_active_language(bulletin, language = language)
     switch(lead_element$type,
            text = lead_element$text,
            Rmd = Rmd_to_html(element = lead_element),
@@ -98,7 +83,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   }
   
   bulletin_path <- function(bulletin) {
-    path <- paste0("klimabulletin", "-", bulletin$month_str, "-", bulletin$year)
+    path <- paste0("klimabulletin", "-", month_str(bulletin$month, language = "de"), "-", bulletin$year)
     tolower(path)
   }
   
@@ -110,7 +95,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     )
     
     for (lang in names(title)) {
-      title[lang] <- paste(title[lang], cat.lang::get.text(paste0("month.", bulletin$month), lang = cat.func::isolang2dwhlang(lang)))
+      title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))
       title[lang] <- paste(title[lang], bulletin$year)
     }
     
@@ -151,7 +136,7 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
   
   log_info("bulletin head")
   
-  title <- paste("# Klimabulletin", bulletin$month_str, bulletin$year)
+  title <- paste("# Klimabulletin", month_str(bulletin$month), bulletin$year)
   bulletin <- bulletin %>% add_title(title) 
   
   # Change the succession of these sentences based on a weight
@@ -204,7 +189,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   # bulletin <- bulletin %>% set_active_language(language = language)
   # if (bulletin$language != "de"){
-  #   month <- sapply(bulletin$month_str,add_article)
+  #   month <- sapply(month_str(bulletin$month),add_article)
   #   month <- as.character(month)
   # }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
@@ -483,7 +468,7 @@ get_final_date <- function(year, month, language) {
     # Get the last day of the specified month in the past
     last_date <- lubridate::ceiling_date(as.Date(paste(year, month, "01", sep = "-")), "month") - 1
   }
-  locale <- paste0(language, "_CH.UTF-8")
+  locale <- get_locale(language)
   last_date <- withr::with_locale(
     new = c("LC_TIME" = locale),
     code = format(last_date, "%d. %B %Y")
@@ -517,4 +502,15 @@ get_bulletin_monthly_provisional <- function(year, month) {
   }
   
   return(provisional)
+}
+
+month_str <- function(month, language) {
+  cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
+  if (missing(language)) language = NULL else language = cat.func::isolang2dwhlang(language)
+  cat.lang::get.text(paste0("month.", month), lang = language)
+}
+
+nextmonth_str <- function(month, language) {
+  cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
+  month_str(ifelse(month == 12, 1, month + 1), language = language)
 }

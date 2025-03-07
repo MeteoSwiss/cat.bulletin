@@ -45,17 +45,15 @@ bulletin_to_markdown <- function(bulletin,
       
       # add markdown for all elements
       for (element in get_elements(bulletin, hidden = FALSE)) {
-        if (!element$hidden) {
-          tryCatch({
-            lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element, language = language))
-            readr::write_lines(lines, file = file_conn)
-          },
-          error = function(e) {
-            warning_message <- paste("Could not process element", element$id, ":", e)
-            warning(warning_message)
-          }
-          )
+        tryCatch({
+          lines <- do.call(what = paste0(element$type, "_to_markdown"), args = list(element = element))
+          readr::write_lines(lines, file = file_conn)
+        },
+        error = function(e) {
+          warning_message <- paste("Could not process element", element$id, ":", e)
+          warning(warning_message)
         }
+        )
       }
     })
   filename
