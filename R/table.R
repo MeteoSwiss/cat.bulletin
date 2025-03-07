@@ -1,8 +1,10 @@
 table_element <- function(table, bulletin_envir, id = NULL, caption = NULL) {
   assertthat::assert_that(inherits(table, "data.frame"))
   table_element <- bulletin_element(type = "table", id = id)
-  # save the table by element_id in the bulletin markdown environment so that it can be accessed later in the rendering process
-  assign(table_element$id, table, envir = bulletin_envir)
+  # save the table in the bulletin markdown environment so that it can be accessed later in the rendering process
+  table_var <- generate_element_id(type = "table")
+  table_element[["table_var"]] <- table_var
+  assign(table_var, table, envir = bulletin_envir)
   table_element[["bulletin_envir"]] <- bulletin_envir
   table_element[["caption"]] <- caption
   
@@ -10,7 +12,7 @@ table_element <- function(table, bulletin_envir, id = NULL, caption = NULL) {
 }
 
 get_table <- function(table_element) {
-  get(table_element$id, envir = table_element[["bulletin_envir"]])
+  get(table_element$table_var, envir = table_element[["bulletin_envir"]])
 }
 
 #' Add a table to a bulletin
@@ -36,7 +38,7 @@ add_table <- function(bulletin, table, id = NULL, caption = NULL) {
 #' @rdname bulletin_to_markdown
 table_to_markdown <- function(element) {
   md  <- paste("```{r, echo=FALSE}",
-               paste0("kableExtra::kbl(", element$id, ")"),
+               paste0("kableExtra::kbl(", element$table_var, ")"),
                "```", 
                sep = "\n"
   )
