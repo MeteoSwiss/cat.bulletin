@@ -23,16 +23,19 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
     bulletin <- set_active_language(bulletin, language = default_language)
     function_name <- paste0(element$type, "_to_xml")
     
-    xml_node <- tryCatch({
-      do.call(what = function_name, 
-              args = list(xml = content_node, element = element, language = default_language))
-    },
-    error = function(e) {
-      warning_message <- paste("Could not process xml element", element$id, "for default language", default_language, ":", e)
-      warning(warning_message)
-      next
-    }
-    )
+    withr::with_locale(
+      new = c("LC_TIME" = get_locale(default_language)), {
+        xml_node <- tryCatch({
+          do.call(what = function_name, 
+                  args = list(xml = content_node, element = element, language = default_language))
+        },
+        error = function(e) {
+          warning_message <- paste("Could not process xml element", element$id, "for default language", default_language, ":", e)
+          warning(warning_message)
+          next
+        }
+        )
+      })
     
     # process other languages
     for (language in bulletin$languages[-1]) {
@@ -41,16 +44,18 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
       # find element
       if (has_element(bulletin, language = language, id = element$id)) {
         lang_element <- get_elements(bulletin, language = language, id = element$id)[[1]]
-        tryCatch({
-          do.call(what = function_name, 
-                args = list(xml = xml_node, element = lang_element, language = language))
-        },
-        error = function(e) {
-          warning_message <- paste("Could not process xml element", element$id, "for language", language, ":", e)
-          warning(warning_message)
-          next
-        }
-        )
+        withr::with_locale(
+          new = c("LC_TIME" = get_locale(language)), {
+            tryCatch({
+              do.call(what = function_name, 
+                      args = list(xml = xml_node, element = lang_element, language = language))
+            },
+            error = function(e) {
+              warning_message <- paste("Could not process xml element", element$id, "for language", language, ":", e)
+              warning(warning_message)
+              next
+            })
+          })
       } else {
         warning(paste("no element with id ", element$id, "found for language", language))
       }

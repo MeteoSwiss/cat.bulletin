@@ -200,3 +200,7 @@ bulletin_pdfxmlzip <- function(bulletin) {
   cli::cli_li(paste("xml:", xml))
   cli::cli_li(paste("zip:", zip))
 }
+
+get_locale <- function(language) {
+  paste0(language, "_CH.UTF-8")
+}

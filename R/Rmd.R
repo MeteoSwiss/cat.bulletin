@@ -18,7 +18,7 @@ add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_i
   add_element(bulletin, Rmd_element(filename, envir = envir, id = id, hidden = hidden))
 }
 
-Rmd_to_markdown <- function(element) {
+Rmd_to_markdown_file <- function(element) {
   tmpfile <- tempfile(fileext = ".md")
   tryCatch({
     knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]])
@@ -26,6 +26,11 @@ Rmd_to_markdown <- function(element) {
   error = function(e)
     warning(paste("Could not knit Rmd file", element[["Rmd_file"]], "to markdown."))
   )
+  tmpfile
+}
+
+Rmd_to_markdown <- function(element) {
+  tmpfile <- Rmd_to_markdown_file(element) 
   md <- readr::read_lines(tmpfile)
   md
 }
@@ -38,11 +43,10 @@ Rmd_to_xml <- function(xml, element, language) {
 }
 
 Rmd_to_html <- function(element) {
-  md_in <- tempfile(fileext = ".md")
+  md_in <- Rmd_to_markdown_file(element) 
   html_out <- tempfile(fileext = ".html")
-  writeLines(Rmd_to_markdown(element), con = md_in)
   tryCatch({
-    markdown::markdownToHTML(file = md_in, output = html_out, fragment.only = TRUE)
+      markdown::markdownToHTML(file = md_in, output = html_out, fragment.only = TRUE)
   },
   error = function(e)
     warning(paste("Could not knit markdown file ", element[["Rmd_file"]], "to html from markdown."))

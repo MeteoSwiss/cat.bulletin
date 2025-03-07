@@ -5,7 +5,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r echo=FALSE, results="hide"}
-Sys.setlocale("LC_TIME", "de_DE.UTF-8")
 formatted_date <- format(Sys.Date(), "%d. %B %Y")
 
 current_date <- Sys.Date()
