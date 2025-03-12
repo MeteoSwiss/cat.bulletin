@@ -402,7 +402,7 @@ monatsbulletin_disclaimer <- function(bulletin) {
 # further helping functions
 add_article <- function(word) {
   # Check if the word starts with a vowel (a, e, i, o, u, y)
-  if (grepl("^[aeéèiouyAEÉÈIOUY]", word)) {
+  if (grepl("^[ae\u00E9\u00E8iouyAE\u00C9\u00C8IOUY]", word)) {
     return(paste0("d'", tolower(word)))
   } else {
     return(paste0("de ", tolower(word)))

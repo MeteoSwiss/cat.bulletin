@@ -16,7 +16,8 @@ publication_metadata(
   categories = c("climate"),
   authors = NULL,
   publication = NULL,
-  publishedAt = Sys.Date()
+  publishedAt = Sys.Date(),
+  edition = NULL
 )
 
 update_metadata_element(metadata, ...)
@@ -42,6 +43,8 @@ it will be interpreted as relative to \code{/meteoswiss/homepage/service-and-pub
 \item{authors}{a multilanguage string denoting the authors of the publication}
 
 \item{publication}{multilanguage vector of paths to the publication files (made avaailable as download)}
+
+\item{edition}{multilanguage vector of edition field in xml publication.}
 
 \item{metadata}{a publication_metadata list of publication metadata}
 }
