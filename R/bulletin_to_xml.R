@@ -1,6 +1,9 @@
 
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
+  
+  assert_that(length(get_elements(bulletin)) > 0, msg = "Bulletin must contain at least one element for xml processing.")
+  
   xml <- xml2::xml_new_root(.value = "publication-page")
   
   root_node <- xml2::xml_root(xml)

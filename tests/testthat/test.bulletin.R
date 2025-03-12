@@ -70,12 +70,12 @@ test_that("has_element", {
   
   bulletin <- create_bulletin(languages = language) %>%
     add_text(text) %>%
-    add_title(title)
+    add_text(title)
   
   text_element = bulletin[[languaged_elements(language)]][[1]]
   title_element = bulletin[[languaged_elements(language)]][[2]]
   
-  expect_true(has_element(bulletin, type = "title"))
+  expect_true(has_element(bulletin, type = "text"))
   expect_true(has_element(bulletin, type = "text"))
   expect_false(has_element(bulletin, type = "blabla"))
   expect_true(has_element(bulletin, id = title_element$id))
@@ -86,22 +86,18 @@ test_that("has_element", {
 })
 
 test_that("get_elements", {
-  title <- "# This is a title"
   text <- "This is normal text."
   
   language = "de"
   
   bulletin <- create_bulletin(languages = language) %>%
-    add_text(text) %>%
-    add_title(title)
+    add_text(text) 
   
   text_element = bulletin[[languaged_elements(language)]][[1]]
-  title_element = bulletin[[languaged_elements(language)]][[2]]
-  
-  expect_equivalent(get_elements(bulletin, type = "title"), list(title_element))
+
   expect_equivalent(get_elements(bulletin, type = "text"), list(text_element))
   expect_equivalent(get_elements(bulletin, type = "blabla"), list())
-  expect_equivalent(get_elements(bulletin, id = title_element$id), list(title_element))
+  expect_equivalent(get_elements(bulletin, id = text_element$id), list(text_element))
   expect_equivalent(get_elements(bulletin, id = "asdfasfd"), list())
   expect_error(get_elements(bulletin, type = "asdf", id = "asdf"))
   expect_equal(get_elements(bulletin), bulletin$elements)
