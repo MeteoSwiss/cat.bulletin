@@ -138,57 +138,6 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   metadata
 }
 
-monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
-  
-  log_info("bulletin head")
-  
-  title <- paste("# Klimabulletin", month_str(bulletin$month), bulletin$year)
-  bulletin <- bulletin %>% add_title(title) 
-  
-  # Change the succession of these sentences based on a weight
-  bulletin <- bulletin %>% add_Rmd(element_id = "leadtext")
-  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-temp")
-  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-precip")
-  # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-sun")
-  
-  bulletin_prod_path <- get_config_value("bulletin_prod_path")
-  yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))
-  
-  # teaser text
-  get_teaser_text <- function(bulletin_prod_path, yearmonth) {
-    filepath <- file.path(bulletin_prod_path, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
-    if (assertthat::is.readable(filepath)) {
-      lines <- readLines(filepath)
-      if (length(lines) > 1)
-        warning("teaser_text.txt contains more than one line. Using only the first.")
-      lines[1]
-    } else {
-      log_debug("Did not find a teaser text for the current month. Using default...")
-    }
-  }
-  
-  teasertext <- get_teaser_text(bulletin_prod_path, yearmonth)
-  
-  #teaser image
-  
-  get_teaser_image <- function(bulletin_prod_path, yearmonth) {
-    filepath = file.path(bulletin_prod_path, yearmonth, "teaser_image.jpg")
-    if (assertthat::is.readable(filepath)) {
-      filepath
-    } else {
-      log_debug("Did not find a teaser image for the current month. Using default...")
-      system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
-    }
-  } 
-  
-  bulletin <- bulletin %>% 
-    add_image(filename = "teaser_image.jpg", 
-              filepath = get_teaser_image(bulletin_prod_path, yearmonth),
-              caption = teasertext)
-  
-  bulletin
-}
-
 monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")

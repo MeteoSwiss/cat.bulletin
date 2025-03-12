@@ -23,8 +23,8 @@ comp_regdiff_abs <- function(parameter, vals) {
     vhighest[r] <- quantile(abs(vals[[absval]][indr]),0.8,na.rm=TRUE)
     vlowest[r] <- quantile(abs(vals[[absval]][indr]),0.2,na.rm=TRUE)
   }
-  member_h <- cutree(hclust(dist(vhighest)),3)
-  member_l <- cutree(hclust(dist(vlowest)),3)
+  member_h <- stats::cutree(hclust(dist(vhighest)),3)
+  member_l <- stats::cutree(hclust(dist(vlowest)),3)
   mr_h <- 0
   mr_l <- 0
   for (i in 1:3) {

@@ -68,8 +68,8 @@ comp_regdiff <- function(parameter, vals) {
     vhighest[r] <- quantile(abs(vals[[deviations]][indr]),0.75,na.rm=TRUE)
     vlowest[r] <- quantile(abs(vals[[deviations]][indr]),0.25,na.rm=TRUE)
   }
-  member_h <- cutree(hclust(dist(vhighest)),3)
-  member_l <- cutree(hclust(dist(vlowest)),3)
+  member_h <- stats::cutree(hclust(dist(vhighest)),3)
+  member_l <- stats::cutree(hclust(dist(vlowest)),3)
   mr_h <- 0
   mr_l <- 0
   for (i in 1:3) {

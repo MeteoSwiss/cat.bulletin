@@ -77,6 +77,7 @@ create_bulletin <- function(bulletin_id,
                      bulletin_envir = new.env(),
                      stage = "prod",
                      languages = languages,
+                     language = languages[1],
                      metadata = metadata
                 )
   )

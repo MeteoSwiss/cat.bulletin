@@ -1,6 +1,9 @@
 
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
+  
+  assert_that(length(get_elements(bulletin)) > 0, msg = "Bulletin must contain at least one element for xml processing.")
+  
   xml <- xml2::xml_new_root(.value = "publication-page")
   
   root_node <- xml2::xml_root(xml)
@@ -137,8 +140,11 @@ xml_set_attribute <- function(xml, attribute, value, languages = NULL) {
 #' If the given node is already of the type, no action is taken.
 #' If the given node is not of the type, a child node is added with value set to the type. 
 #' @examples 
+#' \dontrun{
 #' xml_node <- xml2::xml_new_root("root")
-#' xml_node <- assure_node_of_type("text")
+#' xml_node <- assure_node_of_type(xml_node, "text")
+#' }
+#' @keywords internal
 assure_node_of_type <- function(xml_node, type) {
   if (xml2::xml_name(xml_node) != type) {
     xml_node <- xml2::xml_add_child(xml_node, .value = type)

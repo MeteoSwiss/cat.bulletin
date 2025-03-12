@@ -19,5 +19,5 @@ The \code{table} package for supporting tables.
 \examples{
 myData <- data.frame(a = 3, b = 4)
 bulletin <- create_bulletin() \%>\%
-  add_table(table = myTable, caption = "An example table.")
+  add_table(table = myData, caption = "An example table.")
 }

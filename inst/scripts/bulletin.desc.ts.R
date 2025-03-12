@@ -97,7 +97,7 @@ if (par == "T") {
   filepaths_reganom <- c(paste0(fname03), paste0(fname04), paste0(fname05))
 
   # absolute temperature, swissmean
-  data_abs <- read.table(filepath_abs, header=T)
+  data_abs <- utils::read.table(filepath_abs, header=T)
   year <- data_abs$year
   ycurr <- year[length(year)]
   poscurr <- length(year)
@@ -105,7 +105,7 @@ if (par == "T") {
   abs  <- data_abs$val
   vcurr <- round(abs[poscurr],1)
 
-  data_anom <- read.table(filepath_anom, header=T)
+  data_anom <- utils::read.table(filepath_anom, header=T)
   anom <- data_anom$val
   acurr <- round(anom[poscurr],1)
   
@@ -176,7 +176,7 @@ if (par == "T") {
   rankcurr_reg <- 0
   anom_reg <- array(NA, c(length(year),length(filepaths_reganom)))
   for (i in 1:length(filepaths_reganom)) {
-    data <- read.table(filepaths_reganom[i],header=T)
+    data <- utils::read.table(filepaths_reganom[i],header=T)
     anom_reg[,i] <- data$val
     acurr_reg[i] <- round(anom_reg[poscurr,i],1)
 

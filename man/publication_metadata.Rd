@@ -75,9 +75,7 @@ my_metadata <- publication_metadata(
     it = "Clima",
     fr = "Climat"
   ),
-  teaser_image = teaser_image(
-    filepath = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
-  ),
+  teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
   teaser_source = c(
     de = "Foto: ",
     it = "Foto: ",
@@ -91,9 +89,12 @@ my_metadata <- publication_metadata(
   ),
   publishedAt = Sys.Date()
 )
-my_metadata <- publication_metadata()
+my_metadata <- publication_metadata(
+  title = c(de = "deutscher titel", fr = "titre français")
+)
 # update an element 
-my_metadata <- update_metadata_element(my_metadata, path = "new path")
+my_metadata <- update_metadata_element(my_metadata, path = "/my_new_path")
 # update a language string within a multi language element
-my_metadata <- update_metadata_element(my_metadata, title = update_multi_language_string(m$title, "de", "neuer deutscher Titel"))
+my_metadata <- update_metadata_element(my_metadata, title = update_multi_language_string(my_metadata$title, "de", "neuer deutscher Titel"))
+
 }

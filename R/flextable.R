@@ -19,16 +19,16 @@ get_flextable <- function(flextable_element) {
 #' @param flextable a flextable object created with the \code{flextable} package.
 #' @examples
 #' myData <- data.frame(a = 3, b = 4)
-#' myTable <- flextable(myData) 
-#' bulletin <- create_bulletin() %>%
-#'   add_flextable(flextable = myTable, caption = "An example table.")
+#' myTable <- flextable::flextable(myData) 
+#' bulletin <- create_bulletin()
+#' bulletin <- add_flextable(bulletin, flextable = myTable, caption = "An example table.")
 #' @export
 add_flextable <- function(bulletin, flextable, caption = NULL) {
   assertthat::assert_that(inherits(flextable, "flextable"))
   
   # add caption
   if (!is.null(caption)) {
-    flextable <- set_caption(flextable, caption)
+    flextable <- flextable::set_caption(flextable, caption)
   }
   
   add_element(bulletin, element = flextable_element(flextable = flextable, bulletin_envir = bulletin$bulletin_envir))

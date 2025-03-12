@@ -14,10 +14,10 @@ calculate_swissmean_temp <- function (bulletin) {
   #mshort <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
   #filename_abs <- system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", paste0("ths200m0.swissmean.m.",mshort[bulletin$month],".1864.",bulletin$year,".abs.txt"), package = "cat.bulletin")
   #
-  data_abs <- read.table(filename_abs, header = TRUE)
+  data_abs <- utils::read.table(filename_abs, header = TRUE)
   
   filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
-  data_anom <- read.table(filename_anom, header = TRUE)
+  data_anom <- utils::read.table(filename_anom, header = TRUE)
   
   # absolute temperature, swissmean
   year <- data_abs$year
@@ -80,8 +80,8 @@ calculate_swissmean_temp <- function (bulletin) {
   diff <- round(c(loess$incr.cf[1],loess$t.incr,loess$incr.cf[2]),1)
   ydiff_ca <- round(ycurr-1885+1,-1)
   
-  resid1 <- as.numeric(quantile(abs-loess$fit,probs=c(0.16,0.84)))
-  resid2 <- as.numeric(quantile(abs-loess$fit,probs=c(0.025,0.975)))
+  resid1 <- as.numeric(stats::quantile(abs-loess$fit,probs=c(0.16,0.84)))
+  resid2 <- as.numeric(stats::quantile(abs-loess$fit,probs=c(0.025,0.975)))
   
   bounds1 <- format(round(c(loess$val2+resid1[1],loess$val2+resid1[2]),1), nsmall=1)
   bounds2 <- format(round(c(loess$val2+resid2[1],loess$val2+resid2[2]),1), nsmall=1)

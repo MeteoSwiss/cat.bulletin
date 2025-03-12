@@ -76,7 +76,7 @@ distance <- dist(datanew2)
 mydata.hclust = hclust(distance)
 plot(mydata.hclust,cex=0.4)
 
-member = cutree(mydata.hclust,10)
+member = stats::cutree(mydata.hclust,10)
 table(member)
 
 # Mittel über alle Member in einem Cluster (hier: 1)
