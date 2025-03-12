@@ -262,7 +262,7 @@ comp_regdiff <- function(parameter, vals, regsort) {
   a_ueber <- length(which(acurr_all > norm_range[2])) / length(acurr_all)
   a_unter <- length(which(acurr_all < norm_range[1])) / length(acurr_all)
   a_bereich <- 1 - a_ueber - a_unter
-  quac <- quantile(acurr_all,probs = dev_probs)
+  quac <- stats::quantile(acurr_all,probs = dev_probs)
   if (parameter == "T") {
     quac <- round(quac, digits=1)
     quac <- sprintf("%+.1f",quac)
@@ -271,7 +271,7 @@ comp_regdiff <- function(parameter, vals, regsort) {
   }
   
   # temperature difference with altitude
-  diff_highlow <- abs(median(vals[[deviations]][vals$Hoehe>=alt_limit],na.rm=T))-abs(median(vals[[deviations]][vals$Hoehe<alt_limit],na.rm=T))
+  diff_highlow <- abs(stats::median(vals[[deviations]][vals$Hoehe>=alt_limit],na.rm=T))-abs(stats::median(vals[[deviations]][vals$Hoehe<alt_limit],na.rm=T))
   
   # greatest vals[[deviations]] in all regions
   regs <- unique(vals$Region)
@@ -279,11 +279,11 @@ comp_regdiff <- function(parameter, vals, regsort) {
   vlowest <- 1
   for (r in 1:length(regs)) {
     indr <- which(vals$Region == regs[r])
-    vhighest[r] <- quantile(abs(vals[[deviations]][indr]),0.75,na.rm=TRUE)
-    vlowest[r] <- quantile(abs(vals[[deviations]][indr]),0.25,na.rm=TRUE)
+    vhighest[r] <- stats::quantile(abs(vals[[deviations]][indr]),0.75,na.rm=TRUE)
+    vlowest[r] <- stats::quantile(abs(vals[[deviations]][indr]),0.25,na.rm=TRUE)
   }
-  member_h <- cutree(hclust(dist(vhighest)),3)
-  member_l <- cutree(hclust(dist(vlowest)),3)
+  member_h <- stats::cutree(stats::hclust(stats::dist(vhighest)),3)
+  member_l <- stats::cutree(stats::hclust(stats::dist(vlowest)),3)
   mr_h <- 0
   mr_l <- 0
   for (i in 1:3) {

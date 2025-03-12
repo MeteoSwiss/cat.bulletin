@@ -14,7 +14,7 @@
 #' @param keywords multilanguage vector of comma separated strings with keywords for each language
 #' @param publication multilanguage vector of paths to the publication files (made avaailable as download)
 #' @param edition multilanguage vector of edition field in xml publication.
-#' @example inst/examples/metadata_examples.R
+#' @example inst/examples/publication_metadata_examples.R
 #' @export
 publication_metadata <- function(path = NULL, 
                                  alias = NULL, 
@@ -57,11 +57,14 @@ publication_metadata <- function(path = NULL,
 #' For multi language strings, you can use the function \code{\link{update_multi_language_string}}, see examples.
 #' @param metadata a publication_metadata list of publication metadata
 #' @examples 
-#' my_metadata <- publication_metadata()
+#' my_metadata <- publication_metadata(
+#'   title = c(de = "deutscher titel", fr = "titre français")
+#' )
 #' # update an element 
-#' my_metadata <- update_metadata_element(my_metadata, path = "new path")
+#' my_metadata <- update_metadata_element(my_metadata, path = "/my_new_path")
 #' # update a language string within a multi language element
-#' my_metadata <- update_metadata_element(my_metadata, title = update_multi_language_string(m$title, "de", "neuer deutscher Titel"))
+#' my_metadata <- update_metadata_element(my_metadata, title = update_multi_language_string(my_metadata$title, "de", "neuer deutscher Titel"))
+#' 
 #' @rdname publication_metadata
 #' @export 
 update_metadata_element <- function(metadata, ...) {
@@ -95,6 +98,9 @@ assert_publication_metdata <- function(metadata, languages = c("de", "fr", "it",
   assert_that(is.null(metadata$edition) || assert_multi_language_string(metadata$edition, languages = languages))  
 }
 
+#' get lore ipsum content
+#' @param language language identifier
+#' @export
 lore_ipsum <- function(language) {
   switch(language,
          de = "Damit Ihr indess erkennt, woher dieser ganze Irrthum gekommen ist, und weshalb man die Lust anklagt und den Schmerz lobet, so will ich Euch Alles eröffnen und auseinander setzen, was jener Begründer der Wahrheit und gleichsam Baumeister des glücklichen Lebens selbst darüber gesagt hat. Niemand, sagt er, verschmähe, oder hasse, oder fliehe die Lust als solche, sondern weil grosse Schmerzen ihr folgen, wenn man nicht mit Vernunft ihr nachzugehen verstehe. Ebenso werde der Schmerz als solcher von Niemand geliebt, gesucht und verlangt, sondern weil mitunter solche Zeiten eintreten, dass man mittelst Arbeiten und Schmerzen eine grosse Lust sich zu verschaften suchen müsse. Um hier gleich bei dem Einfachsten stehen zu bleiben, so würde Niemand von uns anstrengende körperliche Übungen vornehmen, wenn er nicht einen Vortheil davon erwartete. Wer dürfte aber wohl Den tadeln, der nach einer Lust verlangt, welcher keine Unannehmlichkeit folgt, oder der einem Schmerze ausweicht, aus dem keine Lust hervorgeht?",

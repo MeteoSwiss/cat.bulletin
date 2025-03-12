@@ -92,26 +92,25 @@ rekorde <- function(top=10,minmax="max",year=2024,month=2,station="SMA",paramete
                                             param_short=parameter,
                                             year=c(1864,year),
                                             month=month,meas_cat=1),
-                     error=function(e) e)
-    if (is(data,"error")) {
-      data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
+                     error=function(e) {
+                       # try meas_cat 12
+                       mchdwh::dwhget_surface(nat_abbr=station,
                                               param_short=parameter,
                                               year=c(1864,year),
-                                              month=month,meas_cat=12),
-                       error=function(e) e)
-    }
+                                              month=month,meas_cat=12)
+                     })
   }
+  
   if (rectype=="y") {
     data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
                                             param_short=parameter,
                                             year=c(1864,year),meas_cat=1),
-                     error=function(e) e)
-    if (is(data,"error")) {
-      data <- tryCatch(mchdwh::dwhget_surface(nat_abbr=station,
+                     error=function(e) {
+                       # try meas_cat 12
+                       mchdwh::dwhget_surface(nat_abbr=station,
                                               param_short=parameter,
-                                              year=c(1864,year),meas_cat=12),
-                       error=function(e) e)
-    }
+                                              year=c(1864,year),meas_cat=12)
+                     })
   }
   
   

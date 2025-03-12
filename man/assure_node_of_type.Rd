@@ -11,6 +11,9 @@ If the given node is already of the type, no action is taken.
 If the given node is not of the type, a child node is added with value set to the type.
 }
 \examples{
+\dontrun{
 xml_node <- xml2::xml_new_root("root")
-xml_node <- assure_node_of_type("text")
+xml_node <- assure_node_of_type(xml_node, "text")
 }
+}
+\keyword{internal}

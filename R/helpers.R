@@ -32,6 +32,7 @@ empty_multi_language_string <- function(languages) {
 #' @param string multilanguage string
 #' @param language language to update
 #' @param value value to set for the given language
+#' @export
 update_multi_language_string <- function(string, language, value) {
   assert_multi_language_string(string)  
   assert_that(language %in% names(string))

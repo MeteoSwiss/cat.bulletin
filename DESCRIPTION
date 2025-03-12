@@ -23,5 +23,8 @@ Imports:
     magrittr,
     assertthat,
     config,
-    yaml (>= 2.3.10)
+    yaml (>= 2.3.10), 
+    lubridate,
+    kableExtra,
+    markdown
 RoxygenNote: 7.2.3

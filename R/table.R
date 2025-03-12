@@ -23,7 +23,7 @@ get_table <- function(table_element) {
 #' @examples
 #' myData <- data.frame(a = 3, b = 4)
 #' bulletin <- create_bulletin() %>%
-#'   add_table(table = myTable, caption = "An example table.")
+#'   add_table(table = myData, caption = "An example table.")
 #' @export
 add_table <- function(bulletin, table, id = NULL, caption = NULL) {
   assertthat::assert_that(inherits(table, "data.frame"))

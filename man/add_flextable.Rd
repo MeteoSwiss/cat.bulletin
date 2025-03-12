@@ -18,7 +18,7 @@ The \code{flextable} package for supporting tables.
 }
 \examples{
 myData <- data.frame(a = 3, b = 4)
-myTable <- flextable(myData) 
-bulletin <- create_bulletin() \%>\%
-  add_flextable(flextable = myTable, caption = "An example table.")
+myTable <- flextable::flextable(myData) 
+bulletin <- create_bulletin()
+bulletin <- add_flextable(bulletin, flextable = myTable, caption = "An example table.")
 }

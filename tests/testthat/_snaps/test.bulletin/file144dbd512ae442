@@ -1,9 +1,0 @@
----
-output:
-  pdf_document:
-    fig_caption: true
-    fig_width: 3
-header-includes:
-  - \usepackage{xcolor}
-  - \usepackage[french]{babel}
----
