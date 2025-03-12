@@ -1,8 +1,8 @@
 test_that("Update metadata element", {
   m <- publication_metadata(path = "path1")
-  m <- update_metdata_element(m, path = "path2")
-  expect_equal(m$path, "path2")
-  expect_warning(update_metdata_element(m, foo = "new element"))
+  m <- update_metadata_element(m, path = "/path2")
+  expect_equal(m$path, "/path2")
+  expect_warning(update_metadata_element(m, foo = "new element"))
 })
 
 test_that("Update multilanguage element", {

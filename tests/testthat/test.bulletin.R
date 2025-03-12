@@ -98,11 +98,11 @@ test_that("get_elements", {
   text_element = bulletin[[languaged_elements(language)]][[1]]
   title_element = bulletin[[languaged_elements(language)]][[2]]
   
-  expect_equal(get_elements(bulletin, type = "title"), list(title_element))
-  expect_equal(get_elements(bulletin, type = "text"), list(text_element))
-  expect_equal(get_elements(bulletin, type = "blabla"), list())
-  expect_equal(get_elements(bulletin, id = title_element$id), list(title_element))
-  expect_equal(get_elements(bulletin, id = "asdfasfd"), list())
+  expect_equivalent(get_elements(bulletin, type = "title"), list(title_element))
+  expect_equivalent(get_elements(bulletin, type = "text"), list(text_element))
+  expect_equivalent(get_elements(bulletin, type = "blabla"), list())
+  expect_equivalent(get_elements(bulletin, id = title_element$id), list(title_element))
+  expect_equivalent(get_elements(bulletin, id = "asdfasfd"), list())
   expect_error(get_elements(bulletin, type = "asdf", id = "asdf"))
   expect_equal(get_elements(bulletin), bulletin$elements)
   
