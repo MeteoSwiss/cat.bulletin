@@ -9,4 +9,10 @@
 library(testthat)
 library(cat.bulletin)
 
-test_check("cat.bulletin")
+reporter <- MultiReporter$new(list(
+  CheckReporter$new(),
+  JunitReporter$new(file = "junit_result.xml")
+))
+
+test_check("cat.bulletin",
+           reporter = reporter)
