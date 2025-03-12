@@ -2,22 +2,28 @@
 % Please edit documentation in R/bulletin.R
 \name{create_bulletin}
 \alias{create_bulletin}
+\alias{set_metadata}
 \alias{add_element}
+\alias{set_element}
 \alias{has_element}
 \title{Create a bulletin}
 \usage{
 create_bulletin(
   bulletin_id,
-  language = c("de", "en", "fr", "it"),
+  languages = c("de", "en", "fr", "it"),
   bulletin_args = list(),
   bulletin_dir = "bulletin",
   workdir = tempdir(),
-  bulletin_path = file.path(workdir, bulletin_dir)
+  metadata = publication_metadata()
 )
 
-add_element(bulletin, element)
+set_metadata(bulletin, metadata)
 
-has_element(bulletin, type = NULL, id = NULL)
+add_element(bulletin, element, language = bulletin$language)
+
+set_element(bulletin, element, language = bulletin$language, id = element$id)
+
+has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 }
 \arguments{
 \item{bulletin_id}{a string identifing the type of the bulletin, e.g. \code{bulletin-monthly}}
@@ -28,19 +34,32 @@ has_element(bulletin, type = NULL, id = NULL)
 
 \item{workdir}{working directory for bulletin creation}
 
-\item{bulletin_path}{the path to the directory where the bulletin will be created in}
+\item{metadata}{A list of metadata information created with \code{\link{publication_metadata}}.}
 
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{element}{one of the bulletin elements}
 
+\item{id}{string The id of the element}
+
 \item{type}{string The type of the element(s)}
 
-\item{id}{string The id of the element}
+\item{bulletin_path}{the path to the directory where the bulletin will be created in}
 }
 \value{
 an object that represents the bulletin content
 }
 \description{
 Create a bulletin
+
+Set the metadata object for a bulletin
+
+Adds an element to a bulletin
+
+Adds or replaces an element in the bulletin
+
+Checks if the bulletin has an element in the given language
+}
+\details{
+The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}.
 }

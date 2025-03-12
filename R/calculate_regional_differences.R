@@ -27,26 +27,27 @@ calculate_regional_differences <- function(bulletin) {
 
   ### TEMPERATURE ###
   regdiff_T <- comp_regdiff(parameter = "T", vals = vals, regsort = regsort)
-  subset_climtab_T <- flextable::flextable(regdiff_T$subset_climtab)
-  subset_climtab_T <- flextable::set_caption(subset_climtab_T, caption = paste0("Monatsmitteltemperatur für den Monat ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist das aktuelle Monatsmittel, der Referenzwert (1991-2020) und die Abweichung zur Referenzperiode angegeben."))
-  
+  subset_climtab_T <- regdiff_T$subset_climtab
+
   # Local temperature rankin
   high_temp_records <- process_extreme_values(param_short = "ths20m0x", bulletin)
   low_temp_records  <- process_extreme_values(param_short = "ths20m0n", bulletin)
 
   ### PRECIPITATION ###
   regdiff_P <- comp_regdiff(parameter = "P", vals = vals, regsort = regsort)
-  subset_climtab_P <- flextable::flextable(regdiff_P$subset_climtab)
-  subset_climtab_P <- flextable::set_caption(subset_climtab_P, caption = paste0("Monatsniederschläge für den ",bulletin$month_str," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
-
+  subset_climtab_P <- regdiff_P$subset_climtab
+  # subset_climtab_P <- flextable::flextable(regdiff_P$subset_climtab)
+  # subset_climtab_P <- flextable::set_caption(subset_climtab_P, caption = paste0("Monatsniederschläge für den ",month_str(bulletin$month)," an ausgewählten Stationen im Messnetz von MeteoSchweiz. Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  
   # Local precipitation ranking
   high_prec_records <- process_extreme_values(param_short = "rhs15m0x", bulletin)
   low_prec_records  <- process_extreme_values(param_short = "rhs15m0n", bulletin)
 
   ### SUNSHINE DURATION ###
   regdiff_S <- comp_regdiff(parameter = "S", vals = vals, regsort = regsort)
-  subset_climtab_S <- flextable::flextable(regdiff_S$subset_climtab)
-  subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",bulletin$month_str," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
+  subset_climtab_S <- regdiff_S$subset_climtab
+  # subset_climtab_S <- flextable::flextable(regdiff_S$subset_climtab)
+  # subset_climtab_S <- flextable::set_caption(subset_climtab_S, caption = paste0("Monatliche Sonnenscheindauer im ",month_str(bulletin$month)," ",bulletin$year," an ausgewählten Stationen von MeteoSchweiz.  Es ist die aktuelle Monatssumme, der Referenzwert (1991-2020) und das Verhältnis zur Referenzperiode in % angegeben."))
   
   # Local sunshine duration ranking
   high_sun_records <- process_extreme_values(param_short = "sh200m0x", bulletin)
@@ -240,21 +241,21 @@ comp_regdiff <- function(parameter, vals, regsort) {
     deviations <- "Abw"
     norm_range <- c(-0.5,0.5)
     tab_columns <- c(1:5)
-    climtab_names <- c("Station","Höhe [m ü.M.]","Monatsmittel [\u00B0C]","Referenz [\u00B0C]","Abweichung [\u00B0C]")
+#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatsmittel [\u00B0C]","Referenz [\u00B0C]","Abweichung [\u00B0C]")
   }
   if (parameter == "P") {
     # Fixed input for precipitation
     deviations <- "R.dev"
     norm_range <- c(95,105)
     tab_columns <- c(1,2,11:13)
-    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [mm]","Referenz [mm]","Verhältnis zur Referenz [%]")
+#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [mm]","Referenz [mm]","Verhältnis zur Referenz [%]")
   }
   if (parameter == "S") {
     # Fixed input for sunshine duration
     deviations <- "S.dev"
     norm_range <- c(95,105)
     tab_columns <- c(1,2,7:9)
-    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [h]","Referenz [h]","Verhältnis zur Referenz [%]")
+#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [h]","Referenz [h]","Verhältnis zur Referenz [%]")
   }
   
   acurr_all <- vals[[deviations]][!is.na(vals[[deviations]])]
@@ -324,7 +325,6 @@ comp_regdiff <- function(parameter, vals, regsort) {
     subset_climtab[[deviations]] <- sprintf("%+.1f", subset_climtab[[deviations]])
   }
   rownames(subset_climtab) <- NULL
-  attributes(subset_climtab)$names <- climtab_names
 
   # Output
   return(list(allvalues = acurr_all, anteil_ueber = a_ueber, anteil_unter = a_unter, anteil_bereich = a_bereich,

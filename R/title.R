@@ -8,7 +8,7 @@ title_element <- function(title) {
 #' @export
 add_title <- function(bulletin, title) {
   if (has_element(bulletin, type = "title"))
-    stop("This bulletin already has a title element.")
+    stop(paste("The bulletin already has a title element for language", bulletin$language))
   add_element(bulletin, title_element(title))
 }
 
@@ -16,8 +16,8 @@ title_to_markdown <- function(element) {
   element$title
 }
 
-
-title_to_xml <- function(xml, element) {
-  xml2::xml_add_child(xml, .value = "title", element$title)
+title_to_xml <- function(xml, element, language) {
+  # title is added as attribute to root node
+  xml2::xml_attr(xml, languaged("title", language)) <- element$title
   xml
 }

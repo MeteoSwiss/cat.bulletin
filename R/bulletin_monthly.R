@@ -1,54 +1,148 @@
 #' Create the monthly bulletin
 #' @param year Bulletin year
 #' @param month Bulletin month
-#' @param provisional boolean indicating if the provisional version of the bulletin shall be created
+#' @param provisional boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
+#' \code{get_bulletin_monthly_provisional}.
 #' @param ... further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc. 
 #' @importFrom magrittr %>%
 #' @export
-create_bulletin_monthly <- function(year = 2024, month = 8, provisional = FALSE, ...) {
+create_bulletin_monthly <- function(year = 2024, 
+                                    month = 8, 
+                                    provisional, 
+                                    ...) {
   
   cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
-  cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12)  
+  cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12) 
+  if (missing(provisional))
+    provisional <- get_bulletin_monthly_provisional(year = year, month = month)
   assert_that(is.logical(provisional) && length(provisional) == 1)
-  
-  month_str <- cat.lang::get.text(paste("month", month, sep="."))
-  nextmonth_str <- cat.lang::get.text(paste("month", ifelse(month == 12, 1, month + 1), sep=".")) 
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               workdir = ".",
+                              languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
                                                    month = month,
-                                                   month_str = month_str,
-                                                   nextmonth_str = nextmonth_str,
-                                                   provisional = provisional),
+                                                   provisional = provisional,
+                                                   yearmonth = paste0(year, sprintf("%02d", month))
+                              ),
                               ...)
-  
-  bulletin <- set_monthly_bulletin_status(bulletin)
 
   swissmean <- calculate_swissmean_temp(bulletin)
   regdiff <- calculate_regional_differences(bulletin)
   
-  bulletin <- bulletin %>%
-    monatsbulletin_head(swissmean, regdiff) %>%
-    monatsbulletin_disclaimer() %>%
-    monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff) %>%
-    temporal_evolution(swissmean = swissmean, regdiff = regdiff) %>%
-    monatsbilanz_precip(regdiff = regdiff) %>%
-    monatsbilanz_sun(regdiff = regdiff) %>%
-    monatsbulletin_daily_timeseries() %>%
-    monatsbulletin_more_info()
+  for (language in bulletin[["languages"]]) {
+    bulletin <- bulletin %>% set_active_language(language = language)
+    
+    # add lead (add default if no Rmd element exists)
+    bulletin <- tryCatch({
+      add_Rmd(bulletin = bulletin, element_id = "leadtext", hidden = TRUE)
+    }, 
+    error = function(e) {
+      warning(paste("Could not add lead element for language", language, ". Adding lore_ipsum default."))
+      add_text(bulletin = bulletin, text = lore_ipsum(language = language), id = "leadtext", hidden = TRUE)
+    })
+    
+    # add sections
+    bulletin <- bulletin %>%
+      monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
+      monatsbilanz_precip(regdiff = regdiff, language = language) %>%
+      monatsbilanz_sun(regdiff = regdiff, language = language) 
+      #monatsbulletin_daily_timeseries(language = language)
+  }
   
-  #bulletin_pdfxmlzip(bulletin)
-  #bulletin_to_pdf(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.pdf"))
-  #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "bulletin.xml"))
+  metadata <- monatsbulletin_metadata(bulletin = bulletin,
+                                      lead_element_id = "leadtext",
+                                      swissmean = swissmean,
+                                      regdiff = regdiff)
+  
+  
+  bulletin <- bulletin %>% 
+    set_metadata(metadata) 
+  
   bulletin_to_webzip(bulletin)
+}
+
+#' Create the publication_metadata for the monthly bulletin.
+#' @inheritParams create_bulletin_monthly
+#' @param lead_element_id the id of the (hidden) bulletin element that contains the lead text. Can be either of type Rmd or text. 
+#' @param swissmean output of \code{calculate_swissmean_temp}
+#' @param regdiff output of \code{calculate_regional_differences}
+monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdiff) {
+  
+  assert_that(is.character(lead_element_id), length(lead_element_id) == 1)
+  
+  bulletin_lead <- function(bulletin, lead_element_id, language) {
+    assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
+    lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
+    bulletin = set_active_language(bulletin, language = language)
+    switch(lead_element$type,
+           text = lead_element$text,
+           Rmd = Rmd_to_html(element = lead_element),
+           stop("lead element type not supported")
+    )
+  }
+  
+  bulletin_edition <- function(language, provisional) {
+    id <- ifelse(provisional, "edition_provisional", "edition_definitive")
+    cat.lang::get.text(id, lang = cat.func::isolang2dwhlang(language))
+  }
+  
+  bulletin_path <- function(bulletin) {
+    path <- paste0("klimabulletin", "-", month_str(bulletin$month, language = "de"), "-", bulletin$year)
+    tolower(path)
+  }
+  
+  bulletin_title <- function(bulletin) {
+    title = c(
+      de = "Klimabulletin",
+      fr = "Bulletin climatologique",
+      it = "Bolletino del clima"
+    )
+    
+    for (lang in names(title)) {
+      title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))
+      title[lang] <- paste(title[lang], bulletin$year)
+    }
+    
+    title
+  }
+  
+  metadata <- publication_metadata(
+    path = bulletin_path(bulletin),
+    title = bulletin_title(bulletin),
+    lead = sapply(bulletin$languages, 
+                  function(lang) bulletin_lead(bulletin = bulletin, 
+                                               lead_element_id = lead_element_id,
+                                               language = lang)
+    ),
+    edition = sapply(bulletin$languages, bulletin_edition, provisional = bulletin$provisional),
+    categories = c(
+      de = "Klima",
+      it = "Clima",
+      fr = "Climat"
+    ),
+    teaser_image = monthlybulletin_teaser_image(yearmonth = bulletin$yearmonth),
+    teaser_source = sapply(bulletin$languages, 
+                           function(lang) 
+                             monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
+    ),
+    keywords = c(),
+    authors = c(
+      de = "MeteoSchweiz",
+      fr = "MeteoSuisse",
+      it = "MeteoSvizzera"
+    ),
+    publishedAt = Sys.Date()
+  )
+  
+  metadata
 }
 
 monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
   
   log_info("bulletin head")
   
-  title <- paste("# Klimabulletin", bulletin$month_str, bulletin$year)
+  title <- paste("# Klimabulletin", month_str(bulletin$month), bulletin$year)
   bulletin <- bulletin %>% add_title(title) 
   
   # Change the succession of these sentences based on a weight
@@ -57,12 +151,12 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
   # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-precip")
   # bulletin <- bulletin %>% add_Rmd(element_id = "leadtext-sun")
   
-  basepath <- "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
   yearmonth <- paste0(bulletin$year, sprintf("%02d", bulletin$month))
   
   # teaser text
-  get_teaser_text <- function(basepath, yearmonth) {
-    filepath <- file.path(basepath, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
+  get_teaser_text <- function(bulletin_prod_path, yearmonth) {
+    filepath <- file.path(bulletin_prod_path, yearmonth, paste0(yearmonth, "_teaser_text.txt"))
     if (assertthat::is.readable(filepath)) {
       lines <- readLines(filepath)
       if (length(lines) > 1)
@@ -73,55 +167,78 @@ monatsbulletin_head <- function(bulletin, swissmean, regdiff) {
     }
   }
   
-  teasertext <- get_teaser_text(basepath, yearmonth)
+  teasertext <- get_teaser_text(bulletin_prod_path, yearmonth)
   
   #teaser image
   
-  get_teaser_image <- function(basepath, yearmonth) {
-    filepath = file.path(basepath, yearmonth, "teaser_image.jpg")
+  get_teaser_image <- function(bulletin_prod_path, yearmonth) {
+    filepath = file.path(bulletin_prod_path, yearmonth, "teaser_image.jpg")
     if (assertthat::is.readable(filepath)) {
       filepath
     } else {
       log_debug("Did not find a teaser image for the current month. Using default...")
       system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg")
     }
-  }
+  } 
   
   bulletin <- bulletin %>% 
     add_image(filename = "teaser_image.jpg", 
-              filepath = get_teaser_image(basepath, yearmonth),
+              filepath = get_teaser_image(bulletin_prod_path, yearmonth),
               caption = teasertext)
   
   bulletin
 }
 
-monatsbilanz_temp <- function(bulletin, swissmean, regdiff) {
+monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
+  # bulletin <- bulletin %>% set_active_language(language = language)
   # if (bulletin$language != "de"){
-  #   month <- sapply(bulletin$month_str,add_article)
+  #   month <- sapply(month_str(bulletin$month),add_article)
   #   month <- as.character(month)
   # }
-  
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
-  # Add images 
-  filename = "monatsbilanz_temp_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-                        filename = filename,
-                        caption = paste0("Monatsmitteltemperaturen in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Monatsmitteltemperaturen über 0 \u00B0C sind rot, Werte unter 0 \u00B0C blau eingefärbt."))
+  # Add image for absolute temperatures
+  image_id <- "monatsbilanz_temp_map_abs"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
+      id = image_id
+    )
   
-  filename = "monatsbilanz_temp_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichungen der Monatsmitteltemperatur von der Referenzperiode 1991-2020 in \u00B0C für den ",bulletin$month_str," ",bulletin$year,". Abweichungen über der Referenz sind rot, Abweichungen unter der Referenz sind blau eingefärbt."))
+  # Add image for temperature anomalies
+  image_id <- "monatsbilanz_temp_map_anom"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom")),
+      id = image_id
+    )
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_T)
+  ## Add table
+  temp_table <- regdiff$subset_climtab_T
+  colnames(temp_table) <- c(cat.lang::get.text("climtab_stat"),
+                            cat.lang::get.text("climtab_altitude"),
+                            cat.lang::get.text("climtab_temp_mean"),
+                            cat.lang::get.text("climtab_temp_ref"),
+                            cat.lang::get.text("climtab_temp_dev")
+  )
+  print(temp_table)
+  bulletin <- bulletin %>%
+    add_table(temp_table, id = "monatsbilanz_temp_table",
+              caption = paste("Die Caption funktioniert noch nicht:",language))
+  
   bulletin
 }
 
@@ -146,24 +263,35 @@ regdata_example_table <- function(bulletin) {
   table
 }
 
-monatsbilanz_precip <- function(bulletin, regdiff) {
+monatsbilanz_precip <- function(bulletin, regdiff, language) {
   log_info("monatsbilanz_precip")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p1")
   
-  # Add images 
-  filename = "monatsbilanz_prec_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-                        filename = filename,
-                        caption = paste0("Monatliche Niederschlagssumme in mm für den ",bulletin$month_str," ",bulletin$year,"."))
+  # Add image for absolute precipitation
+  image_id <- "monatsbilanz_prec_map_abs"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_abs")),
+      id = image_id
+    )
   
-  filename = "monatsbilanz_prec_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichung der monatlichen Niederschlagssumme von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
-
+  # Add image for precipitation anomalies
+  image_id <- "monatsbilanz_prec_map_anom"
+  filename_in <- paste0(image_id,".png")
+  filename_out <- paste0(image_id,"_",language,".png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_anom")),
+      id = image_id
+    )
+  
   if (regdiff$high_prec_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-1")
   }
@@ -171,29 +299,42 @@ monatsbilanz_precip <- function(bulletin, regdiff) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-2")
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p3")
-  
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
+  # 
+  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
   bulletin
 }
 
-monatsbilanz_sun <- function(bulletin, regdiff) {
+monatsbilanz_sun <- function(bulletin, regdiff, language) {
   log_info("monatsbilanz_sun")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p1")
   
-  # Add images 
-  filename = "monatsbilanz_sunshine_map_abs.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-                        filename = filename,
-                        caption = paste0("Verhältnis der effektiven Sonnenscheindauer zur maximal möglichen Sonnenscheindauer für den ",bulletin$month_str," ",bulletin$year,"."))
+  if (!bulletin$provisional) {
+    # Add image for sunshine duration relative to maximum
+    image_id <- "monatsbilanz_sunshine_map_abs"
+    filename_in <- paste0(image_id,".png")
+    filename_out <- paste0(image_id,"_",language,".png")
+    bulletin <- bulletin %>% 
+      add_image(
+        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+        filename = filename_out,
+        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_abs")),
+        id = image_id
+      )
+    
+    # Add image for sunshine duration anomalies
+    image_id <- "monatsbilanz_sunshine_map_anom"
+    filename_in <- paste0(image_id,".png")
+    filename_out <- paste0(image_id,"_",language,".png")
+    bulletin <- bulletin %>% 
+      add_image(
+        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
+        filename = filename_out,
+        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_anom")),
+        id = image_id
+      )
+  }
   
-  filename = "monatsbilanz_sunshine_map_anom.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename),
-                        filename = filename,
-                        caption = paste0("Abweichung der monatlichen Sonnenscheindauer von der Referenzperiode 1991-2020 für den ",bulletin$month_str," ",bulletin$year,", dargestellt in % der Referenz."))
-
   if (regdiff$high_sun_rec_avail) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p2-1")
   }
@@ -202,7 +343,7 @@ monatsbilanz_sun <- function(bulletin, regdiff) {
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p3")
   
-  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
+  #  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
   bulletin  
 }
 
@@ -224,18 +365,27 @@ temporal_evolution <- function(bulletin, swissmean, regdiff) {
   bulletin
 }
 
-monatsbulletin_daily_timeseries <- function(bulletin) {
+monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   log_info("monatsbulletin_daily_timeseries")
-  
+
+  station <- c(de = "SMA", fr = "GVE", it = "LUG")
+  station_name <- mchdwh::station_info(nat_abbr=station[language])$station_name
+
   bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
-  
-  filename = "witterungsverlauf.png"
-  bulletin <- bulletin %>% add_image(
-                        filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location="SMA", language=bulletin$language, filename = filename),
-                        filename = filename,
-                        caption = "This is a caption.")
-  
+
+  # Add image for daily weather conditions
+  image_id <- "witterungsverlauf"
+  filename_in  <- paste0(image_id,"_",language,"_in.png")
+  filename_out <- paste0(image_id,"_",language,"_out.png")
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(station[language]), language=language, filename = filename_in),
+      filename = filename_out,
+      caption = glue::glue(cat.lang::get.text("daily_timeseries")),
+      id = image_id
+    )
+
   bulletin
 }
 
@@ -252,7 +402,7 @@ monatsbulletin_disclaimer <- function(bulletin) {
 # further helping functions
 add_article <- function(word) {
   # Check if the word starts with a vowel (a, e, i, o, u, y)
-  if (grepl("^[aeéèiouyAEÉÈIOUY]", word)) {
+  if (grepl("^[ae\u00E9\u00E8iouyAE\u00C9\u00C8IOUY]", word)) {
     return(paste0("d'", tolower(word)))
   } else {
     return(paste0("de ", tolower(word)))
@@ -306,8 +456,8 @@ collapse_sentence <- function(strings) {
 
 #' Get the publication date for the monthly bulletin formatted as string
 #' @return a string of the date
-#' @param year
-#' @param month
+#' @param year publication year
+#' @param month publication month
 #' @param language iso country id
 get_final_date <- function(year, month, language) {
   # Get the current year, month, and day
@@ -324,7 +474,7 @@ get_final_date <- function(year, month, language) {
     # Get the last day of the specified month in the past
     last_date <- lubridate::ceiling_date(as.Date(paste(year, month, "01", sep = "-")), "month") - 1
   }
-  locale <- paste0(language, "_CH.UTF-8")
+  locale <- get_locale(language)
   last_date <- withr::with_locale(
     new = c("LC_TIME" = locale),
     code = format(last_date, "%d. %B %Y")
@@ -332,26 +482,41 @@ get_final_date <- function(year, month, language) {
   return(last_date)
 }
 
-set_monthly_bulletin_status <- function(bulletin) {
+#' Get default provisional value for \code{create_bulletin_monthly}
+#' @inheritParams create_bulletin_monthly
+#' @return  boolean value to use for the provisional parameter in \code{create_bulletin_monthly}
+#' @export
+get_bulletin_monthly_provisional <- function(year, month) {
   current_date <- Sys.Date()
   current_year <- as.integer(format(current_date, "%Y"))
   current_month <- as.integer(format(current_date, "%m"))
   
   # Check if predefined month is in the future
-  if (bulletin$year > current_year || 
-      (bulletin$year == current_year && bulletin$month > current_month)) {
+  if (year > current_year || 
+      (year == current_year && month > current_month)) {
     stop("Error: You cannot create a bulletin for a month in the future.\n
          Please make sure bulletin$year and bulletin$month either correspond to 
          the current or any past month.")
   }
   
-  # If bulletin$year and $month == current --> provisional
-  if (bulletin$year == current_year && bulletin$month == current_month) {
-    bulletin$provisional <- TRUE
+  # If year and month == current --> provisional
+  if (year == current_year && month == current_month) {
+    provisional <- TRUE
   } else {
     # otherwise --> definitive
-    bulletin$provisional <- FALSE
+    provisional <- FALSE
   }
   
-  return(bulletin)
+  return(provisional)
+}
+
+month_str <- function(month, language) {
+  cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
+  if (missing(language)) language = NULL else language = cat.func::isolang2dwhlang(language)
+  cat.lang::get.text(paste0("month.", month), lang = language)
+}
+
+nextmonth_str <- function(month, language) {
+  cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
+  month_str(ifelse(month == 12, 1, month + 1), language = language)
 }

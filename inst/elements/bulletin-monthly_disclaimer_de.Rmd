@@ -5,7 +5,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r echo=FALSE, results="hide"}
-Sys.setlocale("LC_TIME", "de_DE.UTF-8")
 formatted_date <- format(Sys.Date(), "%d. %B %Y")
 
 current_date <- Sys.Date()
@@ -29,6 +28,6 @@ Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Schweizer Klimas 
 
 **Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.** `r ifelse(bulletin$provisional, "In dieser Phase basieren die Angaben im Bulletin auf provisorischen Daten. Landesweite Angaben zu Temperatur und Niederschlag berücksichtigen die Prognose bis zum Monatsende mit den dazugehörigen Unsicherheiten. Lokale Informationen beziehen sich auf den bisherigen Monatsverlauf.","")` 
 
-`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {bulletin$nextmonth_str} hier auch als PDF zu finden."), glue::glue("Dies ist das definitive Bulletin für den {bulletin$month_str} {bulletin$year}."))`
+`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {nextmonth_str(bulletin$month)} hier auch als PDF zu finden."), glue::glue("Dies ist das definitive Bulletin für den {month_str(bulletin$month)} {bulletin$year}."))`
 
 **Publikationsdatum: `r formatted_date``r ifelse(days_to_eom > 5 & bulletin$provisional, paste0("; ", warning_early[bulletin$language,]), "")`**

@@ -9,17 +9,24 @@ add_image(
   filepath,
   filename = basename(filepath),
   caption = NULL,
-  label = NULL
+  alt = NULL,
+  source = NULL,
+  label = NULL,
+  id = NULL
 )
 }
 \arguments{
 \item{bulletin}{the bulletin object to which to append the image element}
 
-\item{filepath}{the path to the image to add}
+\item{filepath}{the path of the image to add}
 
 \item{filename}{the name of the image within the bulletin (can differ from the filepath)}
 
 \item{caption}{image caption in the bulletin}
+
+\item{alt}{alt text to use for html / xml export}
+
+\item{source}{image source (a small text)}
 
 \item{label}{optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.}
 }

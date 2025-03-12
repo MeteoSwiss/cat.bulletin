@@ -4,14 +4,17 @@
 \alias{bulletin_element}
 \title{Create a bulletin element}
 \usage{
-bulletin_element(type)
+bulletin_element(type, id, hidden = FALSE)
 }
 \arguments{
 \item{type}{a string defining the type of the bulletin element}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should)}
+
+\item{hidden}{boolean indicates if the element is visible in the output
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
 }
 \description{
 Create a bulletin element
-}
-\details{
-The bulletin element gets an id which is composed of the type and a random string.
 }
