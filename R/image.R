@@ -30,7 +30,11 @@ add_image <- function(bulletin, filepath, filename = basename(filepath),
                       id = NULL) {
   assert_that(file.exists(filepath))
   newpath <- file.path(bulletin$image_path, filename)
-  file.copy(filepath, newpath, overwrite = TRUE)
+  if (file.exists(newpath)) {
+    log_debug("add_image: file", bulletin$image_dir, "/", filename, "alread exists. Using existing file.")
+  } else {
+    file.copy(filepath, newpath, overwrite = TRUE)
+  }
   add_element(bulletin, image_element(filename = filename, image_dir = bulletin$image_dir, 
                                       filepath = newpath, caption = caption, 
                                       alt = alt, source = source, label = label, id = id))
