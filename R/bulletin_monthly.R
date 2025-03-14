@@ -35,18 +35,18 @@ create_bulletin_monthly <- function(year = 2024,
     
     # add lead (add default if no Rmd element exists)
     bulletin <- tryCatch({
-      add_Rmd(bulletin = bulletin, element_id = "leadtext", hidden = TRUE)
+      add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
     }, 
     error = function(e) {
       warning(paste("Could not add lead element for language", language, ". Adding lore_ipsum default."))
-      add_text(bulletin = bulletin, text = lore_ipsum(language = language), id = "leadtext", hidden = TRUE)
+      add_text(bulletin = bulletin, text = lore_ipsum(language = language), id = "leadtext", appear = c())
     })
     
     # add sections
     bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language) 
+      monatsbilanz_sun(regdiff = regdiff, language = language)
       #monatsbulletin_daily_timeseries(language = language)
   }
   
@@ -313,7 +313,7 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
 
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
-  filename_in  <- paste0(image_id,"_",language,"_in.png")
+  filename_in  <- paste0(image_id,"_",language,".png")
   bulletin <- bulletin %>% 
     add_image(
       filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(station[language]), language=language, filename = filename_in),

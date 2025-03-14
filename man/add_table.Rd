@@ -4,7 +4,7 @@
 \alias{add_table}
 \title{Add a table to a bulletin}
 \usage{
-add_table(bulletin, table, id = NULL, caption = NULL)
+add_table(bulletin, table, id = NULL, caption = NULL, appear = c("xml", "pdf"))
 }
 \arguments{
 \item{bulletin}{the bulletin object to which to append the image element}

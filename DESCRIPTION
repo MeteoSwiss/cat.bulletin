@@ -26,5 +26,13 @@ Imports:
     yaml (>= 2.3.10), 
     lubridate,
     kableExtra,
-    markdown
+    markdown,
+    clim.table,
+    datefuns,
+    evoclim,
+    knitr,
+    mch.auth,
+    mchdwh,
+    mmtpred,
+    withr
 RoxygenNote: 7.2.3
