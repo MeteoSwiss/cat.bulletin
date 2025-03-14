@@ -8,7 +8,8 @@
 #' @export
 create_bulletin_monthly <- function(year = 2024, 
                                     month = 8, 
-                                    provisional, 
+                                    provisional,
+                                    workdir = ".",
                                     ...) {
   
   cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
@@ -18,7 +19,7 @@ create_bulletin_monthly <- function(year = 2024,
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
-                              workdir = ".",
+                              workdir = workdir,
                               languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
                                                    month = month,
