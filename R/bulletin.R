@@ -162,11 +162,14 @@ has_element <- function(bulletin, language = bulletin$language, type = NULL, id 
   length(bulletin[[slot]]) > 0
 }
 
-get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL, hidden = NULL) {
+get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL, appear = NULL) {
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
   
   slot <- languaged_elements(language)
+  
+  if (length(bulletin[[slot]]) == 0)
+    return(bulletin[[slot]])
   
   elements <- 
     if (!is.null(type)) {
@@ -181,9 +184,10 @@ get_elements <- function(bulletin, language = bulletin$language, type = NULL, id
       bulletin[[slot]]
     }
   
-  #hidden
-  if (!is.null(hidden)) {
-    i = which(sapply(elements, function(element) element[["hidden"]] == hidden))
+  #appear
+  if (!is.null(appear)) {
+    appear = match.arg(appear, c("xml", "pdf"), several.ok = TRUE)
+    i = which(sapply(elements, function(element) any(element[["appear"]] %in% appear)))
     elements <- elements[i]
   }
   

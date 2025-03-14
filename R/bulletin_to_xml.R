@@ -21,7 +21,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
   
   default_language <- bulletin$languages[1]
   
-  for (element in get_elements(bulletin, language = default_language, hidden = FALSE)) {
+  for (element in get_elements(bulletin, language = default_language, appear = "xml")) {
     log_debug("processing element", element$id)
     bulletin <- set_active_language(bulletin, language = default_language)
     function_name <- paste0(element$type, "_to_xml")
@@ -151,3 +151,4 @@ assure_node_of_type <- function(xml_node, type) {
   }
   xml_node
 }
+

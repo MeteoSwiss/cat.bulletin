@@ -9,7 +9,7 @@ add_Rmd(
   element_id,
   envir = parent.frame(),
   id = element_id,
-  hidden = FALSE
+  appear = c("xml", "pdf")
 )
 }
 \arguments{

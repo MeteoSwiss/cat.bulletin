@@ -1,12 +1,13 @@
-table_element <- function(table, bulletin_envir, id = NULL, caption = NULL) {
+table_element <- function(table, bulletin_envir, appear = NULL, id = NULL, caption = NULL, table_nr = NULL) {
   assertthat::assert_that(inherits(table, "data.frame"))
-  table_element <- bulletin_element(type = "table", id = id)
+  table_element <- bulletin_element(type = "table", id = id, appear = appear)
   # save the table in the bulletin markdown environment so that it can be accessed later in the rendering process
   table_var <- generate_element_id(type = "table")
   table_element[["table_var"]] <- table_var
   assign(table_var, table, envir = bulletin_envir)
   table_element[["bulletin_envir"]] <- bulletin_envir
   table_element[["caption"]] <- caption
+  table_element[["table_nr"]] <- caption
   
   table_element
 }
@@ -25,12 +26,27 @@ get_table <- function(table_element) {
 #' bulletin <- create_bulletin() %>%
 #'   add_table(table = myData, caption = "An example table.")
 #' @export
-add_table <- function(bulletin, table, id = NULL, caption = NULL) {
+add_table <- function(bulletin, table, id = NULL, caption = NULL, appear = c("xml", "pdf")) {
   assertthat::assert_that(inherits(table, "data.frame"))
-  add_element(bulletin, element = table_element(table = table, 
-                                                id = id,
-                                                caption = caption,
-                                                bulletin_envir = bulletin$bulletin_envir)
+  
+  # try to get previous table for table numbering
+  table_nr <- length(get_elements(bulletin, type = "table")) + 1
+  
+  bulletin <- add_element(bulletin, element = table_element(table = table, 
+                                                            id = id,
+                                                            caption = caption,
+                                                            bulletin_envir = bulletin$bulletin_envir,
+                                                            table_nr = table_nr,
+                                                            appear = appear)
+  )
+  
+  # xml supports no table caption -> add a text element only visible in xml
+  xml_caption <- paste0(cat.lang::get.text("table_label", lang = cat.func::isolang2dwhlang(bulletin$language)),
+                        " ", table_nr, ": ",
+                        caption)
+  add_element(bulletin, element = text_element(id = paste(id, "_label"),
+                                               text = xml_caption,
+                                               appear = "xml")
   )
 }
 
@@ -38,7 +54,7 @@ add_table <- function(bulletin, table, id = NULL, caption = NULL) {
 #' @rdname bulletin_to_markdown
 table_to_markdown <- function(element) {
   md  <- paste("```{r, echo=FALSE}",
-               paste0("kableExtra::kbl(", element$table_var, ")"),
+               paste0("kableExtra::kbl(", element$table_var, ", caption = '", element$caption, "')"),
                "```", 
                sep = "\n"
   )
@@ -50,7 +66,9 @@ table_to_xml <- function(xml, element, language) {
   file = tempfile(fileext = ".html")
   html <- as.character(kableExtra::kbl(get_table(element), format = "html"))
   
-  text_node <- assure_node_of_type(xml, type = "table") %>%
-    set_languaged_attribute(attribute = "html", language = language, value = html) 
-  text_node
+  table_node <- assure_node_of_type(xml, type = "table") %>%
+    set_languaged_attribute(attribute = "html", language = language, value = html)
+
+  table_node
 }
+

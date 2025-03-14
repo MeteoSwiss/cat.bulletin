@@ -1,5 +1,5 @@
-image_element <- function(filename, image_dir, filepath, caption, alt, source, label, id = NULL) {
-  element <- bulletin_element(type = "image", id = id)
+image_element <- function(filename, image_dir, filepath, caption, alt, source, label, appear = NULL, id = NULL) {
+  element <- bulletin_element(type = "image", appear = appear, id = id)
   element[["caption"]] <- caption
   element[["filename"]] <- filename
   element[["image_dir"]] <- image_dir
@@ -27,13 +27,19 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' @export
 add_image <- function(bulletin, filepath, filename = basename(filepath), 
                       caption = NULL, alt = NULL, source = NULL, label = NULL,
+                      appear = c("xml", "pdf"),
                       id = NULL) {
   assert_that(file.exists(filepath))
   newpath <- file.path(bulletin$image_path, filename)
-  file.copy(filepath, newpath, overwrite = TRUE)
+  if (file.exists(newpath)) {
+    log_debug("add_image: file", bulletin$image_dir, "/", filename, "alread exists. Using existing file.")
+  } else {
+    file.copy(filepath, newpath, overwrite = TRUE)
+  }
   add_element(bulletin, image_element(filename = filename, image_dir = bulletin$image_dir, 
                                       filepath = newpath, caption = caption, 
-                                      alt = alt, source = source, label = label, id = id))
+                                      alt = alt, source = source, label = label, id = id,
+                                      appear = appear))
 }
 
 image_to_markdown <- function(element) {

@@ -12,6 +12,7 @@ add_image(
   alt = NULL,
   source = NULL,
   label = NULL,
+  appear = c("xml", "pdf"),
   id = NULL
 )
 }

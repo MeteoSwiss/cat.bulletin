@@ -1,13 +1,13 @@
-text_element <- function(text, id = NULL, hidden = FALSE) {
-  text_element <- bulletin_element(type = "text", id = id, hidden = hidden)
+text_element <- function(text, appear = NULL, id = NULL) {
+  text_element <- bulletin_element(type = "text", id = id, appear = appear)
   text_element[["text"]] <- text
   text_element
 }
 
 #' add text to a bulletin
 #' @export
-add_text <- function(bulletin, text, id = NULL, hidden = FALSE) {
-  set_element(bulletin, text_element(text, id = id, hidden = hidden))
+add_text <- function(bulletin, text, id = NULL, appear = c("xml", "pdf")) {
+  set_element(bulletin, text_element(text, id = id, appear = appear))
 }
 
 text_to_markdown <- function(element) {
