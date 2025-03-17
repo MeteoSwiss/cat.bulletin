@@ -18,7 +18,8 @@ create_bulletin_monthly <- function(year = 2024,
     provisional <- get_bulletin_monthly_provisional(year = year, month = month)
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
-  bulletin <- create_bulletin(bulletin_id = "climate-bulletin-monthly",
+  bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
+                              bulletin_dir = "climate-bulletin-monthly",
                               workdir = workdir,
                               languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
@@ -63,7 +64,11 @@ create_bulletin_monthly <- function(year = 2024,
   
   zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
                        "-", format(Sys.time(), format = "%Y%m%d%H%M"))
+  
   bulletin_to_webzip(bulletin, zipfilename = zipfilename)
+  log_info("Webzip for monthly bulletin written to", zipfilename, ".")
+  
+  invisible(bulletin)
 }
 
 #' Create the publication_metadata for the monthly bulletin.
@@ -76,7 +81,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   assert_that(is.character(lead_element_id), length(lead_element_id) == 1)
   
   bulletin_lead <- function(bulletin, lead_element_id, language) {
-    return(lore_ipsum(language = language))
+    #return(lore_ipsum(language = language))
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
     bulletin = set_active_language(bulletin, language = language)
@@ -121,22 +126,12 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
                                                language = lang)
     ),
     edition = sapply(bulletin$languages, bulletin_edition, provisional = bulletin$provisional),
-    categories = c(
-      de = "Klima",
-      it = "Clima",
-      fr = "Climat"
-    ),
     teaser_image = monthlybulletin_teaser_image(yearmonth = bulletin$yearmonth),
     teaser_source = sapply(bulletin$languages, 
                            function(lang) 
                              monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
     ),
     keywords = c(),
-    authors = c(
-      de = "MeteoSchweiz",
-      fr = "MeteoSuisse",
-      it = "MeteoSvizzera"
-    ),
     publishedAt = Sys.Date()
   )
   

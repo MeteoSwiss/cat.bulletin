@@ -94,9 +94,9 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   # publication node
   publication_node <- xml2::xml_add_child(xml, .value = "publication") %>%
     xml_set_attribute("publishedAt", metadata$publishedAt) %>%
-    xml_set_attribute("categories", metadata$categories, languages = bulletin$languages) %>%
+    xml_set_attribute("categories", metadata$categories) %>%
     xml_set_attribute("publicationType", metadata$publication_type) %>% 
-    xml_set_attribute("authors", metadata$authors, languages = bulletin$languages)
+    xml_set_attribute("authors", metadata$authors)
   
   if (!is.null(metadata$edition)) 
     publication_node <- publication_node %>%  xml_set_attribute("edition", metadata$edition, languages = bulletin$languages)

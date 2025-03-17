@@ -29,24 +29,13 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       it = lore_ipsum("it"),
       fr = lore_ipsum("fr")
     ),
-    categories = c(
-      de = "Klima",
-      it = "Clima",
-      fr = "Climat"
-    ),
     teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
     teaser_source = c(
       de = "Foto: ",
       it = "Foto: ",
       fr = "Photo: "
     ),
-    keywords = c(),
-    authors = c(
-      de = "MeteoSchweiz",
-      fr = "MeteoSuisse",
-      it = "MeteoSvizzera"
-    ),
-    publishedAt = Sys.Date()
+    keywords = c()
   )
   
   bulletin <- bulletin %>% set_metadata(metadata)

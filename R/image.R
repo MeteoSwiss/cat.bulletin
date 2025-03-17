@@ -64,6 +64,7 @@ image_to_xml <- function(xml, element, language) {
     set_languaged_attribute("fileName", language, paste0(element$image_dir, "/", element$filename)) %>%
     set_languaged_attribute("legend", language, element$caption) %>%
     set_languaged_attribute("alt", language, element$alt) %>%
-    set_languaged_attribute("source", language, element$source) %>%
-    set_languaged_attribute("hasLightbox", language, "true")   
+    set_languaged_attribute("source", language, element$source)
+  xml2::xml_set_attr(image_node, "hasLightbox", "true") 
+  image_node
 }
