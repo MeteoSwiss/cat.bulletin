@@ -1,8 +1,8 @@
 #' Create a bulletin
-#' @param bulletin_id a string identifing the type of the bulletin, e.g. \code{bulletin-monthly}
+#' @param bulletin_id a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}
 #' @param bulletin_args a list of arguments 
 #' @param workdir working directory for bulletin creation
-#' @param bulletin_path the path to the directory where the bulletin will be created in
+#' @param bulletin_path the path to the directory where the bulletin will be created. Default: \code{bulletin_id}.
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @param metadata a publication_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}.
 #' @return an object that represents the bulletin content
@@ -12,7 +12,7 @@
 create_bulletin <- function(bulletin_id,
                             languages = c("de", "en", "fr", "it"),
                             bulletin_args = list(),
-                            bulletin_dir = "bulletin", 
+                            bulletin_dir = bulletin_id, 
                             workdir = tempdir(),
                             metadata = publication_metadata()
 ) {

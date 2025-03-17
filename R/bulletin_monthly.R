@@ -18,7 +18,7 @@ create_bulletin_monthly <- function(year = 2024,
     provisional <- get_bulletin_monthly_provisional(year = year, month = month)
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
-  bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
+  bulletin <- create_bulletin(bulletin_id = "climate-bulletin-monthly",
                               workdir = workdir,
                               languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
@@ -45,9 +45,10 @@ create_bulletin_monthly <- function(year = 2024,
     
     # add sections
     bulletin <- bulletin %>%
-      monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
-      monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language)
+      add_text("testtext", id = "testtext")
+    #  monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
+    #  monatsbilanz_precip(regdiff = regdiff, language = language) %>%
+    #  monatsbilanz_sun(regdiff = regdiff, language = language)
       #monatsbulletin_daily_timeseries(language = language)
   }
   
@@ -60,7 +61,9 @@ create_bulletin_monthly <- function(year = 2024,
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
   
-  bulletin_to_webzip(bulletin)
+  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
+                       "-", format(Sys.time(), format = "%Y%m%d%H%M"))
+  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
 }
 
 #' Create the publication_metadata for the monthly bulletin.
@@ -73,12 +76,13 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   assert_that(is.character(lead_element_id), length(lead_element_id) == 1)
   
   bulletin_lead <- function(bulletin, lead_element_id, language) {
+    return(lore_ipsum(language = language))
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
     bulletin = set_active_language(bulletin, language = language)
     switch(lead_element$type,
            text = lead_element$text,
-           Rmd = Rmd_to_html(element = lead_element),
+           Rmd = Rmd_to_text(element = lead_element),
            stop("lead element type not supported")
     )
   }
@@ -89,7 +93,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   }
   
   bulletin_path <- function(bulletin) {
-    path <- paste0("klimabulletin", "-", month_str(bulletin$month, language = "de"), "-", bulletin$year)
+    path <- paste0("klimabulletin", "-", bulletin$year, "-", bulletin$month)
     tolower(path)
   }
   

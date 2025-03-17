@@ -55,3 +55,17 @@ Rmd_to_html <- function(element) {
   html <- paste(html, collapse = " ") # join all lines to one
   html
 }
+
+Rmd_to_text <- function(element) {
+  md_in <- Rmd_to_markdown_file(element) 
+  text_out <- tempfile(fileext = ".txt")
+  tryCatch({
+    markdown::mark(file = md_in, output = text_out, format = "text")
+  },
+  error = function(e)
+    warning(paste("Could not knit markdown file ", element[["Rmd_file"]], "to text from markdown."))
+  )
+  text <- readr::read_lines(text_out)
+  text <- paste(text, collapse = " ") # join all lines to one
+  text
+}

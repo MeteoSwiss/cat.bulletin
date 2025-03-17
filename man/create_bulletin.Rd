@@ -12,7 +12,7 @@ create_bulletin(
   bulletin_id,
   languages = c("de", "en", "fr", "it"),
   bulletin_args = list(),
-  bulletin_dir = "bulletin",
+  bulletin_dir = bulletin_id,
   workdir = tempdir(),
   metadata = publication_metadata()
 )
@@ -26,7 +26,7 @@ set_element(bulletin, element, language = bulletin$language, id = element$id)
 has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 }
 \arguments{
-\item{bulletin_id}{a string identifing the type of the bulletin, e.g. \code{bulletin-monthly}}
+\item{bulletin_id}{a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}}
 
 \item{bulletin_args}{a list of arguments}
 
@@ -44,7 +44,7 @@ has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 
 \item{type}{string The type of the element(s)}
 
-\item{bulletin_path}{the path to the directory where the bulletin will be created in}
+\item{bulletin_path}{the path to the directory where the bulletin will be created. Default: \code{bulletin_id}.}
 }
 \value{
 an object that represents the bulletin content
