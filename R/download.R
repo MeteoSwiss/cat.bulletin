@@ -23,13 +23,8 @@ download_realization <- function(bulletin, product, filter, filename, out_path, 
     product = product,
     filter = filter,
     out_path = out_path,
-    filename = filename,
-    token_refresher = 
-      mch.auth::oltoken_token_refresher(
-        oltoken_envvar = "MCHDWH_OL_TOKEN",
-        stage = bulletin$stage
-      )
-  ))
+    filename = filename)
+  )
 }
 
 filter_to_string <- function(filter) {

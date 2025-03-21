@@ -7,7 +7,8 @@
 bulletin_element <- function(type, id, appear = c("xml", "pdf")) {
   if (missing(id) || is.null(id))
     id <- generate_element_id(type = type)
-  appear = match.arg(appear, several.ok = TRUE)
+  if (!is.null(appear))
+    appear = match.arg(appear, several.ok = TRUE)
   list(type = type,
        id = id,
        appear = appear)

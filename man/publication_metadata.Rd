@@ -14,7 +14,7 @@ publication_metadata(
   teaser_image = NULL,
   teaser_source = NULL,
   categories = c("climate"),
-  authors = NULL,
+  authors = "MeteoSchweiz / MétéoSuisse / MeteoSvizzera",
   publication = NULL,
   publishedAt = Sys.Date(),
   edition = NULL
@@ -24,7 +24,7 @@ update_metadata_element(metadata, ...)
 }
 \arguments{
 \item{path}{a string denoting the CMS path. If the path does not start with a \code{/}, 
-it will be interpreted as relative to \code{/meteoswiss/homepage/service-and-publications/publications/}.}
+it will be interpreted as relative to \code{"/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/climate-bulletins/"}.}
 
 \item{alias}{multilanguage vector with alias to use in the path for each language}
 
@@ -32,13 +32,14 @@ it will be interpreted as relative to \code{/meteoswiss/homepage/service-and-pub
 
 \item{lead}{multilanguage string with lead text for each language}
 
-\item{keywords}{multilanguage vector of comma separated strings with keywords for each language}
+\item{keywords}{a comma separated strings with keywords}
 
 \item{teaser_image}{a path to the teaser image. It will be copied to the bulletins image folder during processing.}
 
 \item{teaser_source}{a multilanguage string denoting the source of the teaser image}
 
-\item{categories}{a comma separated string with publication categories}
+\item{categories}{a comma separated string with publication categories. 
+Possible categories: weather, hazards, climate, measurementAndForecastingSystem.}
 
 \item{authors}{a multilanguage string denoting the authors of the publication}
 

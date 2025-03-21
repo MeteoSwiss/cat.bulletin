@@ -4,7 +4,13 @@
 \alias{create_bulletin_monthly}
 \title{Create the monthly bulletin}
 \usage{
-create_bulletin_monthly(year = 2024, month = 8, provisional, ...)
+create_bulletin_monthly(
+  year = 2024,
+  month = 8,
+  provisional,
+  workdir = ".",
+  ...
+)
 }
 \arguments{
 \item{year}{Bulletin year}

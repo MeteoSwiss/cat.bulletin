@@ -8,7 +8,8 @@
 #' @export
 create_bulletin_monthly <- function(year = 2024, 
                                     month = 8, 
-                                    provisional, 
+                                    provisional,
+                                    workdir = ".",
                                     ...) {
   
   cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
@@ -18,7 +19,8 @@ create_bulletin_monthly <- function(year = 2024,
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
-                              workdir = ".",
+                              bulletin_dir = "climate-bulletin-monthly",
+                              workdir = workdir,
                               languages = c("de", "fr", "it"),
                               bulletin_args = list(year = year,
                                                    month = month,
@@ -26,7 +28,7 @@ create_bulletin_monthly <- function(year = 2024,
                                                    yearmonth = paste0(year, sprintf("%02d", month))
                               ),
                               ...)
-
+  
   swissmean <- calculate_swissmean_temp(bulletin)
   regdiff <- calculate_regional_differences(bulletin)
   
@@ -47,7 +49,7 @@ create_bulletin_monthly <- function(year = 2024,
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
       monatsbilanz_sun(regdiff = regdiff, language = language)
-      #monatsbulletin_daily_timeseries(language = language)
+    #monatsbulletin_daily_timeseries(language = language)
   }
   
   metadata <- monatsbulletin_metadata(bulletin = bulletin,
@@ -59,7 +61,13 @@ create_bulletin_monthly <- function(year = 2024,
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
   
-  bulletin_to_webzip(bulletin)
+  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
+                       "-", format(Sys.time(), format = "%Y%m%d%H%M"))
+  
+  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
+  log_info("Webzip for monthly bulletin written to", zipfilename, ".")
+  
+  invisible(bulletin)
 }
 
 #' Create the publication_metadata for the monthly bulletin.
@@ -72,12 +80,13 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   assert_that(is.character(lead_element_id), length(lead_element_id) == 1)
   
   bulletin_lead <- function(bulletin, lead_element_id, language) {
+    #return(lore_ipsum(language = language))
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
     bulletin = set_active_language(bulletin, language = language)
     switch(lead_element$type,
            text = lead_element$text,
-           Rmd = Rmd_to_html(element = lead_element),
+           Rmd = Rmd_to_text(element = lead_element),
            stop("lead element type not supported")
     )
   }
@@ -88,7 +97,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   }
   
   bulletin_path <- function(bulletin) {
-    path <- paste0("klimabulletin", "-", month_str(bulletin$month, language = "de"), "-", bulletin$year)
+    path <- paste0("klimabulletin", "-", bulletin$year, "-", bulletin$month)
     tolower(path)
   }
   
@@ -116,22 +125,12 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
                                                language = lang)
     ),
     edition = sapply(bulletin$languages, bulletin_edition, provisional = bulletin$provisional),
-    categories = c(
-      de = "Klima",
-      it = "Clima",
-      fr = "Climat"
-    ),
     teaser_image = monthlybulletin_teaser_image(yearmonth = bulletin$yearmonth),
     teaser_source = sapply(bulletin$languages, 
                            function(lang) 
                              monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
     ),
     keywords = c(),
-    authors = c(
-      de = "MeteoSchweiz",
-      fr = "MeteoSuisse",
-      it = "MeteoSvizzera"
-    ),
     publishedAt = Sys.Date()
   )
   
@@ -305,12 +304,12 @@ temporal_evolution <- function(bulletin, swissmean, regdiff) {
 monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   log_info("monatsbulletin_daily_timeseries")
-
+  
   station <- c(de = "SMA", fr = "GVE", it = "LUG")
   station_name <- mchdwh::station_info(nat_abbr=station[language])$station_name
-
+  
   bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
-
+  
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
   filename_in  <- paste0(image_id,"_",language,".png")
@@ -320,7 +319,7 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
       caption = glue::glue(cat.lang::get.text("daily_timeseries")),
       id = image_id
     )
-
+  
   bulletin
 }
 
