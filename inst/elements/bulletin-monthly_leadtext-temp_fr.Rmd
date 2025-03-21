@@ -6,7 +6,7 @@ sm_gt0 <- as.numeric(swissmean$curr_temp_dev) > 0
 sm_eq0 <- as.numeric(swissmean$curr_temp_dev) == 0
 sm_lt0 <- as.numeric(swissmean$curr_temp_dev) < 0
 
-ordnum_rank <- ifelse({swissmean$curr_rank}==1,"er","e")
+ordnum_rank <- ifelse(swissmean$curr_rank == 1, "er", "e")
 ```
 
 

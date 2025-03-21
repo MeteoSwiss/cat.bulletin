@@ -5,5 +5,4 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-Die folgende Tabelle zeigt die Monatsniederschlagssummen und deren Abweichung zur Referenzperiode an ausgewählten Stationen im Messnetz von MeteoSchweiz.
-
+Le tableau suivant indique le cumul des précipitations mensuelles et l'écart par rapport à la période de référence dans certaines stations du réseau de mesure de MétéoSuisse.
