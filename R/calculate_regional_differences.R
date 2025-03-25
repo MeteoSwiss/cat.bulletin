@@ -15,7 +15,7 @@ calculate_regional_differences <- function(bulletin) {
   
   data <- clim.table::climtable(period=c(begdate,enddate), outDir = bulletin$data_path)
   
-  # set region "every station is belonging to
+  # set region every station is belonging to
   regsort <- c("Jura","Mittelland","Alpennordhang","Wallis","Nord- und Mittelbünden","Engadin","Alpensüdseite")
   vals <- data$dana$vals
 

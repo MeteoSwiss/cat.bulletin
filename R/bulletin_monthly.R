@@ -458,3 +458,47 @@ nextmonth_str <- function(month, language) {
   cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
   month_str(ifelse(month == 12, 1, month + 1), language = language)
 }
+
+translate_regions <- function(text, lang) {
+  # Wörterbuch für Französisch
+  dict_fr <- list(
+    "Nord- und Mittelbünden" = "Grisons du Nord et centraux",
+    "Mittelland" = "Plateau",
+    "Voralpen" = "Préalpes",
+    "Alpen" = "Alpes",
+    "Jura" = "Jura",
+    "Südtessin" = "Tessin méridional"
+  )
+  
+  # Wörterbuch für Italienisch
+  dict_it <- list(
+    "Nord- und Mittelbünden" = "Grigioni settentrionali e centrali",
+    "Mittelland" = "Altipiano",
+    "Voralpen" = "Prealpi",
+    "Alpen" = "Alpi",
+    "Jura" = "Giura",
+    "Südtessin" = "Ticino meridionale"
+  )
+  
+  # Auswahl des passenden Wörterbuchs
+  dict <- switch(lang,
+                 "fr" = dict_fr,
+                 "it" = dict_it,
+                 stop("Ungültige Sprache. Verwenden Sie 'fr' oder 'it'."))
+  
+  # Zerlegen des Strings in einzelne Regionen
+  parts <- strsplit(text, ", | und ", perl = TRUE)[[1]]
+  
+  # Übersetzen
+  translated_parts <- unname(sapply(parts, function(x) dict[[x]]))
+  
+  # Französische oder italienische Konjunktion
+  conjunction <- ifelse(lang == "fr", "et", "e")
+  
+  # Zusammensetzen mit der entsprechenden Konjunktion
+  if (length(translated_parts) > 1) {
+    paste(paste(translated_parts[-length(translated_parts)], collapse = ", "), conjunction, translated_parts[length(translated_parts)])
+  } else {
+    translated_parts
+  }
+}
