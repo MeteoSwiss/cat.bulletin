@@ -109,7 +109,11 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     )
     
     for (lang in names(title)) {
-      title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))
+      if (lang == "fr") {
+        title[lang] <- paste(title[lang], tolower(month_str(bulletin$month, language = lang)))  
+      } else {
+        title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))  
+      }
       title[lang] <- paste(title[lang], bulletin$year)
     }
     
