@@ -238,8 +238,20 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-2")
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p3")
-  # 
-  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
+  
+  ## Add table
+  prec_table <- regdiff$subset_climtab_P
+  colnames(prec_table) <- c(cat.lang::get.text("climtab_stat"),
+                            cat.lang::get.text("climtab_altitude"),
+                            cat.lang::get.text("climtab_prec_mean"),
+                            cat.lang::get.text("climtab_prec_ref"),
+                            cat.lang::get.text("climtab_prec_dev")
+  )
+  print(prec_table)
+  bulletin <- bulletin %>%
+    add_table(prec_table, id = "monatsbilanz_prec_table",
+              caption = paste("Die Prec-table-Caption funktioniert noch nicht:",language))
+  
   bulletin
 }
 
@@ -278,7 +290,19 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p3")
   
-  #  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
+  ## Add table
+  sun_table <- regdiff$subset_climtab_S
+  colnames(sun_table) <- c(cat.lang::get.text("climtab_stat"),
+                            cat.lang::get.text("climtab_altitude"),
+                            cat.lang::get.text("climtab_sun_mean"),
+                            cat.lang::get.text("climtab_sun_ref"),
+                            cat.lang::get.text("climtab_sun_dev")
+  )
+  print(sun_table)
+  bulletin <- bulletin %>%
+    add_table(sun_table, id = "monatsbilanz_sun_table",
+              caption = paste("Die sun-table-Caption funktioniert noch nicht:",language))
+  
   bulletin  
 }
 

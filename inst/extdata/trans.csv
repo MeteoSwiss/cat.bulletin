@@ -11,6 +11,12 @@ climtab_altitude;Höhe [m ü.M.];Altitude [m s.n.m.];Quota [m s.l.m.];Altitude [
 climtab_temp_mean;Monatsmittel [°C];Moyenne mensuelle [°C];Media mensile [°C];Monthly mean [°C]
 climtab_temp_ref;Referenz [°C];Référence [°C];Riferimento [°C];Reference [°C]
 climtab_temp_dev;Abweichung [°C];Déviation [°C];Deviazione [°C];Deviation [°C]
+climtab_prec_mean;Monatssumme [mm];Somme mensuelle [mm];Somma mensile [mm];
+climtab_prec_ref;Referenz [mm];Référence [mm];Riferimento [mm];
+climtab_prec_dev;Verhältnis zur Referenz [%];Rapport à la référence [%];Rapporto al riferimento [%];
+climtab_sun_mean;Monatssumme [h];Somme mensuelle [h];Somma mensile [h];
+climtab_sun_ref;Referenz [h];Référence [h];Riferimento [h];
+climtab_sun_dev;Verhältnis zur Referenz [%];Rapport à la référence [%];Rapporto al riferimento [%];
 daily_timeseries;Monatsverlauf der Lufttemperatur (Tagesmittel und Tagesmaxima/-minima), Tagessumme der Sonnenscheindauer und des Niederschlags und höchste Böenspitzen pro Tag an der Station {station_name} für den {bulletin$month_str} {bulletin$year}. Die mittlere Lufttemperatur ist als Abweichung zum klimatologischen Referenzwert 1991‒2020 dargestellt.;Evolution mensuelle de la température de l'air (moyenne journalière et maxima/minima journaliers), somme journalière de la durée d'ensoleillement et des précipitations et rafales maximales par jour à la station de {station_name} pour {bulletin$month_str} {bulletin$year}. La température moyenne de l'air est représentée en tant qu'écart par rapport à la valeur climatologique de référence 1991-2020.;Andamento mensile della temperatura dell'aria (media giornaliera e massime/minime giornaliere), della somma giornaliera della durata del soleggiamento e delle precipitazioni e dei picchi di raffica più elevati al giorno alla stazione di {station_name} per {bulletin$month_str} {bulletin$year}. La temperatura media dell'aria è indicata come deviazione dal valore climatologico di riferimento 1991-2020.;
 edition_definitive;Definitives Bulletin;Bulletin définitif;Bollettino definitivo;
 edition_provisional;Provisorisches Bulletin; Bulletin provisoire;Bollettino provvisorio;

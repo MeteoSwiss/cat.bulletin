@@ -241,21 +241,18 @@ comp_regdiff <- function(parameter, vals, regsort) {
     deviations <- "Abw"
     norm_range <- c(-0.5,0.5)
     tab_columns <- c(1:5)
-#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatsmittel [\u00B0C]","Referenz [\u00B0C]","Abweichung [\u00B0C]")
   }
   if (parameter == "P") {
     # Fixed input for precipitation
     deviations <- "R.dev"
     norm_range <- c(95,105)
     tab_columns <- c(1,2,11:13)
-#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [mm]","Referenz [mm]","Verhältnis zur Referenz [%]")
   }
   if (parameter == "S") {
     # Fixed input for sunshine duration
     deviations <- "S.dev"
     norm_range <- c(95,105)
     tab_columns <- c(1,2,7:9)
-#    climtab_names <- c("Station","Höhe [m ü.M.]","Monatssumme [h]","Referenz [h]","Verhältnis zur Referenz [%]")
   }
   
   acurr_all <- vals[[deviations]][!is.na(vals[[deviations]])]
