@@ -459,25 +459,27 @@ nextmonth_str <- function(month, language) {
   month_str(ifelse(month == 12, 1, month + 1), language = language)
 }
 
-translate_regions <- function(text, lang) {
+translate_regions <- function(text, lang = "fr") {
   # Wörterbuch für Französisch
   dict_fr <- list(
-    "Nord- und Mittelbünden" = "Grisons du Nord et centraux",
-    "Mittelland" = "Plateau",
-    "Voralpen" = "Préalpes",
-    "Alpen" = "Alpes",
-    "Jura" = "Jura",
-    "Südtessin" = "Tessin méridional"
+    "Alpennordhang" = "le versant nord des Alpes",
+    "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
+    "Jura" = "le Jura",
+    "Alpensüdseite" = "le sud des Alpes",
+    "Mittelland" = "le Plateau",
+    "Wallis" = "le Valais",
+    "Engadin" = "l'Engadine"
   )
   
   # Wörterbuch für Italienisch
   dict_it <- list(
-    "Nord- und Mittelbünden" = "Grigioni settentrionali e centrali",
-    "Mittelland" = "Altipiano",
-    "Voralpen" = "Prealpi",
-    "Alpen" = "Alpi",
+    "Alpennordhang" = "Pendio nordalpino",
+    "Nord- und Mittelbünden" = "Nord e centro dei Grigioni",
     "Jura" = "Giura",
-    "Südtessin" = "Ticino meridionale"
+    "Alpensüdseite" = "Sud delle Alpi",
+    "Mittelland" = "Altopiano",
+    "Wallis" = "Vallese",
+    "Engadin" = "Engadina"
   )
   
   # Auswahl des passenden Wörterbuchs
@@ -486,11 +488,12 @@ translate_regions <- function(text, lang) {
                  "it" = dict_it,
                  stop("Ungültige Sprache. Verwenden Sie 'fr' oder 'it'."))
   
-  # Zerlegen des Strings in einzelne Regionen
-  parts <- strsplit(text, ", | und ", perl = TRUE)[[1]]
+  # Regionen aus dem Wörterbuch priorisiert erkennen
+  pattern <- paste(names(dict), collapse = "|")  # Erzeuge Regex-Muster für alle Regionen
+  matches <- unlist(regmatches(text, gregexpr(pattern, text, perl = TRUE)))  # Finde passende Regionen
   
-  # Übersetzen
-  translated_parts <- unname(sapply(parts, function(x) dict[[x]]))
+  # Übersetzen der erkannten Regionen
+  translated_parts <- unname(sapply(matches, function(x) dict[[x]]))
   
   # Französische oder italienische Konjunktion
   conjunction <- ifelse(lang == "fr", "et", "e")
