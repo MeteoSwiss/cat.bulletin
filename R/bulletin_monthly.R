@@ -145,11 +145,6 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
-  # bulletin <- bulletin %>% set_active_language(language = language)
-  # if (bulletin$language != "de"){
-  #   month <- sapply(month_str(bulletin$month),add_article)
-  #   month <- as.character(month)
-  # }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
   # Add image for absolute temperatures
@@ -338,13 +333,16 @@ monatsbulletin_disclaimer <- function(bulletin) {
 }
 
 # further helping functions
-add_article <- function(word) {
+add_article <- function(word, lang, to_lower = TRUE) {
   # Check if the word starts with a vowel (a, e, i, o, u, y)
-  if (grepl("^[ae\u00E9\u00E8iouyAE\u00C9\u00C8IOUY]", word)) {
-    return(paste0("d'", tolower(word)))
+  if (grepl("^[aeéèiouyAEÉÈIOUY]", word)) {
+    article <- "d'"
   } else {
-    return(paste0("de ", tolower(word)))
+    article <- ifelse(lang == "fr", "de ", "di ")
   }
+  
+  transformed_word <- if (to_lower) tolower(word) else word
+  return(paste0(article, transformed_word))
 }
 
 ordinal_number <- function(number, gender, language) {
@@ -460,7 +458,6 @@ nextmonth_str <- function(month, language) {
 }
 
 translate_regions <- function(text, lang = "fr") {
-  # Wörterbuch für Französisch
   dict_fr <- list(
     "Alpennordhang" = "le versant nord des Alpes",
     "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
@@ -471,7 +468,6 @@ translate_regions <- function(text, lang = "fr") {
     "Engadin" = "l'Engadine"
   )
   
-  # Wörterbuch für Italienisch
   dict_it <- list(
     "Alpennordhang" = "Pendio nordalpino",
     "Nord- und Mittelbünden" = "Nord e centro dei Grigioni",
@@ -482,26 +478,37 @@ translate_regions <- function(text, lang = "fr") {
     "Engadin" = "Engadina"
   )
   
-  # Auswahl des passenden Wörterbuchs
   dict <- switch(lang,
                  "fr" = dict_fr,
                  "it" = dict_it,
                  stop("Ungültige Sprache. Verwenden Sie 'fr' oder 'it'."))
   
-  # Regionen aus dem Wörterbuch priorisiert erkennen
   pattern <- paste(names(dict), collapse = "|")  # Erzeuge Regex-Muster für alle Regionen
   matches <- unlist(regmatches(text, gregexpr(pattern, text, perl = TRUE)))  # Finde passende Regionen
   
-  # Übersetzen der erkannten Regionen
   translated_parts <- unname(sapply(matches, function(x) dict[[x]]))
   
-  # Französische oder italienische Konjunktion
   conjunction <- ifelse(lang == "fr", "et", "e")
   
-  # Zusammensetzen mit der entsprechenden Konjunktion
   if (length(translated_parts) > 1) {
     paste(paste(translated_parts[-length(translated_parts)], collapse = ", "), conjunction, translated_parts[length(translated_parts)])
   } else {
     translated_parts
   }
+}
+
+translate_stations <- function(input_string, lang, use_art = FALSE) {
+  conjunction <- ifelse(lang == "fr", "et", "e")
+  
+  stations <- unlist(strsplit(input_string, " und "))
+  
+  if (use_art) {
+    translated_stations <- sapply(stations, add_article, lang = lang, to_lower = FALSE)
+  } else {
+    translated_stations <- stations
+  }
+  
+  result <- paste(translated_stations, collapse = paste0(" ", conjunction, " "))
+  
+  return(result)
 }
