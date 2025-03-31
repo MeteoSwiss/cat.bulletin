@@ -6,9 +6,11 @@
 \usage{
 create_test_bulletin_for_web(
   workdir = tempdir(),
+  bulletin_dir = "bulletin",
   zipfilename = paste0("webtest_", format(Sys.time(), format = "\%Y\%m\%d\%H\%M"),
     ".zip"),
-  sections = c("text", "image", "markdown", "table")
+  path = "test-bulletin",
+  sections = c("text", "image", "markdown", "table", "shorties")
 )
 }
 \description{

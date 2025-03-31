@@ -1,26 +1,28 @@
 #' Create a test bulletin publication zip file for the website
 #' @export
 create_test_bulletin_for_web <- function(workdir = tempdir(),
+                                         bulletin_dir = "bulletin",
                                          zipfilename = paste0(
                                            "webtest_",
                                            format(Sys.time(), format = "%Y%m%d%H%M"),
                                            ".zip"
                                          ),
-                                         sections = c("text", "image", "markdown", "table")) {
+                                         path = "test-bulletin",
+                                         sections = c("text", "image", "markdown", "table", "shorties")) {
   
   sections <- match.arg(sections, several.ok = TRUE)
   
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
     languages = c("de", "fr", "it"),
-    bulletin_dir = "bulletin",
+    bulletin_dir = bulletin_dir,
     workdir = workdir
   ) 
   
   metadata <- publication_metadata(
-    path = "test-bulletin",
+    path = path,
     title = c(
-      de = "Klimabulletin - Testpublikation",
+      de = paste("Klimabulletin - Testpublikation", Sys.Date()),
       fr = "Bulletin climatologique - test",
       it = "Bolletino del clima - test"
     ),
@@ -98,6 +100,21 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                 id = element_id,
                 caption = paste(language, "caption"))
   }
+  
+  ## Shorties list element
+  if ("shorties" %in% sections) {
+    element_id = "my_shorties"
+    for (language in bulletin$languages)
+      bulletin <- bulletin %>%
+        set_active_language(language = language) %>%
+        add_shorties_list(group_id = "event",
+                          title = cat.lang::get.text("bulletin_monthly_shorties_title"),
+                          path = system.file(package = "cat.bulletin", "example-data", "shorties"),
+                          id = element_id
+        )
+  }
+  
+  
   ## Generate pdfs in all languages and the xml and zip everything up
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
