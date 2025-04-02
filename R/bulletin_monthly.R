@@ -358,8 +358,8 @@ monatsbulletin_disclaimer <- function(bulletin) {
 
 # further helping functions
 add_article <- function(word, lang = "fr", to_lower = TRUE) {
-  # Check if the word starts with a vowel (a, e, i, o, u, y)
-  if (grepl("^[aeéèiouyAEÉÈIOUY]", word)) {
+  # Check if the word starts with a vowel (h, a, e, i, o, u, y)
+  if (grepl("^[haeéèiouyAEÉÈIOUYH]", word)) {
     article <- "d'"
   } else {
     article <- ifelse(lang == "fr", "de ", "di ")
