@@ -10,11 +10,19 @@ bulletin_to_pdf <- function(bulletin,
                             filename = tempfile(pattern = languaged("bulletin", language),
                                                 fileext = ".pdf")
 ) {
+  #documentation: https://bookdown.org/yihui/rmarkdown/pdf-document.html
+  
   log_debug("Processing bulletin for language", language, "to pdf via markdown...")
+  #cat.report::load.cat.report()
+  
   markdown_file = bulletin_to_markdown(bulletin, language = language)
   log_debug("Processing file", markdown_file, "to pdf.")
   log_debug("Expected pdf-file:", filename)
-  rmarkdown::render(markdown_file, envir = bulletin$bulletin_envir, output_format = "pdf_document", output_file = filename, clean = FALSE)
+  rmarkdown::render(markdown_file, 
+                    envir = bulletin$bulletin_envir, 
+                    # output_format = "pdf_document", 
+                    output_file = filename, 
+                    clean = FALSE)
 }
 
 
@@ -39,6 +47,9 @@ bulletin_to_markdown <- function(bulletin,
     new = c("LC_TIME" = get_locale(language)), {
       # write the R markdown front matter first
       write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
+      
+      # write latex code to come within document but before content
+      write_latex_preabmle(bulletin = bulletin, file_conn = file_conn)
       
       # process metadata
       write_markdown_metadata(bulletin = bulletin, file_conn = file_conn)
@@ -80,20 +91,54 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
   )
   
   front_matter <- c(front_matter,
+                    "documentclass: |",
+                    "  ```{=latex}",
+                    "  mch_basisformular",
+                    "   ```",
                     "output:",
                     "  pdf_document:",
+                    "    keep_tex: true",
                     "    fig_caption: true",
                     "    fig_width: 3",
                     #                    paste0("    lang: ", bulletin$language, "-CH"),
                     "header-includes:",
+                    "  - \\usepackage[utf8]{inputenc}",
                     "  - \\usepackage{xcolor}",
                     paste0("  - \\usepackage[", babel, "]{babel}"),
-                    #    "    includes:",
+                    #"includes:",
                     #    "      in_header: 'preamble.tex',
+                    #"  before_body: 'before_body.tex'",
+                    #paste0("before_body: ", system.file("tex", 'before_body.tex', package = "cat.bulletin")),
                     "---"
   )
   readr::write_lines(front_matter, file = file_conn)
 }
+
+write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
+  
+  # latex commands must be escaped (double backslash)
+  preamble <- c(
+    "```{=latex}
+    % define variables used in headers and footers
+    \\catpackage{cat.bulletin}
+    %\\copyrightmeteo{}
+    %\\contact{}
+    
+    %\\headerleft{left header}
+    %\\headercenter{center header}
+    %\\headerright{right header}
+    ",
+                #language for header picture
+                paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
+                "% show the MeteoSwiss logo on the first page
+    \\thispagestyle{frontpage}",
+    "```"
+  )
+  
+  readr::write_lines(preamble, file = file_conn)
+  
+}
+
 
 write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   write_lines <- function(lines) readr::write_lines(lines, file = file_conn)

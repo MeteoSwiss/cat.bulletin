@@ -117,7 +117,10 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   ## Generate pdfs in all languages and the xml and zip everything up
   
+  #language = "de"
+  #filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
+  
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   
-  bulletin
+  invisible(bulletin)
 }
