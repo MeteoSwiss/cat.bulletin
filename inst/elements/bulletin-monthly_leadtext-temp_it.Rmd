@@ -1,0 +1,15 @@
+``` {r echo=FALSE, results = "hide"}
+moment01 <- ifelse(bulletin$provisional, "Fino alla giornata di ieri ", "")
+abw_lwt <- format(abs(as.numeric(swissmean$curr_temp_dev)),nsmall=1)
+
+sm_gt0 <- as.numeric(swissmean$curr_temp_dev) > 0
+sm_eq0 <- as.numeric(swissmean$curr_temp_dev) == 0
+sm_lt0 <- as.numeric(swissmean$curr_temp_dev) < 0
+L <- ifelse(bulletin$provisional, "l", "L")
+
+rank_it <- ifelse(swissmean$curr_rank == 1, "", paste0(swissmean$curr_rank,"° "))
+```
+
+
+`r ifelse(sm_gt0, glue::glue("{moment01}{L}a temperatura media svizzera di {month_str(bulletin$month)} {bulletin$year} è stata di {abw_lwt} °C superiore rispetto al periodo di riferimento 1991-2020, {rank_it}valore più elevato dall'inizio delle misure nel 1864."), "")``r ifelse(sm_lt0, glue::glue("{moment01}{L}a temperatura media svizzera di {month_str(bulletin$month)} {bulletin$year} è stata di {abw_lwt} °C inferiore rispetto al periodo di riferimento 1991-2020, {rank_it}valore più elevato dall'inizio delle misure nel 1864."), "")``r ifelse(sm_eq0, glue::glue("{moment01}{L}a temperatura media svizzera di {month_str(bulletin$month)} {bulletin$year} è stata di {abw_lwt} °C, in linea con la media del periodo di riferimento 1991-2020, {rank_it}valore più elevato dall'inizio delle misure nel 1864."), "")`
+
