@@ -75,18 +75,23 @@ download_monatsbilanz_maps <- function(bulletin,
 
 download_monatsbilanz_temp <- function(bulletin,
                                        filename = NULL,
-                                       valueBase = c("abs", "anom"),
+                                       valueBase = c("abs", "anom9120"),
                                        provisional = FALSE, 
                                        mediaType = "text/plain") {
   
   valueBase = match.arg(valueBase)
   assertthat::assert_that(is.logical(provisional))
   
+  product = paste0("climate-temperature-evolution-region-", valueBase)
+  if (provisional) product <- paste0(product, "-outlook")
+  
   attributevalues <- 
     list(
       valueBase = valueBase,
-      normalPeriod= "1991-2020",
-      location= "regSwiss",
+      trend = "loess30",
+      parameter ="ths200m0",
+      loctype ="region",
+      location = "regSwiss",
       language = bulletin$language,
       plotPeriod = "1864-today",
       mediaType = mediaType
@@ -95,19 +100,19 @@ download_monatsbilanz_temp <- function(bulletin,
   if (provisional) {
     download_realization(
       bulletin = bulletin,
-      product = "climate-temperature-evolution-outlook",
+      product = product,
       filter = c(attributevalues, list(timeGranularity="month")),
       filename = filename
     )
   } else {
     download_realization(
       bulletin = bulletin,
-      product = "climate-temperature-evolution",
+      product = product,
       filter = c(attributevalues, list(timeOfYear = sprintf("%02d", bulletin$month))),
       filename = filename
     )
   }
-
+  
 }
 
 
@@ -118,14 +123,14 @@ download_witterungsverlauf <- function(bulletin,
                                        location = "SMA",
                                        language = bulletin$language) {
   
-#  valueBase = match.arg(valueBase)
-
+  #  valueBase = match.arg(valueBase)
+  
   attributevalues <- 
     list(
       mediaType = "image/png",
       productName = "climate-overview-series-monthdaily"
     )
-
+  
   attributevalues = c(attributevalues, c(month = sprintf("%02d", bulletin$month), year = bulletin$year, location = location, language = language))
   
   download_realization(
