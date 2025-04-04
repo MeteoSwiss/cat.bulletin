@@ -19,8 +19,11 @@ get_table <- function(table_element) {
 #' Add a table to a bulletin
 #' 
 #' The \code{table} package for supporting tables.
-#' @inheritParams add_image
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
 #' @param table a table object created with the \code{table} package.
+#' @param caption The caption for the table.
+#' @family bulletin_elements
 #' @examples
 #' myData <- data.frame(a = 3, b = 4)
 #' bulletin <- create_bulletin() %>%

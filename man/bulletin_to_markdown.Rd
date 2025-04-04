@@ -17,7 +17,9 @@ flextable_to_markdown(element)
 table_to_markdown(element)
 }
 \arguments{
-\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+\item{bulletin}{The bulletin object created with \code{\link{create_bulletin}}.}
+
+\item{language}{Single language identifier.}
 
 \item{filename}{The name of the file to write the R markdown to.}
 
@@ -32,3 +34,10 @@ This function will set the current active language to language as a side effect.
 \code{flextable_to_markdown}: Rendering of flextables to markdown is not possible (only directly to either html or pdf). 
 The flextable object is thus stored by element_id in the bulletin environment and rendered in the final rendering step.
 }
+\seealso{
+Bulletin rendering functions
+\code{\link{bulletin_to_pdf}()},
+\code{\link{bulletin_to_webzip}()},
+\code{\link{bulletin_to_xml}()}
+}
+\concept{rendering}

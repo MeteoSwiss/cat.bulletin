@@ -4,6 +4,7 @@
 #' @param provisional boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
 #' \code{get_bulletin_monthly_provisional}.
 #' @param ... further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc. 
+#' @inheritParams create_bulletin
 #' @importFrom magrittr %>%
 #' @export
 create_bulletin_monthly <- function(year = 2024, 
@@ -73,6 +74,7 @@ create_bulletin_monthly <- function(year = 2024,
 
 #' Create the publication_metadata for the monthly bulletin.
 #' @inheritParams create_bulletin_monthly
+#' @inheritParams bulletin_to_webzip
 #' @param lead_element_id the id of the (hidden) bulletin element that contains the lead text. Can be either of type Rmd or text. 
 #' @param swissmean output of \code{calculate_swissmean_temp}
 #' @param regdiff output of \code{calculate_regional_differences}

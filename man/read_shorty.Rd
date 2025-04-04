@@ -6,6 +6,18 @@
 \usage{
 read_shorty(filepath)
 }
+\arguments{
+\item{filepath}{Path to the file that contains the short content.}
+}
 \description{
 Read a shorty from given filepath
 }
+\details{
+A shorty file is a text file with two or three lines.
+\itemize{
+ \item{"line 1"}{Title}
+ \item{"line 2"}{Content}
+ \item{"optional line 3"}{Link (\url{https://...})} 
+}
+}
+\keyword{internal}

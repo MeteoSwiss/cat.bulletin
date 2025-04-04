@@ -1,13 +1,19 @@
 #' Create a bulletin
+#' @description 
+#' The bulletin list ist the top level data strucutre in the \code{cat_bulletin} package. 
+#' It contains the bulletin content in form of bulletin_elements, separated for each language. 
+#' The bulletin elements represent building blocks of a bulletin like text, R-Markdown sections, links, images etc.
+#' The bulletin data structure also contains information needed for bulletin rendering, like working directories etc. 
 #' @param bulletin_id a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}
 #' @param bulletin_args a list of arguments 
+#' @param languages The set of supported language identifiers for the publication. Must be a subset of \code{de}, \code{fr}, \code{it}, \code{en}.
 #' @param workdir working directory for bulletin creation
-#' @param bulletin_path the path to the directory where the bulletin will be created. Default: \code{bulletin_id}.
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @param metadata a publication_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}.
 #' @return an object that represents the bulletin content
 #' @details 
 #' The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}. 
+#' @seealso [create_test_bulletin_for_web()] for a minimal example on how to create a bulletin.
 #' @export
 create_bulletin <- function(bulletin_id,
                             languages = c("de", "en", "fr", "it"),
@@ -96,8 +102,12 @@ languaged_elements <- function(language) {
 
 #' Set the active language for the bulletin
 #' 
-#' When compiling input
+#' The language defines the language environment / settings to use when compiling input or adding elements to a bulletin.
+#' @param bulletin The bulletin object created with \code{\link{create_bulletin}}.
+#' @param language language identifier.
 set_active_language <- function(bulletin, language = bulletin$languages[1]) {
+  language = match.arg(language, choices = bulletin$languages)
+  
   # set language in cat.lang
   cat.lang::set.language(cat.func::isolang2dwhlang(language))
   # set language in bulletin
@@ -107,7 +117,6 @@ set_active_language <- function(bulletin, language = bulletin$languages[1]) {
 
 #' Set the metadata object for a bulletin
 #' @rdname create_bulletin
-#' @inheritParams add_element
 #' @param metadata A list of metadata information created with \code{\link{publication_metadata}}.
 set_metadata <- function(bulletin, metadata) {
   assert_publication_metdata(metadata, languages = bulletin$languages)
@@ -117,7 +126,6 @@ set_metadata <- function(bulletin, metadata) {
 
 #' Adds an element to a bulletin
 #' @rdname create_bulletin
-#' @inheritParams set_element
 add_element <- function(bulletin, element, language = bulletin$language) {
   slot <- languaged_elements(language)
   bulletin[[slot]] <- append(bulletin[[slot]], list(element))
@@ -128,7 +136,9 @@ add_element <- function(bulletin, element, language = bulletin$language) {
 #' @rdname create_bulletin
 #' @param bulletin a bulletin created by \code{\link{create_bulletin}}.
 #' @param element one of the bulletin elements
-#' @inheritParams bulletin_element
+#' @param language Langue identifier (i.e., "de"). Elements of different languages are kept separate within the bulletin object. 
+#' The language parameter specifies the language of the element to be added.
+# @inheritParams bulletin_element
 set_element <- function(bulletin, element, language = bulletin$language, id = element$id) {
   assert_that(is.string(id))
   slot <- languaged_elements(language)
@@ -138,7 +148,6 @@ set_element <- function(bulletin, element, language = bulletin$language, id = el
 
 #' Checks if the bulletin has an element in the given language
 #' @rdname create_bulletin
-#' @inheritParams add_element
 #' @param type string The type of the element(s) 
 #' @param id string The id of the element
 has_element <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {

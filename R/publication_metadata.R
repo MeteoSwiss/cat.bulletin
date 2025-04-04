@@ -15,6 +15,7 @@
 #' @param keywords a comma separated strings with keywords 
 #' @param publication multilanguage vector of paths to the publication files (made avaailable as download)
 #' @param edition multilanguage vector of edition field in xml publication.
+#' @param publishedAt Set publication date (visible on the website) in format YYYY-MM-DD, for example "2005-11-15".
 #' @example inst/examples/publication_metadata_examples.R
 #' @export
 publication_metadata <- function(path = NULL, 
@@ -57,6 +58,7 @@ publication_metadata <- function(path = NULL,
 #' Use \code{update_metadata} to update elements within a publication_metadata list. 
 #' For multi language strings, you can use the function \code{\link{update_multi_language_string}}, see examples.
 #' @param metadata a publication_metadata list of publication metadata
+#' @param ... metadata elements to update
 #' @examples 
 #' my_metadata <- publication_metadata(
 #'   title = c(de = "deutscher titel", fr = "titre français")

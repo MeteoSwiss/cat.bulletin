@@ -1,4 +1,7 @@
-
+#' Create the zip file containing all data needed for publication on MeteoSwiss website.
+#' @param zipfilename The name of the zipfile to be created. The zip file will be created within \code{bulletin$bulletin_path}.
+#' @inheritParams bulletin_to_pdf
+#' @family rendering
 #' @export
 bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
 

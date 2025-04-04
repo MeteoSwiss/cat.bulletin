@@ -13,6 +13,18 @@ create_test_bulletin_for_web(
   sections = c("text", "image", "markdown", "table", "shorties")
 )
 }
+\arguments{
+\item{workdir}{working directory for bulletin creation}
+
+\item{bulletin_dir}{the name of the directory within the bulletin_path where bulletin related files will be stored.}
+
+\item{zipfilename}{The name of the zipfile to be created. The zip file will be created within \code{bulletin$bulletin_path}.}
+
+\item{path}{a string denoting the CMS path. If the path does not start with a \code{/}, 
+it will be interpreted as relative to \code{"/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/climate-bulletins/"}.}
+
+\item{sections}{A subset of example sections to process. For faster processing, only a subset of elements can be processed.}
+}
 \description{
 Create a test bulletin publication zip file for the website
 }

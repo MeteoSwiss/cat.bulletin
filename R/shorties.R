@@ -12,6 +12,11 @@ shorties_list_element <- function(shorties, title = NULL, appear = NULL, id = NU
 #' A group or list of shorties is rendered together in a text section that has a title.
 #' The group is identified by a group_id which serves to identify the shorty files that belong to the group.
 #' If there are several language versions for a shorty (i.e., same group and id), the version of the current language is shown in both markdown and xml.
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
+#' @inheritParams read_shorties
+#' @param title The text to be used as title for the group of shorties in the pdf and xml.
+#' @family bulletin_elements
 #' @export
 add_shorties_list <- function(bulletin, 
                               group_id, 
@@ -32,7 +37,6 @@ add_shorties_list <- function(bulletin,
   )
 }
 
-
 shorties_list_to_markdown <- function(element) {
   if (length(element$shorties) > 0) {
     md <- c(
@@ -45,7 +49,7 @@ shorties_list_to_markdown <- function(element) {
   }
 }
 
-#' A shorty is rendered as a title that works as a link and the lead text below.
+# A shorty is rendered as a title that works as a link and the lead text below.
 shorty_to_markdown <- function(shorty) {
   md <- c(
     paste("###", 
@@ -70,7 +74,12 @@ shorties_list_to_xml <- function(xml, element, language) {
   text_node
 }
 
-
+#' Create a shorty list object
+#' @param title title element
+#' @param lead lead/content of the shorty
+#' @param link optional link of the shorty
+#' @param language language identifier for this shorty
+#' @param id string identifying the shorty
 create_shorty <- function(title, lead, link = NULL, language, id) {
   list(
     title = title,
@@ -82,11 +91,16 @@ create_shorty <- function(title, lead, link = NULL, language, id) {
 }
 
 #' Read all shorties for the given group_id and language from the bulletin_prod_path given in config.
-#' @param yearmonth single string giving year and month of the bulletin as "yyyymm" 
+#' @param group_id The string that identifies the group of shorties in the directory given.
 #' @param language language identifier
+#' @param path The base directory from where to read the shorties text files.
+#' @param subdir An optional string giving a subdirectory within the base directory to look for the shorties text files.
+#' @seealso read_shorty
+#' @keywords internal
 read_shorties <- function(group_id, language, path, subdir = NULL) {
+  language <- match.arg(language, choices = c("de", "fr", "it", "en"))
   assert_that(is.readable(path),
-              msg = paste("Cannot read base path for shorties", filepath))
+              msg = paste("Cannot read base path for shorties", path))
   shorties_path <- ifelse(is.null(subdir), path, file.path(path, subdir))
   assert_that(is.readable(shorties_path),
               msg = paste("Cannot read shorties path", shorties_path))
@@ -109,6 +123,15 @@ read_shorties <- function(group_id, language, path, subdir = NULL) {
 
 
 #' Read a shorty from given filepath
+#' @param filepath Path to the file that contains the short content.
+#' @details 
+#' A shorty file is a text file with two or three lines.
+#' \itemize{
+#'  \item{"line 1"}{Title}
+#'  \item{"line 2"}{Content}
+#'  \item{"optional line 3"}{Link (\url{https://...})} 
+#' }
+#' @keywords internal
 read_shorty <- function(filepath) {
   log_debug("reading shorty file", filepath)
   assert_that(is.readable(filepath),

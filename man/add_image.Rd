@@ -17,7 +17,7 @@ add_image(
 )
 }
 \arguments{
-\item{bulletin}{the bulletin object to which to append the image element}
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{filepath}{the path of the image to add}
 
@@ -30,6 +30,12 @@ add_image(
 \item{source}{image source (a small text)}
 
 \item{label}{optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
 }
 \description{
 copies the image from the filepath to the bulletin directory and adds an image element
@@ -39,3 +45,4 @@ image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_t
 bulletin <- create_bulletin() \%>\%
   add_image(filepath = image_filepath, caption = "An example figure.")
 }
+\concept{bulletin_element#'}

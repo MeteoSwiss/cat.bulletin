@@ -31,7 +31,6 @@ Imports:
     datefuns,
     evoclim,
     knitr,
-    mch.auth,
     mchdwh,
     mmtpred,
     withr

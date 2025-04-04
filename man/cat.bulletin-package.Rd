@@ -4,3 +4,6 @@
 \name{cat.bulletin-package}
 \alias{cat.bulletin-package}
 \title{Generation of MeteoSwiss climate bulletins}
+\description{
+cat.bulletin is used to automate climate bulletins to be published on the MeteoSwiss website as both html (xml) and pdf.
+}

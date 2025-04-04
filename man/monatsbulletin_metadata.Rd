@@ -7,6 +7,8 @@
 monatsbulletin_metadata(bulletin, lead_element_id, swissmean, regdiff)
 }
 \arguments{
+\item{bulletin}{The bulletin object created with \code{\link{create_bulletin}}.}
+
 \item{lead_element_id}{the id of the (hidden) bulletin element that contains the lead text. Can be either of type Rmd or text.}
 
 \item{swissmean}{output of \code{calculate_swissmean_temp}}

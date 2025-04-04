@@ -2,7 +2,7 @@
 % Please edit documentation in R/Rmd.R
 \name{add_Rmd}
 \alias{add_Rmd}
-\title{add text to a bulletin}
+\title{Add R markdown to a bulletin}
 \usage{
 add_Rmd(
   bulletin,
@@ -13,10 +13,18 @@ add_Rmd(
 )
 }
 \arguments{
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+
 \item{element_id}{the name of the Rmd file in the elements folder of the package.}
 
 \item{envir}{environment in which to knit the Rmd later.}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
 }
 \description{
-add text to a bulletin
+Add R markdown to a bulletin
 }
