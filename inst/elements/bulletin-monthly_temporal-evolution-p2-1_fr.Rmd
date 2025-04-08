@@ -1,0 +1,14 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r echo=FALSE, results="hide"}
+# Determine singular or plural form
+station_word <- ifelse(regdiff$high_temp_count_hr == 1, "station", "stations")
+ordnum_rank <- ifelse(regdiff$high_temp_highest_rank == 1, "er", "e")
+month_with_art <- add_article(month_str(bulletin$month), lang="fr", to_lower=TRUE)
+```
+
+`r ifelse(regdiff$high_temp_count_hr <= 5, glue::glue("La température moyenne en {month_str(bulletin$month)} {bulletin$year} a atteint dans {regdiff$high_temp_num_word} {station_word} disposant de données depuis plus de {regdiff$high_temp_shortest_period} années le {regdiff$high_temp_highest_rank}{ordnum_rank} rang du mois {month_with_art} le plus chaud : {regdiff$high_temp_station_record_info}."), glue::glue("La température moyenne en {month_str(bulletin$month)} {bulletin$year} a atteint dans {regdiff$high_temp_num_word} {station_word} disposant de données depuis plus de {regdiff$high_temp_shortest_period} années le {regdiff$high_temp_highest_rank}{ordnum_rank} rang du mois {month_with_art} le plus chaud."))``r ifelse(bulletin$provisional & regdiff$high_temp_count_hr==1, " Il s'agit d'une valeur record provisoire. La valeur mesurée, le rang et le nombre de stations ayant établi des records peuvent encore changer d'ici la fin du mois.", "")``r ifelse(bulletin$provisional & regdiff$high_temp_count_hr>1, " Il s'agit de valeurs record provisoires. Les valeurs mesurées, les rangs et le nombre de stations ayant établi des records peuvent encore changer d'ici la fin du mois.", "")`
