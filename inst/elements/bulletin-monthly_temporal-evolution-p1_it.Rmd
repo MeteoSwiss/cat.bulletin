@@ -13,7 +13,7 @@ if (length(swissmean$ind_simyears) >= 1) {
   similar_years <- collapse_sentence(swissmean$all_years[swissmean$ind_simyears])  
 }
 not_new_record <- swissmean$curr_rank != 1
-if (bulletin$provisional & swissmean$rank_diff_neq_0) {
+if (bulletin$provisional) {
   rank_unc_low <- paste0(swissmean$rank_uncertainty[1],"&ordf;")
   rank_unc_high <- paste0(swissmean$rank_uncertainty[2],"&ordf;")
 }

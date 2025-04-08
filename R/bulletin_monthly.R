@@ -47,6 +47,7 @@ create_bulletin_monthly <- function(year = 2024,
     # add sections
     bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
+      temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
       monatsbilanz_sun(regdiff = regdiff, language = language)
     #monatsbulletin_daily_timeseries(language = language)
@@ -306,7 +307,7 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   bulletin  
 }
 
-temporal_evolution <- function(bulletin, swissmean, regdiff) {
+temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("temporal_evolution")
   
