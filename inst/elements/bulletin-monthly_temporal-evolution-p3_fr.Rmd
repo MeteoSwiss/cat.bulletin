@@ -10,6 +10,9 @@ temp_below_currclim <- swissmean$curr_temp < swissmean$loess_bounds1[1]
 temp_above_currclim <- swissmean$curr_temp > swissmean$loess_bounds1[2]
 temp_in_currclim    <- swissmean$curr_temp <= swissmean$loess_bounds1[2] & 
                        swissmean$curr_temp >= swissmean$loess_bounds1[1]
+temp_inclim_hrank   <- swissmean$curr_temp <= swissmean$loess_bounds1[2] & 
+                       swissmean$curr_temp >= swissmean$loess_bounds1[1] & 
+                       swissmean$curr_rank<10
 
 moment01 <- ifelse(bulletin$provisional, "actuelle ", "")
 ```
