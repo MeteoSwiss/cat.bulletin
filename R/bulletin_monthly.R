@@ -484,8 +484,8 @@ nextmonth_str <- function(month, language) {
 
 translate_regions <- function(text, lang = "fr") {
   dict_fr <- list(
-    "Alpennordhang" = "le versant Nord des Alpes",
-    "Nord- und Mittelbünden" = "le Nord et le centre des Grisons",
+    "Alpennordhang" = "le versant nord des Alpes",
+    "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
     "Jura" = "le Jura",
     "Alpensüdseite" = "le Sud des Alpes",
     "Mittelland" = "le Plateau",
@@ -495,7 +495,7 @@ translate_regions <- function(text, lang = "fr") {
   
   dict_it <- list(
     "Alpennordhang" = "nel Pendio nordalpino",
-    "Nord- und Mittelbünden" = "al Nord e nel centro dei Grigioni",
+    "Nord- und Mittelbünden" = "al nord e nel centro dei Grigioni",
     "Jura" = "nel Giura",
     "Alpensüdseite" = "al Sud delle Alpi",
     "Mittelland" = "nell'Altopiano",
@@ -536,4 +536,25 @@ translate_stations <- function(input_string, lang, use_art = FALSE) {
   result <- paste(translated_stations, collapse = paste0(" ", conjunction, " "))
   
   return(result)
+}
+
+num_to_word <- function(num, lang) {
+  words <- list(
+    de = c("einer", "zwei", "drei", "vier", "fünf", "sechs", 
+           "sieben", "acht", "neun", "zehn", "elf", "zwölf"),
+    fr = c("une", "deux", "trois", "quatre", "cinq", "six", 
+           "sept", "huit", "neuf", "dix", "onze", "douze"),
+    it = c("una", "due", "tre", "quattro", "cinque", "sei", 
+           "sette", "otto", "nove", "dieci", "undici", "dodici")
+  )
+  
+  if (!lang %in% names(words)) {
+    stop("Wrong language. Use 'de', 'fr' or 'it'.")
+  }
+  
+  if (num > 12) {
+    return(num)
+  } else {
+    return(words[[lang]][num])
+  }
 }

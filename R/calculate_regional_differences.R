@@ -84,7 +84,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               high_temp_highest_rank = high_temp_records$highest_rank, 
                               high_temp_count_hr = high_temp_records$count_hr, 
-                              high_temp_num_word = high_temp_records$num_as_word, 
                               high_temp_shortest_period = high_temp_records$shortest_period, 
                               high_temp_station_record_info = high_temp_records$station_record_info)
   } 
@@ -92,7 +91,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               low_temp_highest_rank = low_temp_records$highest_rank, 
                               low_temp_count_hr = low_temp_records$count_hr,
-                              low_temp_num_word = low_temp_records$num_as_word,
                               low_temp_shortest_period = low_temp_records$shortest_period, 
                               low_temp_station_record_info = low_temp_records$station_record_info)
   } 
@@ -100,7 +98,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               high_prec_highest_rank = high_prec_records$highest_rank, 
                               high_prec_count_hr = high_prec_records$count_hr, 
-                              high_prec_num_word = high_prec_records$num_as_word,
                               high_prec_shortest_period = high_prec_records$shortest_period, 
                               high_prec_station_record_info = high_prec_records$station_record_info)
   } 
@@ -108,7 +105,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               low_prec_highest_rank = low_prec_records$highest_rank, 
                               low_prec_count_hr = low_prec_records$count_hr,
-                              low_prec_num_word = low_prec_records$num_as_word,
                               low_prec_shortest_period = low_prec_records$shortest_period, 
                               low_prec_station_record_info = low_prec_records$station_record_info)
   } 
@@ -116,7 +112,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               high_sun_highest_rank = high_sun_records$highest_rank, 
                               high_sun_count_hr = high_sun_records$count_hr, 
-                              high_sun_num_word = high_sun_records$num_as_word,
                               high_sun_shortest_period = high_sun_records$shortest_period, 
                               high_sun_station_record_info = high_sun_records$station_record_info)
   } 
@@ -124,7 +119,6 @@ calculate_regional_differences <- function(bulletin) {
     regional_differences <- c(regional_differences,
                               low_sun_highest_rank = low_sun_records$highest_rank, 
                               low_sun_count_hr = low_sun_records$count_hr, 
-                              low_sun_num_word = low_sun_records$num_as_word,
                               low_sun_shortest_period = low_sun_records$shortest_period, 
                               low_sun_station_record_info = low_sun_records$station_record_info)
   } 
@@ -138,7 +132,6 @@ process_extreme_values <- function(param_short, bulletin) {
   # Initialize output parameters
   highest_rank <- NA
   count_hr <- NA
-  num_as_word <- NA
   shortest_period <- NA
   station_record_info <- NA
   
@@ -183,7 +176,6 @@ process_extreme_values <- function(param_short, bulletin) {
     
     # Get the count, stations, and values for the highest rank
     count_hr <- rank_summary[[as.character(highest_rank)]]
-    num_as_word <- num_to_word(count_hr, bulletin$language)
     stations_longseries <- stations_by_rank[[as.character(highest_rank)]]
     values_longseries <- values_by_rank[[as.character(highest_rank)]]
     
@@ -219,7 +211,6 @@ process_extreme_values <- function(param_short, bulletin) {
       rec_avail = rec_avail, 
       highest_rank = highest_rank,
       count_hr = count_hr,
-      num_as_word = num_as_word,
       shortest_period = shortest_period,
       station_record_info = station_record_info
     ))
@@ -264,7 +255,14 @@ comp_regdiff <- function(parameter, vals, regsort) {
     quac <- round(quac, digits=1)
     quac <- sprintf("%+.1f",quac)
   } else {
-    quac <- round(quac, digits=0)
+    quac_test <- round(quac/10, digits=0)*10
+    # use values rounded to the nearest 10 if these values are not equal
+    # for both quantiles, otherwise use values rounded to nearest integer
+    if (all(quac_test==quac_test[1])) {
+      quac <- round(quac, digits=0)
+    } else {
+      quac <- quac_test
+    }
   }
   
   # temperature difference with altitude
@@ -334,25 +332,4 @@ comp_regdiff <- function(parameter, vals, regsort) {
 clean_region_names <- function(regions) {
   regions <- sub(".*(Alpennordhang|Mittelland|Jura).*", "\\1", regions)
   return(regions)
-}
-
-num_to_word <- function(num, lang) {
-  words <- list(
-    de = c("einer", "zwei", "drei", "vier", "fünf", "sechs", 
-           "sieben", "acht", "neun", "zehn", "elf", "zwölf"),
-    fr = c("une", "deux", "trois", "quatre", "cinq", "six", 
-           "sept", "huit", "neuf", "dix", "onze", "douze"),
-    it = c("una", "due", "tre", "quattro", "cinque", "sei", 
-           "sette", "otto", "nove", "dieci", "undici", "dodici")
-  )
-  
-  if (!lang %in% names(words)) {
-    stop("Wrong language. Use 'de', 'fr' or 'it'.")
-  }
-  
-  if (num > 12) {
-    return(num)
-  } else {
-    return(words[[lang]][num])
-  }
 }
