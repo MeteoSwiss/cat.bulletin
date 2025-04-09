@@ -4,10 +4,15 @@
 \alias{assert_image_outpath}
 \title{Assert that a filepath to write to is writeable and absolut.}
 \usage{
-assert_image_outpath(outpath)
+assert_image_outpath(outpath = NULL)
 }
 \arguments{
-\item{outpath}{a single absolute filepath to write the output to. If only a filename is given, the output is written to \code{temdir()}.}
+\item{outpath}{a single absolute filepath to write the output to. 
+If only a filename is given, the output is written to \code{temdir()}. 
+If outpath is NULL, output will be set to a temporary file}
+}
+\value{
+an absolute path to write the image output
 }
 \description{
 Assert that a filepath to write to is writeable and absolut.

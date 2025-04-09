@@ -4,15 +4,30 @@
 \alias{join_images}
 \title{Joins two or more images in horizontal or vertical diretion}
 \usage{
-join_images(image_filepaths, outpath, direction = c("horizontal", "vertical"))
+join_images(
+  image_filepaths,
+  outpath = NULL,
+  direction = c("horizontal", "vertical")
+)
 }
 \arguments{
 \item{image_filepaths}{a vector of image source filepaths to join}
 
-\item{outpath}{a single absolute filepath to write the output to. If only a filename is given, the output is written to \code{temdir()}.}
+\item{outpath}{a single absolute filepath to write the output to. 
+If only a filename is given, the output is written to \code{temdir()}. 
+If outpath is NULL, output will be set to a temporary file}
 
 \item{direction}{direction of join, either 'horizontal' or 'vertical'.}
 }
+\value{
+the path to the output file
+}
 \description{
 Joins two or more images in horizontal or vertical diretion
+}
+\examples{
+outpath <- join_images(
+  image_filepaths = rep(system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"), 2),
+  direction = "horizontal"
+)
 }

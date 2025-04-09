@@ -6,7 +6,7 @@
 \usage{
 crop_image(
   image_filepath,
-  outpath,
+  outpath = NULL,
   side = c("top", "bottom", "left", "right"),
   margin
 )
@@ -14,8 +14,24 @@ crop_image(
 \arguments{
 \item{image_filepath}{an image source filepath}
 
-\item{outpath}{a single absolute filepath to write the output to. If only a filename is given, the output is written to \code{temdir()}.}
+\item{outpath}{a single absolute filepath to write the output to. 
+If only a filename is given, the output is written to \code{temdir()}. 
+If outpath is NULL, output will be set to a temporary file}
+
+\item{side, }{either "top", "bottom", "left", or "right".}
+
+\item{margin}{Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width/height. Use a string like "20%" for this.}
+}
+\value{
+the path to the output file
 }
 \description{
 Crop an image
+}
+\examples{
+outpath <- crop_image(
+  image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+  side = "top",
+  margin = "5\%"
+)
 }

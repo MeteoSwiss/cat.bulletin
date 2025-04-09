@@ -15,3 +15,8 @@ a named numeric vector with width and height of the image
 \description{
 Get width and heigth of an image
 }
+\examples{
+get_image_size(
+  image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+)
+}

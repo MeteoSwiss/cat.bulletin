@@ -75,7 +75,7 @@ image_to_xml <- function(xml, element, language) {
 #' @inheritParams assert_image_outpath
 #' @return the path to the output file
 #' @export
-#' @example 
+#' @examples
 #' outpath <- join_images(
 #'   image_filepaths = rep(system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"), 2),
 #'   direction = "horizontal"
@@ -114,7 +114,7 @@ join_images <- function(image_filepaths, outpath = NULL, direction = c("horizont
 #' @param image_filepath an image source filepath
 #' @return a named numeric vector with width and height of the image
 #' @export
-#' @example 
+#' @examples
 #' get_image_size(
 #'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
 #' )
@@ -148,7 +148,7 @@ get_image_size <- function(image_filepath) {
 #' @param margin Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width/height. Use a string like "20%" for this.
 #' @return the path to the output file
 #' @export
-#' @example 
+#' @examples
 #' outpath <- crop_image(
 #'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
 #'   side = "top",
