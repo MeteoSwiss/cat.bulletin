@@ -9,7 +9,7 @@ join_images(image_filepaths, outpath, direction = c("horizontal", "vertical"))
 \arguments{
 \item{image_filepaths}{a vector of image source filepaths to join}
 
-\item{outpath}{a single filepath to write the output}
+\item{outpath}{a single absolute filepath to write the output to. If only a filename is given, the output is written to \code{temdir()}.}
 
 \item{direction}{direction of join, either 'horizontal' or 'vertical'.}
 }

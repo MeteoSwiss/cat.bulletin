@@ -16,3 +16,22 @@ test_that("joining images", {
   )
   expect_snapshot_file(outpath)
 })
+
+test_that("get image size", {
+  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+  size <- get_image_size(filepath)
+  expect_equal(size, expected = c(width = 810, height = 560))
+})
+
+test_that("crop image", {
+  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+  margin <- 20
+  outpath <- crop_image(filepath, 
+                        outpath = tempfile(fileext = ".png"), 
+                        side = "top",
+                        margin = margin)
+  
+  size_in <- get_image_size(filepath)
+  size_out <- get_image_size(outpath)
+  expect_equal(size_out["height"], size_in["height"] - margin)
+})
