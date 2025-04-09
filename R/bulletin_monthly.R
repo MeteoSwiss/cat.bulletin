@@ -148,26 +148,25 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
-  # Add image for absolute temperatures
-  image_id <- "monatsbilanz_temp_map_abs"
-  filename_in <- paste0(image_id,".png")
+  # Create joined image for temperature (abs/anom)
+  image_id <- "monatsbilanz_temp_map"
+  joined_filename <- paste0(image_id,".png")
+  
+  abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_abs.png")
+  anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_anom.png")
+  
+  joined_filepath <- join_images(
+    image_filepaths = c(abs_filepath, anom_filepath),
+    outpath = joined_filename
+  )
   bulletin <- bulletin %>% 
     add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
+      filepath = joined_filepath,
+      caption = paste(glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
+                      glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom"))
+      ),
       id = image_id
     )
-  
-  # Add image for temperature anomalies
-  image_id <- "monatsbilanz_temp_map_anom"
-  filename_in <- paste0(image_id,".png")
-  bulletin <- bulletin %>% 
-    add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom")),
-      id = image_id
-    )
-  
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p2")
   
   ## Add table
