@@ -13,10 +13,15 @@ download_realization <- function(bulletin, product, filter, filename, out_path, 
     log_debug("out_path missing, setting to '", out_path, "'.")
   }
   
-  filepath <- file.path(out_path, filename)
-  if (file.exists(filepath)) {
-    log_info("File", filepath, "already exists. Skipping download.")
-    return(filepath)
+  # skip download if file already exists (only works if filename given)
+  if (is.null(filename)) {
+    log_debug("download_realization: Cannot check if file already exists because filename not given.")
+  } else {
+    filepath <- file.path(out_path, filename)
+    if (file.exists(filepath)) {
+      log_info("File", filepath, "already exists. Skipping download.")
+      return(filepath)
+    }
   }
   
   retry(cat.func::download_realization(
@@ -31,12 +36,13 @@ filter_to_string <- function(filter) {
   paste(names(filter), filter, sep="=", collapse = ",")
 }
 
-# https://service.meteoswiss.ch/productbrowser/authenticated/productDisplay/climate-maps-monthly-prelim
+# @param ...: arguments forwarded to download_realization
 download_monatsbilanz_maps <- function(bulletin,
                                        filename = NULL,
                                        valueBase = c("abs", "anom9120"),
                                        provisional = FALSE,
-                                       parameter = c("temp", "prec", "sunshine")) {
+                                       parameter = c("temp", "prec", "sunshine"),
+                                       ...) {
   
   valueBase = match.arg(valueBase)
   parameter = match.arg(parameter)
@@ -68,7 +74,8 @@ download_monatsbilanz_maps <- function(bulletin,
     bulletin = bulletin,
     product = attributevalues$productName,
     filter = attributevalues,
-    filename = filename
+    filename = filename,
+    ...
   )
   
 }

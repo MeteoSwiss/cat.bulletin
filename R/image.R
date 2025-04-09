@@ -68,3 +68,49 @@ image_to_xml <- function(xml, element, language) {
   xml2::xml_set_attr(image_node, "hasLightbox", "true") 
   image_node
 }
+
+#' Joins two or more images in horizontal or vertical diretion
+#' @param image_filepaths a vector of image source filepaths to join
+#' @param outpath a single absolute filepath to write the output to. If only a filename is given, the output is written to \code{temdir()}.
+#' @param direction direction of join, either 'horizontal' or 'vertical'.
+#' @export
+join_images <- function(image_filepaths, outpath, direction = c("horizontal", "vertical")) {
+  direction = match.arg(direction)
+  
+  assert_that(all(sapply(image_filepaths, is.readable)))
+  assert_that(is.string(outpath))
+  if (!startsWith(outpath, "/")) {
+    log_debug("outpath'", outpath, "'does not seem to be an absolute path.")
+    if (length(grep("/", outpath)) > 0)
+      stop("join_images: outpath must be absolute path or filename only")
+    # seems to be a single filename -> adding tempdir
+    outpath <- file.path(tempdir(), outpath)
+    log_debug("join_images: adding tempdir to outpath: ", outpath)
+  }
+  assert_that(
+              is.writeable(dirname(outpath)), 
+              msg = "outpath not valid or not writeable"
+  )
+  
+  convert_args <- paste0(
+    switch(direction, 
+           horizontal = "+",
+           vertical = "-"
+    ),
+    "append ",
+    paste(image_filepaths, collapse = " "),
+    " ", 
+    outpath
+  )
+  log_debug("Calling convert to join images with arguments: '", convert_args, "'.")
+  tryCatch({
+    system2("convert", convert_args)
+    assert_that(is.readable(outpath), msg = "join images: output was not generated")
+  },
+  error = function(e) {
+    stop("Error during join of images.")
+  }
+  )
+  
+  outpath
+}
