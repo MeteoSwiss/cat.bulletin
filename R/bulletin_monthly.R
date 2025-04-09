@@ -558,3 +558,31 @@ num_to_word <- function(num, lang) {
     return(words[[lang]][num])
   }
 }
+
+translate_record_text <- function(text, language = c("fr", "it")) {
+  language <- match.arg(language)
+  
+  # Define translations
+  translations <- list(
+    fr = list(
+      and_word = "et",
+      record_phrase = "record précédent "
+    ),
+    it = list(
+      and_word = "e",
+      record_phrase = "record precedente"
+    )
+  )
+  
+  tr <- translations[[language]]
+  
+  # Replace " und " with translated "and"
+  text <- gsub("\\bund\\b", tr$and_word, text)
+  
+  # Replace "bisheriger Rekord" or just "Rekord"
+  # Make sure to only replace "Rekord" if not already matched as "bisheriger Rekord"
+  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase, text)
+  text <- gsub("\\bRekord\\b", tr$record_phrase, text)
+  
+  return(text)
+}
