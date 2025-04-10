@@ -181,7 +181,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   print(temp_table)
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
-              caption = paste("Die Caption funktioniert noch nicht:",language))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")))
   
   bulletin
 }
@@ -251,7 +251,7 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   print(prec_table)
   bulletin <- bulletin %>%
     add_table(prec_table, id = "monatsbilanz_prec_table",
-              caption = paste("Die Prec-table-Caption funktioniert noch nicht:",language))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
   
   bulletin
 }
@@ -302,8 +302,8 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
-              caption = paste("Die sun-table-Caption funktioniert noch nicht:",language))
-  
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
+
   bulletin  
 }
 
