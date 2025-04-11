@@ -4,10 +4,12 @@
 \alias{log_debug}
 \title{add a log message at the debug level}
 \usage{
-log_debug(...)
+log_debug(..., style = "none")
 }
 \arguments{
 \item{...}{elements of the log message, passed on to \code{paste}}
+
+\item{style}{optional styling information for message}
 }
 \description{
 add a log message at the debug level

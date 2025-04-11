@@ -5,7 +5,11 @@
 #' @export
 bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
 
+  log_info("Starting the webzip build process for bulletin ", bulletin$bulletin_id, style = "h2")
+  
   publication <- empty_multi_language_string(languages = bulletin$languages)
+  
+  log_info("... webzip build process: generating pdfs for all languages", style = "h3")
   
   # generate all pdfs
   for (language in bulletin$languages) {
@@ -21,6 +25,8 @@ bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
 
   bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   
+  log_info("... webzip build process: creating zip file", style = "h3")
+  
   withr::with_dir(new = file.path(bulletin$bulletin_path),
                   code = utils::zip(zipfile = zipfilename, 
                                     files = c("publication.xml",
@@ -30,5 +36,8 @@ bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
                                     )
                   )
   )
+  
+  log_info("Webzip for bulletin '", bulletin$bulletin_id, "' written to", zipfilename, ".", style = "success")
+  
   filename
 }

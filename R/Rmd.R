@@ -22,7 +22,11 @@ add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_i
 Rmd_to_markdown_file <- function(element) {
   tmpfile <- tempfile(fileext = ".md")
   tryCatch({
-    knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]])
+    quiet = get_log_level() < 2 # be verbose on debug level
+    knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]], quiet = quiet)
+  },
+  warning = function(w) {
+    log_debug("Warning from knitr::knit in function Rmd_to_markdown_file:", w$message)
   },
   error = function(e)
     warning(paste("Could not knit Rmd file", element[["Rmd_file"]], "to markdown."))

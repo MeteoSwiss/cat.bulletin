@@ -14,17 +14,27 @@ bulletin_to_pdf <- function(bulletin,
 ) {
   #documentation: https://bookdown.org/yihui/rmarkdown/pdf-document.html
   
-  log_debug("Processing bulletin for language", language, "to pdf via markdown...")
+  log_info("Processing bulletin for language", language, "to pdf via markdown...")
   #cat.report::load.cat.report()
   
   markdown_file = bulletin_to_markdown(bulletin, language = language)
   log_debug("Processing file", markdown_file, "to pdf.")
   log_debug("Expected pdf-file:", filename)
-  rmarkdown::render(markdown_file, 
-                    envir = bulletin$bulletin_envir, 
-                    # output_format = "pdf_document", 
-                    output_file = filename, 
-                    clean = FALSE)
+  
+  quiet = get_log_level() < 2 # be verbose on debug level
+  tryCatch(
+    rmarkdown::render(markdown_file, 
+                      envir = bulletin$bulletin_envir, 
+                      # output_format = "pdf_document", 
+                      output_file = filename, 
+                      quiet = quiet,
+                      clean = FALSE),
+    warning = function(w) {
+      log_debug("Latex warning in bulletin_to_pdf:", w$message)
+    }
+  )
+  log_info("PDF produced for language", language, ".", style = "success")
+  return(filename)
 }
 
 
@@ -131,9 +141,9 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
     %\\headercenter{center header}
     %\\headerright{right header}
     ",
-                #language for header picture
-                paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
-                "% show the MeteoSwiss logo on the first page
+    #language for header picture
+    paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
+    "% show the MeteoSwiss logo on the first page
     \\thispagestyle{frontpage}",
     "```"
   )

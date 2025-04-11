@@ -4,10 +4,12 @@
 \alias{log_info}
 \title{add a log message at the information level}
 \usage{
-log_info(...)
+log_info(..., style = "none")
 }
 \arguments{
 \item{...}{elements of the log message, passed on to \code{paste}}
+
+\item{style}{optional styling information for message}
 }
 \description{
 add a log message at the information level

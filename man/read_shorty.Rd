@@ -14,10 +14,10 @@ Read a shorty from given filepath
 }
 \details{
 A shorty file is a text file with two or three lines.
-\itemize{
- \item{"line 1"}{Title}
- \item{"line 2"}{Content}
- \item{"optional line 3"}{Link (\url{https://...})} 
+\describe{
+ \item{line 1:}{Title}
+ \item{line 2:}{Content}
+ \item{optional line 3:}{(\url{https://...})} 
 }
 }
 \keyword{internal}

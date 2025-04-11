@@ -20,7 +20,7 @@ If outpath is NULL, output will be set to a temporary file}
 
 \item{side, }{either "top", "bottom", "left", or "right".}
 
-\item{margin}{Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width/height. Use a string like "20%" for this.}
+\item{margin}{Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width resp. height. Use a string like "20\%" for this.}
 }
 \value{
 the path to the output file
@@ -30,7 +30,7 @@ Crop an image
 }
 \examples{
 outpath <- crop_image(
-  image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+  image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"),
   side = "top",
   margin = "5\%"
 )

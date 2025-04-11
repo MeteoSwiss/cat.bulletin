@@ -19,6 +19,10 @@ create_bulletin_monthly <- function(year = 2024,
     provisional <- get_bulletin_monthly_provisional(year = year, month = month)
   assert_that(is.logical(provisional) && length(provisional) == 1)
   
+  log_info("Creating bulletin monthly for year =", year, "and month = ", month,".", style = "h1")
+  log_debug("Provisional:", provisional, "; workdir:", workdir)
+  
+  
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               bulletin_dir = "climate-bulletin-monthly",
                               workdir = workdir,
@@ -34,6 +38,8 @@ create_bulletin_monthly <- function(year = 2024,
   regdiff <- calculate_regional_differences(bulletin)
   
   for (language in bulletin[["languages"]]) {
+    log_info("Adding bulletin elements for language", language, style = "h2")
+    
     bulletin <- bulletin %>% set_active_language(language = language)
     
     # add lead (add default if no Rmd element exists)
@@ -54,6 +60,8 @@ create_bulletin_monthly <- function(year = 2024,
     #monatsbulletin_daily_timeseries(language = language)
   }
   
+  log_info("Creating publication metadata", style = "h2")
+  
   metadata <- monatsbulletin_metadata(bulletin = bulletin,
                                       lead_element_id = "leadtext",
                                       swissmean = swissmean,
@@ -64,10 +72,12 @@ create_bulletin_monthly <- function(year = 2024,
     set_metadata(metadata) 
   
   zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
-                       "-", format(Sys.time(), format = "%Y%m%d%H%M"))
+                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
+                       ".zip")
   
   bulletin_to_webzip(bulletin, zipfilename = zipfilename)
-  log_info("Webzip for monthly bulletin written to", zipfilename, ".")
+  
+  log_info("Finished creating bulletin monthly for year =", year, "and month = ", month, ".", style = "success")
   
   invisible(bulletin)
 }

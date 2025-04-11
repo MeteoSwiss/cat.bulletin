@@ -126,10 +126,10 @@ read_shorties <- function(group_id, language, path, subdir = NULL) {
 #' @param filepath Path to the file that contains the short content.
 #' @details 
 #' A shorty file is a text file with two or three lines.
-#' \itemize{
-#'  \item{"line 1"}{Title}
-#'  \item{"line 2"}{Content}
-#'  \item{"optional line 3"}{Link (\url{https://...})} 
+#' \describe{
+#'  \item{line 1:}{Title}
+#'  \item{line 2:}{Content}
+#'  \item{optional line 3:}{(\url{https://...})} 
 #' }
 #' @keywords internal
 read_shorty <- function(filepath) {
