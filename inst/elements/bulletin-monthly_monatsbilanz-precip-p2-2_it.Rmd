@@ -5,9 +5,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r echo=FALSE, results="hide"}
 # Determine singular or plural form
-station_word <- ifelse(regdiff$low_prec_count_hr == 1, "Messstation", "Messstationen")
+station_word <- ifelse(regdiff$low_prec_count_hr == 1, "stazione", "stazioni")
+rank_it <- ifelse(regdiff$low_prec_highest_rank == 1, "", paste0(regdiff$low_prec_highest_rank,"° "))
+num_word <- num_to_word(regdiff$low_prec_count_hr, "it")
+record_list <- translate_record_text(regdiff$low_prec_station_record_info, "it")
 ```
 
 
-`r ifelse(regdiff$low_prec_count_hr <= 5, glue::glue("Die Monatssumme des Niederschlags im {month_str(bulletin$month)} {bulletin$year} erreichte an {regdiff$low_prec_num_word} {station_word} mit Daten seit über {regdiff$low_prec_shortest_period} Jahren den {regdiff$low_prec_highest_rank}. Rang der niederschlagsärmsten {month_str(bulletin$month)}monate: {regdiff$low_prec_station_record_info}."), glue::glue("Die Monatssumme des Niederschlags im {month_str(bulletin$month)} {bulletin$year} erreichte an {regdiff$low_prec_num_word} {station_word} mit Daten seit über {regdiff$low_prec_shortest_period} Jahren den {regdiff$low_prec_highest_rank}. Rang der niederschlagsärmsten {month_str(bulletin$month)}monate."))``r ifelse(bulletin$provisional & regdiff$low_prec_count_hr==1, " Das ist ein vorläufiger Rekordwert. Der Messwert, der Rang und die Anzahl der Stationen mit Rekorden kann bis zum Monatsende noch ändern.", "")``r ifelse(bulletin$provisional & regdiff$low_prec_count_hr>1, " Das sind vorläufige Rekordwerte. Die Messwerte, die Ränge und die Anzahl der Stationen mit Rekorden können bis zum Monatsende noch ändern.", "")`
+`r ifelse(regdiff$low_prec_count_hr <= 5, glue::glue("Il totale mensile delle precipitazioni in {tolower(month_str(bulletin$month))} {bulletin$year} è risultato in {num_word} {station_word} di rilevamento con dati da oltredi rilevamento con dati da oltre {regdiff$low_prec_shortest_period} anni il {rank_it}più basso per {tolower(month_str(bulletin$month))}: {record_list}."), glue::glue("Il totale mensile delle precipitazioni in {tolower(month_str(bulletin$month))} {bulletin$year} è risultato in {num_word} {station_word} di rilevamento con dati da oltredi rilevamento con dati da oltre {regdiff$low_prec_shortest_period} anni il {rank_it}più basso per {tolower(month_str(bulletin$month))}."))``r ifelse(bulletin$provisional & regdiff$low_prec_count_hr==1, " Si tratta di un record provvisorio. Il valore misurato, la posizione in classifica e il numero di stazioni con record possono ancora cambiare fino alla fine del mese.", "")``r ifelse(bulletin$provisional & regdiff$low_prec_count_hr>1, " Questi sono valori record provvisori. I valori misurati, le posizioni in classifica e il numero di stazioni con record possono ancora cambiare fino alla fine del mese.", "")`
 

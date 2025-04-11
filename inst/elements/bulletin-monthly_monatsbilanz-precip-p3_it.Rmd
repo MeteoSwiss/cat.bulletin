@@ -5,5 +5,5 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-Die folgende Tabelle zeigt die Monatsniederschlagssummen und deren Abweichung zur Referenzperiode an ausgewählten Stationen im Messnetz von MeteoSchweiz.
+La tabella seguente mostra i totali mensili delle precipitazioni e la loro deviazione rispetto al periodo di riferimento in stazioni selezionate della rete di misurazione di MeteoSvizzera.
 

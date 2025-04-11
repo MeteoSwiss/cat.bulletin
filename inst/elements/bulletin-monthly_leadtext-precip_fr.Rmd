@@ -1,0 +1,18 @@
+``` {r echo=FALSE, results = "hide"}
+all_prec_devs_above_norm <- all(regdiff$allvalues_P > 105)
+all_prec_devs_below_norm <- all(regdiff$allvalues_P < 95)
+all_prec_devs_normal <- all(regdiff$allvalues_P <= 105) & all(regdiff$allvalues_P >= 95)
+most_prec_devs_above_norm <- regdiff$anteil_ueber_P > 0.7 & regdiff$anteil_ueber_P < 1
+most_prec_devs_below_norm <- regdiff$anteil_unter_P > 0.7 & regdiff$anteil_unter_P < 1
+most_prec_devs_normal <- regdiff$anteil_bereich_P > 0.7 & regdiff$anteil_bereich_P < 1
+
+qr_low <- round(quantile(regdiff$allvalues_P,probs=0.2)/10, digits=0)*10
+qr_high <- round(quantile(regdiff$allvalues_P,probs=0.8)/10, digits=0)*10
+
+moment01 <- ifelse(bulletin$provisional, "Jusqu'à hier, ", "") 
+L <- ifelse(bulletin$provisional, "l", "L") 
+moment02 <- ifelse(bulletin$provisional, "jusqu'à peu de temps avant la fin du mois ", "")
+moncap <- ifelse(bulletin$provisional, tolower(month_str(bulletin$month)), month_str(bulletin$month))
+```
+
+`r ifelse(all_prec_devs_above_norm, glue::glue("Les précipitations mensuelles en {tolower(month_str(bulletin$month))} {bulletin$year} ont été supérieures à la moyenne dans toute la Suisse."), "")``r ifelse(all_prec_devs_below_norm, glue::glue("{moment01}{moncap} {bulletin$year} a connu des précipitations inférieures à la moyenne dans toute la Suisse."), "")``r ifelse(all_prec_devs_normal, glue::glue("{moment01}{L}es précipitations en {tolower(month_str(bulletin$month))} {bulletin$year} ont été dans la moyenne de la période de référence 1991-2020 pour l'ensemble de la Suisse."), "")``r ifelse(most_prec_devs_above_norm, glue::glue("Les précipitations mensuelles en {tolower(month_str(bulletin$month))} {bulletin$year} ont souvent été excédentaires."), "")``r ifelse(most_prec_devs_below_norm, glue::glue("{moment01}{moncap} {bulletin$year} a connu des précipitations souvent déficitaires."), "")``r ifelse(most_prec_devs_normal, glue::glue("{moment01}{L}es précipitations en {tolower(month_str(bulletin$month))} {bulletin$year} ont souvent été dans la moyenne de la période de référence 1991-2020."), "")` `r ifelse(qr_low <= 50, glue::glue("Régionalement, on a enregistré {moment02}moins de {qr_low} % des précipitations moyennes en {tolower(month_str(bulletin$month))}."), "")``r ifelse(qr_high >= 150, glue::glue("Dans certaines régions, les précipitations survenues, {moment02}ont représenté plus de {qr_high} % de la période de référence."), "")`

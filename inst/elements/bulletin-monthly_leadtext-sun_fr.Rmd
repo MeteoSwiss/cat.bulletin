@@ -1,0 +1,23 @@
+``` {r echo=FALSE, results = "hide"}
+all_sun_devs_above_norm <- all(regdiff$allvalues_S > 105)
+all_sun_devs_below_norm <- all(regdiff$allvalues_S < 95)
+all_sun_devs_normal <- all(regdiff$allvalues_S <= 105) & all(regdiff$allvalues_S >= 95)
+most_sun_devs_above_norm <- regdiff$anteil_ueber_S > 0.7 & regdiff$anteil_ueber_S < 1
+most_sun_devs_below_norm <- regdiff$anteil_unter_S > 0.7 & regdiff$anteil_unter_S < 1
+most_sun_devs_normal <- regdiff$anteil_bereich_S > 0.7 & regdiff$anteil_bereich_S < 1
+
+qr_low <- round(quantile(regdiff$allvalues_S,probs=0.2)/10, digits=0)*10
+qr_high <- round(quantile(regdiff$allvalues_S,probs=0.8)/10, digits=0)*10
+
+moment01 <- ifelse(bulletin$provisional, "Jusqu'à hier, ", "")
+L <- ifelse(bulletin$provisional, "l", "L")
+M <- ifelse(bulletin$provisional, "m", "M")
+D <- ifelse(bulletin$provisional, "d", "D")
+moment02 <- ifelse(bulletin$provisional, "Jusque peu avant la fin du mois, ", "")
+moncap <- ifelse(bulletin$provisional, tolower(month_str(bulletin$month)), month_str(bulletin$month))
+```
+
+
+`r ifelse(all_sun_devs_above_norm, glue::glue("L'ensoleillement en {tolower(month_str(bulletin$month))} {bulletin$year} s'est montré excédentaire dans tout le pays."), "")``r ifelse(all_sun_devs_below_norm, glue::glue("{moment01}{moncap} {bulletin$year} a été moins ensoleillé en Suisse que pendant la période de référence 1991-2020."), "")``r ifelse(all_sun_devs_normal, glue::glue("{moment01}{L}'ensoleillement en {tolower(month_str(bulletin$month))} {bulletin$year} s'est situé dans tout le pays autour de la période de référence 1991-2020."), "")``r ifelse(most_sun_devs_above_norm, glue::glue("L'ensoleillement en {tolower(month_str(bulletin$month))} {bulletin$year} a été supérieur à la moyenne pluriannuelle."), "")``r ifelse(most_sun_devs_below_norm, glue::glue("{moment01}{moncap} {bulletin$year} a connu un ensoleillement souvent déficitaire."), "")``r ifelse(most_sun_devs_normal, glue::glue("{moment01}{L}'ensoleillement en {tolower(month_str(bulletin$month))} {bulletin$year} a souvent été conforme à la moyenne de la période de référence 1991-2020."), "")` `r ifelse(qr_low <= 50, glue::glue("{moment02}{M}oins de {qr_low} % de l'ensoleillement moyen a régionalement été mesuré en {tolower(month_str(bulletin$month))}."), "")``r ifelse(qr_high >= 130, glue::glue("{moment02}{D}ans certains endroits, il y a eu plus de {qr_high} % d'ensoleillement par rapport à la période de référence."), "")`
+
+

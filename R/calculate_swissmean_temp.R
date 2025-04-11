@@ -96,6 +96,7 @@ calculate_swissmean_temp <- function (bulletin) {
     y_since_preind = ydiff_ca, loess_bounds1 = bounds1,
     loess_bounds2 = bounds2
   )
+  
   if (bulletin$provisional) {
     swissmean_temp <- c(swissmean_temp, list(
                         abs_uncertainty = abs_uncertainty, rank_uncertainty = rank_uncertainty,

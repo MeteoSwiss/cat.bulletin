@@ -1,0 +1,14 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Helper function to render child Rmds as inline text
+render_child <- function(file) {
+  text <- knitr::knit_child(file, quiet = TRUE)
+  gsub("\n", " ", text) # Remove unwanted newlines
+}
+```
+
+`r paste0(render_child("bulletin-monthly_leadtext-temp_it.Rmd"), " ", render_child("bulletin-monthly_leadtext-precip_it.Rmd"), " ", render_child("bulletin-monthly_leadtext-sun_it.Rmd"))`
+

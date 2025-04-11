@@ -47,6 +47,7 @@ create_bulletin_monthly <- function(year = 2024,
     # add sections
     bulletin <- bulletin %>%
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
+      temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
       monatsbilanz_sun(regdiff = regdiff, language = language)
     #monatsbulletin_daily_timeseries(language = language)
@@ -109,7 +110,11 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     )
     
     for (lang in names(title)) {
-      title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))
+      if (lang == "fr") {
+        title[lang] <- paste(title[lang], tolower(month_str(bulletin$month, language = lang)))  
+      } else {
+        title[lang] <- paste(title[lang], month_str(bulletin$month, language = lang))  
+      }
       title[lang] <- paste(title[lang], bulletin$year)
     }
     
@@ -141,11 +146,6 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("monatsbilanz_temp")
   
-  # bulletin <- bulletin %>% set_active_language(language = language)
-  # if (bulletin$language != "de"){
-  #   month <- sapply(month_str(bulletin$month),add_article)
-  #   month <- as.character(month)
-  # }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
   # Add image for absolute temperatures
@@ -181,7 +181,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   print(temp_table)
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
-              caption = paste("Die Caption funktioniert noch nicht:",language))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")))
   
   bulletin
 }
@@ -239,8 +239,20 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
     bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p2-2")
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p3")
-  # 
-  # bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_P)
+  
+  ## Add table
+  prec_table <- regdiff$subset_climtab_P
+  colnames(prec_table) <- c(cat.lang::get.text("climtab_stat"),
+                            cat.lang::get.text("climtab_altitude"),
+                            cat.lang::get.text("climtab_prec_mean"),
+                            cat.lang::get.text("climtab_prec_ref"),
+                            cat.lang::get.text("climtab_prec_dev")
+  )
+  print(prec_table)
+  bulletin <- bulletin %>%
+    add_table(prec_table, id = "monatsbilanz_prec_table",
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
+  
   bulletin
 }
 
@@ -279,11 +291,23 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   }
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p3")
   
-  #  bulletin <- bulletin %>% add_flextable(flextable = regdiff$subset_climtab_S)
+  ## Add table
+  sun_table <- regdiff$subset_climtab_S
+  colnames(sun_table) <- c(cat.lang::get.text("climtab_stat"),
+                            cat.lang::get.text("climtab_altitude"),
+                            cat.lang::get.text("climtab_sun_mean"),
+                            cat.lang::get.text("climtab_sun_ref"),
+                            cat.lang::get.text("climtab_sun_dev")
+  )
+  print(sun_table)
+  bulletin <- bulletin %>%
+    add_table(sun_table, id = "monatsbilanz_sun_table",
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
+
   bulletin  
 }
 
-temporal_evolution <- function(bulletin, swissmean, regdiff) {
+temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("temporal_evolution")
   
@@ -334,13 +358,16 @@ monatsbulletin_disclaimer <- function(bulletin) {
 }
 
 # further helping functions
-add_article <- function(word) {
-  # Check if the word starts with a vowel (a, e, i, o, u, y)
-  if (grepl("^[ae\u00E9\u00E8iouyAE\u00C9\u00C8IOUY]", word)) {
-    return(paste0("d'", tolower(word)))
+add_article <- function(word, lang = "fr", to_lower = TRUE) {
+  # Check if the word starts with a vowel (h, a, e, i, o, u, y)
+  if (grepl("^[haeéèiouyAEÉÈIOUYH]", word)) {
+    article <- "d'"
   } else {
-    return(paste0("de ", tolower(word)))
+    article <- ifelse(lang == "fr", "de ", "di ")
   }
+  
+  transformed_word <- if (to_lower) tolower(word) else word
+  return(paste0(article, transformed_word))
 }
 
 ordinal_number <- function(number, gender, language) {
@@ -453,4 +480,109 @@ month_str <- function(month, language) {
 nextmonth_str <- function(month, language) {
   cat.func::assert.integer(month, length = 1, minimum = 1, maximum = 12, name = "month")
   month_str(ifelse(month == 12, 1, month + 1), language = language)
+}
+
+translate_regions <- function(text, lang = "fr") {
+  dict_fr <- list(
+    "Alpennordhang" = "le versant nord des Alpes",
+    "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
+    "Jura" = "le Jura",
+    "Alpensüdseite" = "le Sud des Alpes",
+    "Mittelland" = "le Plateau",
+    "Wallis" = "le Valais",
+    "Engadin" = "l'Engadine"
+  )
+  
+  dict_it <- list(
+    "Alpennordhang" = "nel Pendio nordalpino",
+    "Nord- und Mittelbünden" = "al nord e nel centro dei Grigioni",
+    "Jura" = "nel Giura",
+    "Alpensüdseite" = "al Sud delle Alpi",
+    "Mittelland" = "nell'Altopiano",
+    "Wallis" = "nel Vallese",
+    "Engadin" = "nell'Engadina"
+  )
+  
+  dict <- switch(lang,
+                 "fr" = dict_fr,
+                 "it" = dict_it,
+                 stop("Ungültige Sprache. Verwenden Sie 'fr' oder 'it'."))
+  
+  pattern <- paste(names(dict), collapse = "|")  # Erzeuge Regex-Muster für alle Regionen
+  matches <- unlist(regmatches(text, gregexpr(pattern, text, perl = TRUE)))  # Finde passende Regionen
+  
+  translated_parts <- unname(sapply(matches, function(x) dict[[x]]))
+  
+  conjunction <- ifelse(lang == "fr", "et", "e")
+  
+  if (length(translated_parts) > 1) {
+    paste(paste(translated_parts[-length(translated_parts)], collapse = ", "), conjunction, translated_parts[length(translated_parts)])
+  } else {
+    translated_parts
+  }
+}
+
+translate_stations <- function(input_string, lang, use_art = FALSE) {
+  conjunction <- ifelse(lang == "fr", "et", "e")
+  
+  stations <- unlist(strsplit(input_string, " und "))
+  
+  if (use_art) {
+    translated_stations <- sapply(stations, add_article, lang = lang, to_lower = FALSE)
+  } else {
+    translated_stations <- stations
+  }
+  
+  result <- paste(translated_stations, collapse = paste0(" ", conjunction, " "))
+  
+  return(result)
+}
+
+num_to_word <- function(num, lang) {
+  words <- list(
+    de = c("einer", "zwei", "drei", "vier", "fünf", "sechs", 
+           "sieben", "acht", "neun", "zehn", "elf", "zwölf"),
+    fr = c("une", "deux", "trois", "quatre", "cinq", "six", 
+           "sept", "huit", "neuf", "dix", "onze", "douze"),
+    it = c("una", "due", "tre", "quattro", "cinque", "sei", 
+           "sette", "otto", "nove", "dieci", "undici", "dodici")
+  )
+  
+  if (!lang %in% names(words)) {
+    stop("Wrong language. Use 'de', 'fr' or 'it'.")
+  }
+  
+  if (num > 12) {
+    return(num)
+  } else {
+    return(words[[lang]][num])
+  }
+}
+
+translate_record_text <- function(text, language = c("fr", "it")) {
+  language <- match.arg(language)
+  
+  # Define translations
+  translations <- list(
+    fr = list(
+      and_word = "et",
+      record_phrase = "record précédent "
+    ),
+    it = list(
+      and_word = "e",
+      record_phrase = "record precedente"
+    )
+  )
+  
+  tr <- translations[[language]]
+  
+  # Replace " und " with translated "and"
+  text <- gsub("\\bund\\b", tr$and_word, text)
+  
+  # Replace "bisheriger Rekord" or just "Rekord"
+  # Make sure to only replace "Rekord" if not already matched as "bisheriger Rekord"
+  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase, text)
+  text <- gsub("\\bRekord\\b", tr$record_phrase, text)
+  
+  return(text)
 }

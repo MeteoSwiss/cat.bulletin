@@ -1,0 +1,14 @@
+``` {r echo=FALSE, results = "hide"}
+moment01 <- ifelse(bulletin$provisional, "juste avant la fin du mois ", "")
+abw_lwt <- format(abs(as.numeric(swissmean$curr_temp_dev)),nsmall=1)
+
+sm_gt0 <- as.numeric(swissmean$curr_temp_dev) > 0
+sm_eq0 <- as.numeric(swissmean$curr_temp_dev) == 0
+sm_lt0 <- as.numeric(swissmean$curr_temp_dev) < 0
+
+ordnum_rank <- ifelse(swissmean$curr_rank == 1, "er", "e")
+```
+
+
+`r ifelse(sm_gt0, glue::glue("La température moyenne suisse en {tolower(month_str(bulletin$month))} {bulletin$year} a été de {abw_lwt} °C au-dessus de la période de référence 1991-2020 et a donc atteint {moment01}le {swissmean$curr_rank}{ordnum_rank} rang depuis le début des mesures en 1864."), "")``r ifelse(sm_lt0, glue::glue("La température moyenne suisse en {tolower(month_str(bulletin$month))} {bulletin$year} a été de {abw_lwt} °C en dessous de la période de référence 1991-2020 et a donc atteint {moment01}le {swissmean$curr_rank}{ordnum_rank} rang depuis le début des mesures en 1864."), "")``r ifelse(sm_eq0, glue::glue("La température moyenne suisse en {tolower(month_str(bulletin$month))} {bulletin$year} a atteint {moment01}{swissmean$curr_temp} °C, ce qui correspond exactement à la période de référence 1991-2020 et au {swissmean$curr_rank}{ordnum_rank} rang."), "")`
+
