@@ -14,6 +14,23 @@ add_shorties_list(
   appear = c("xml", "pdf")
 )
 }
+\arguments{
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+
+\item{group_id}{The string that identifies the group of shorties in the directory given.}
+
+\item{title}{The text to be used as title for the group of shorties in the pdf and xml.}
+
+\item{path}{The base directory from where to read the shorties text files.}
+
+\item{subdir}{An optional string giving a subdirectory within the base directory to look for the shorties text files.}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
+}
 \description{
 A shorty is a text element with title, text and optional link. The content is read from a file 
 (see \code{\link{read_shorties}} and \code{\link{read_shorty}}).
@@ -21,3 +38,10 @@ A group or list of shorties is rendered together in a text section that has a ti
 The group is identified by a group_id which serves to identify the shorty files that belong to the group.
 If there are several language versions for a shorty (i.e., same group and id), the version of the current language is shown in both markdown and xml.
 }
+\seealso{
+Bulletin elements
+\code{\link{add_flextable}()},
+\code{\link{add_table}()},
+\code{\link{add_text}()}
+}
+\concept{bulletin_elements}

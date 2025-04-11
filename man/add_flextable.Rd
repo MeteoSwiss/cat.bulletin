@@ -7,11 +7,11 @@
 add_flextable(bulletin, flextable, caption = NULL)
 }
 \arguments{
-\item{bulletin}{the bulletin object to which to append the image element}
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{flextable}{a flextable object created with the \code{flextable} package.}
 
-\item{caption}{image caption in the bulletin}
+\item{caption}{table caption}
 }
 \description{
 The \code{flextable} package for supporting tables.
@@ -22,3 +22,10 @@ myTable <- flextable::flextable(myData)
 bulletin <- create_bulletin()
 bulletin <- add_flextable(bulletin, flextable = myTable, caption = "An example table.")
 }
+\seealso{
+Bulletin elements
+\code{\link{add_shorties_list}()},
+\code{\link{add_table}()},
+\code{\link{add_text}()}
+}
+\concept{bulletin_elements}

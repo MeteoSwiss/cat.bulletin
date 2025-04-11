@@ -15,8 +15,11 @@ get_flextable <- function(flextable_element) {
 #' Add a flextable to a bulletin
 #' 
 #' The \code{flextable} package for supporting tables.
-#' @inheritParams add_image
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
+#' @param caption table caption
 #' @param flextable a flextable object created with the \code{flextable} package.
+#' @family bulletin_elements
 #' @examples
 #' myData <- data.frame(a = 3, b = 4)
 #' myTable <- flextable::flextable(myData) 

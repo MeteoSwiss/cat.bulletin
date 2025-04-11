@@ -1,4 +1,9 @@
-
+#' Create the xml document needed for publication on the MeteoSwiss Website
+#' @param filename The filename to store the xml document.
+#' @inheritParams bulletin_to_pdf
+#' @details 
+#' The interface to the MeteoSwiss Website is documented in the Quatico Confluence on \url{https://quatico.atlassian.net/wiki/x/AwC6G}.
+#' @family rendering
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
@@ -109,9 +114,9 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   xml
 }
 
-#' set attribute of xml node
-#' if languages is set to a (set of) language identifier, the languaged version of the attributes are set. 
-#' If the attribute is not multilanguage, and error is thrown.
+# set attribute of xml node
+# if languages is set to a (set of) language identifier, the languaged version of the attributes are set. 
+# If the attribute is not multilanguage, and error is thrown.
 xml_set_attribute <- function(xml, attribute, value, languages = NULL) {
   
   if (is.null(value)) {

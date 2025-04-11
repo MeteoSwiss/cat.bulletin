@@ -4,7 +4,11 @@ text_element <- function(text, appear = NULL, id = NULL) {
   text_element
 }
 
-#' add text to a bulletin
+#' Add text to a bulletin
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
+#' @param text The text to be added to the bulletin.
+#' @family bulletin_elements
 #' @export
 add_text <- function(bulletin, text, id = NULL, appear = c("xml", "pdf")) {
   set_element(bulletin, text_element(text, id = id, appear = appear))

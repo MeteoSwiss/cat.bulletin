@@ -1,4 +1,8 @@
 #' Create a test bulletin publication zip file for the website
+#' @inheritParams bulletin_to_webzip
+#' @inheritParams create_bulletin
+#' @inheritParams publication_metadata
+#' @param sections A subset of example sections to process. For faster processing, only a subset of elements can be processed.
 #' @export
 create_test_bulletin_for_web <- function(workdir = tempdir(),
                                          bulletin_dir = "bulletin",

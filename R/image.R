@@ -13,13 +13,15 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' add an image with caption to a bulletin
 #' 
 #' copies the image from the filepath to the bulletin directory and adds an image element
-#' @param bulletin the bulletin object to which to append the image element
 #' @param filepath the path of the image to add
 #' @param filename the name of the image within the bulletin (can differ from the filepath)
 #' @param caption image caption in the bulletin
 #' @param alt alt text to use for html / xml export
 #' @param source image source (a small text)
 #' @param label optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.
+#' @family bulletin_element#' 
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
 #' @examples 
 #' image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
 #' bulletin <- create_bulletin() %>%

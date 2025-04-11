@@ -28,6 +28,8 @@ has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 \arguments{
 \item{bulletin_id}{a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}}
 
+\item{languages}{The set of supported language identifiers for the publication. Must be a subset of \code{de}, \code{fr}, \code{it}, \code{en}.}
+
 \item{bulletin_args}{a list of arguments}
 
 \item{bulletin_dir}{the name of the directory within the bulletin_path where bulletin related files will be stored.}
@@ -40,26 +42,25 @@ has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 
 \item{element}{one of the bulletin elements}
 
+\item{language}{Langue identifier (i.e., "de"). Elements of different languages are kept separate within the bulletin object. 
+The language parameter specifies the language of the element to be added.}
+
 \item{id}{string The id of the element}
 
 \item{type}{string The type of the element(s)}
-
-\item{bulletin_path}{the path to the directory where the bulletin will be created. Default: \code{bulletin_id}.}
 }
 \value{
 an object that represents the bulletin content
 }
 \description{
-Create a bulletin
-
-Set the metadata object for a bulletin
-
-Adds an element to a bulletin
-
-Adds or replaces an element in the bulletin
-
-Checks if the bulletin has an element in the given language
+The bulletin list ist the top level data strucutre in the \code{cat_bulletin} package. 
+It contains the bulletin content in form of bulletin_elements, separated for each language. 
+The bulletin elements represent building blocks of a bulletin like text, R-Markdown sections, links, images etc.
+The bulletin data structure also contains information needed for bulletin rendering, like working directories etc.
 }
 \details{
 The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}.
+}
+\seealso{
+[create_test_bulletin_for_web()] for a minimal example on how to create a bulletin.
 }

@@ -1,5 +1,6 @@
 #' Generation of MeteoSwiss climate bulletins
 #' 
+#' cat.bulletin is used to automate climate bulletins to be published on the MeteoSwiss website as both html (xml) and pdf. 
 #' @name cat.bulletin-package
 #' @docType package
 #' @import assertthat

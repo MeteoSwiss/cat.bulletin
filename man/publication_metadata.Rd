@@ -45,9 +45,13 @@ Possible categories: weather, hazards, climate, measurementAndForecastingSystem.
 
 \item{publication}{multilanguage vector of paths to the publication files (made avaailable as download)}
 
+\item{publishedAt}{Set publication date (visible on the website) in format YYYY-MM-DD, for example "2005-11-15".}
+
 \item{edition}{multilanguage vector of edition field in xml publication.}
 
 \item{metadata}{a publication_metadata list of publication metadata}
+
+\item{...}{metadata elements to update}
 }
 \description{
 The publication metadata contains all the metadata information required for publication as webpage 

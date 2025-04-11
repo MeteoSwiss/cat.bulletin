@@ -7,11 +7,17 @@
 add_table(bulletin, table, id = NULL, caption = NULL, appear = c("xml", "pdf"))
 }
 \arguments{
-\item{bulletin}{the bulletin object to which to append the image element}
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{table}{a table object created with the \code{table} package.}
 
-\item{caption}{image caption in the bulletin}
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
+
+\item{caption}{The caption for the table.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
 }
 \description{
 The \code{table} package for supporting tables.
@@ -21,3 +27,10 @@ myData <- data.frame(a = 3, b = 4)
 bulletin <- create_bulletin() \%>\%
   add_table(table = myData, caption = "An example table.")
 }
+\seealso{
+Bulletin elements
+\code{\link{add_flextable}()},
+\code{\link{add_shorties_list}()},
+\code{\link{add_text}()}
+}
+\concept{bulletin_elements}

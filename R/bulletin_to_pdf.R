@@ -1,9 +1,11 @@
 
 #' Render a bulletin to pdf
-#' @inheritParams add_element
 #' @param filename The name of the file to write the pdf.
+#' @param bulletin The bulletin object created with \code{\link{create_bulletin}}.
+#' @param language Single language identifier.
 #' @details 
 #' This function will set the current active language to language as a side effect.
+#' @family rendering
 #' @export
 bulletin_to_pdf <- function(bulletin, 
                             language = bulletin$language, 
@@ -30,8 +32,9 @@ bulletin_to_pdf <- function(bulletin,
 #' 
 #' @details 
 #' This function will set the current active language to language as a side effect.
-#' @inheritParams add_element
 #' @param filename The name of the file to write the R markdown to.
+#' @inheritParams bulletin_to_pdf
+#' @family rendering
 #' @export
 bulletin_to_markdown <- function(bulletin, 
                                  language = bulletin$language, 

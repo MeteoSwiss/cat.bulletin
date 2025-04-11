@@ -7,10 +7,18 @@
 read_shorties(group_id, language, path, subdir = NULL)
 }
 \arguments{
+\item{group_id}{The string that identifies the group of shorties in the directory given.}
+
 \item{language}{language identifier}
 
-\item{yearmonth}{single string giving year and month of the bulletin as "yyyymm"}
+\item{path}{The base directory from where to read the shorties text files.}
+
+\item{subdir}{An optional string giving a subdirectory within the base directory to look for the shorties text files.}
 }
 \description{
 Read all shorties for the given group_id and language from the bulletin_prod_path given in config.
 }
+\seealso{
+read_shorty
+}
+\keyword{internal}

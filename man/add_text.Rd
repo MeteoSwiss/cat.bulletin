@@ -2,10 +2,28 @@
 % Please edit documentation in R/text.R
 \name{add_text}
 \alias{add_text}
-\title{add text to a bulletin}
+\title{Add text to a bulletin}
 \usage{
 add_text(bulletin, text, id = NULL, appear = c("xml", "pdf"))
 }
-\description{
-add text to a bulletin
+\arguments{
+\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+
+\item{text}{The text to be added to the bulletin.}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
 }
+\description{
+Add text to a bulletin
+}
+\seealso{
+Bulletin elements
+\code{\link{add_flextable}()},
+\code{\link{add_shorties_list}()},
+\code{\link{add_table}()}
+}
+\concept{bulletin_elements}

@@ -20,6 +20,8 @@ create_bulletin_monthly(
 \item{provisional}{boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
 \code{get_bulletin_monthly_provisional}.}
 
+\item{workdir}{working directory for bulletin creation}
+
 \item{...}{further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc.}
 }
 \description{

@@ -7,10 +7,11 @@ Rmd_element <- function(filename, envir, appear = NULL, id = NULL) {
   Rmd_element
 }
 
-#' add text to a bulletin
+#' Add R markdown to a bulletin
 #' @param element_id the name of the Rmd file in the elements folder of the package. 
 #' @param envir environment in which to knit the Rmd later. 
-#' @inheritParams add_text
+#' @inheritParams bulletin_element 
+#' @inheritParams add_element
 #' @export
 add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_id, appear = c("xml", "pdf")) {
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")

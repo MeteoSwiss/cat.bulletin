@@ -11,7 +11,9 @@ bulletin_to_pdf(
 )
 }
 \arguments{
-\item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
+\item{bulletin}{The bulletin object created with \code{\link{create_bulletin}}.}
+
+\item{language}{Single language identifier.}
 
 \item{filename}{The name of the file to write the pdf.}
 }
@@ -21,3 +23,10 @@ Render a bulletin to pdf
 \details{
 This function will set the current active language to language as a side effect.
 }
+\seealso{
+Bulletin rendering functions
+\code{\link{bulletin_to_markdown}()},
+\code{\link{bulletin_to_webzip}()},
+\code{\link{bulletin_to_xml}()}
+}
+\concept{rendering}

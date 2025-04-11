@@ -6,6 +6,11 @@
 \usage{
 set_active_language(bulletin, language = bulletin$languages[1])
 }
+\arguments{
+\item{bulletin}{The bulletin object created with \code{\link{create_bulletin}}.}
+
+\item{language}{language identifier.}
+}
 \description{
-When compiling input
+The language defines the language environment / settings to use when compiling input or adding elements to a bulletin.
 }

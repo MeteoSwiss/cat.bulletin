@@ -2,5 +2,5 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^Jenkinsfile$
-bulletin
-climate-bulletin-monthly
+^bulletin$
+^climate-bulletin-monthly$
