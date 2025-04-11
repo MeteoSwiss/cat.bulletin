@@ -7,7 +7,11 @@
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
+  log_info("Generating xml for publication", bulletin$bulletin_id, style = "h3")
+  
   assert_that(length(get_elements(bulletin)) > 0, msg = "Bulletin must contain at least one element for xml processing.")
+  
+  
   
   xml <- xml2::xml_new_root(.value = "publication-page")
   
@@ -19,6 +23,9 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
     xml_add_bulletin_elements(bulletin = bulletin)
   
   xml2::write_xml(xml2::xml_root(xml), file = filename)
+  
+  log_info("xml for publication", bulletin$bulletin_id, "created.", style = "success")
+  
   filename
 }
 

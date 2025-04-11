@@ -4,12 +4,14 @@
 \alias{add_log}
 \title{add logging information to the console}
 \usage{
-add_log(..., log_level = 1)
+add_log(..., log_level = 1, style = "none")
 }
 \arguments{
 \item{...}{elements of the log message, passed on to \code{paste}}
 
 \item{log_level}{numeric 0, 1, or 2 for silent, info or debug}
+
+\item{style}{optional styling information for message}
 }
 \value{
 no return value

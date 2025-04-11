@@ -54,13 +54,6 @@ image_to_markdown <- function(element) {
          element$source, "\n")
 }
 
-image_to_markdown2 <- function(element) {
-  tmpfile <- tempfile()
-  knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]])
-  md <- readr::read_lines(tmpfile)
-  md
-}
-
 image_to_xml <- function(xml, element, language) {
   image_node <- assure_node_of_type(xml, type = "image") %>%
     set_languaged_attribute("fileName", language, paste0(element$image_dir, "/", element$filename)) %>%
@@ -147,12 +140,12 @@ get_image_size <- function(image_filepath) {
 #' @inheritParams get_image_size
 #' @inheritParams assert_image_outpath
 #' @param side, either "top", "bottom", "left", or "right".
-#' @param margin Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width/height. Use a string like "20%" for this.
+#' @param margin Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width resp. height. Use a string like "20\%" for this.
 #' @return the path to the output file
 #' @export
 #' @examples
 #' outpath <- crop_image(
-#'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+#'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"),
 #'   side = "top",
 #'   margin = "5%"
 #' )
@@ -171,7 +164,7 @@ crop_image <- function(image_filepath,
   if (is.character(margin)) {
     if (endsWith(margin, "%")) {
       margin <- tryCatch(
-        as.numeric(substr(margin, 0, length(margin)-1)),
+        as.numeric(substr(margin, 0, nchar(margin)-1)),
         error = function(e)
           stop("Could not interpret relative margin")
       )
@@ -234,7 +227,7 @@ crop_image <- function(image_filepath,
 }
 
 string_contains <- function(string, pattern) {
-  length(grep("%", margin) > 0)
+  length(grep("pattern", string) > 0)
 }
 
 #' Assert that a filepath to write to is writeable and absolut.
