@@ -59,7 +59,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   if ("image" %in% sections) {
     image_id <- "my_first_image"
-    filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
+    filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
     bulletin <- bulletin %>%
       set_active_language(language = "de") %>%
       add_image(filepath = filepath, 

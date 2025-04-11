@@ -26,7 +26,7 @@ test_that("Markdown to xml", {
 })
 
 test_that("Image to xml", {
-  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_climanom_1864-today_loess30_winter_regSwiss_fr.png")
+  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
   caption  <- "this is a caption"
 
   bulletin <- create_minimal_bulletin() %>%

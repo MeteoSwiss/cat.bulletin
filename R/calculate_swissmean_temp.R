@@ -16,12 +16,14 @@ calculate_swissmean_temp <- function (bulletin) {
   #
   data_abs <- utils::read.table(filename_abs, header = TRUE)
   
-  filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
+  filename_anom <- download_monatsbilanz_temp(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, filename = "monatsbilanz_temp_anom.txt")
   data_anom <- utils::read.table(filename_anom, header = TRUE)
   
   # absolute temperature, swissmean
   year <- data_abs$year
   poscurr <- which(year == bulletin$year)
+  if (length(poscurr) == 0)
+    stop(paste("Cannot find year", bulletin$year, "in the file ", filename_abs, "."))
   ycurr <- year[poscurr]
   ybeg <- year[1]
   abs  <- data_abs$val

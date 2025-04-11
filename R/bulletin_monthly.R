@@ -144,27 +144,25 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
 
 monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   
-  log_info("monatsbilanz_temp")
+  log_info("Processing monatsbilanz_temp")
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-temp-p1")
   
-  # Add image for absolute temperatures
-  image_id <- "monatsbilanz_temp_map_abs"
-  filename_in <- paste0(image_id,".png")
-  bulletin <- bulletin %>% 
-    add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
-      id = image_id
-    )
+  ## Add joined image with monthly temperature maps (abs/anom)
+  image_id <- "monatsbilanz_temp_map"
+  image_filename <- paste0(image_id,".png")
   
-  # Add image for temperature anomalies
-  image_id <- "monatsbilanz_temp_map_anom"
-  filename_in <- paste0(image_id,".png")
+  abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_abs.png")
+  anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_anom.png")
+  
+  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
+  
   bulletin <- bulletin %>% 
     add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom")),
+      filepath = joined_and_cropped_filepath,
+      caption = paste(glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
+                      glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom"))
+      ),
       id = image_id
     )
   
@@ -178,12 +176,26 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
                             cat.lang::get.text("climtab_temp_ref"),
                             cat.lang::get.text("climtab_temp_dev")
   )
-  print(temp_table)
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")))
   
   bulletin
+}
+
+join_and_crop_monthly_maps <- function(abs_filepath, anom_filepath) {
+  
+  joined_filepath <- join_images(
+    image_filepaths = c(abs_filepath, anom_filepath),
+    outpath = tempfile(fileext = ".png")
+  )
+  
+  cropped_filepath <- crop_image(joined_filepath,
+                                 outpath = tempfile(fileext = ".png"),
+                                 side = "top",
+                                 margin = 23)
+  
+  cropped_filepath
 }
 
 regdata_example_table <- function(bulletin) {
