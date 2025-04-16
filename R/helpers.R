@@ -13,8 +13,7 @@ set_languaged_attribute <- function(xml, attribute, language, value) {
 }
 
 is_multi_language_string <- function(string, languages = c("de", "fr", "it", "en")) {
-  all(names(string) %in% languages) && all(nchar(names(string)) > 0)
-  
+  all(sapply(languages, function(language) has_name(string, language)))
 }
 
 assert_multi_language_string <- function(string, languages = c("de", "fr", "it", "en"), name = NULL) {

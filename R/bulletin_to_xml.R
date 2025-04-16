@@ -11,8 +11,6 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
   assert_that(length(get_elements(bulletin)) > 0, msg = "Bulletin must contain at least one element for xml processing.")
   
-  
-  
   xml <- xml2::xml_new_root(.value = "publication-page")
   
   root_node <- xml2::xml_root(xml)
@@ -102,7 +100,7 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
   
   teaser_image_element <- copy_teaser_image(filepath = metadata$teaser_image, bulletin = bulletin)
   teaser_node <- xml2::xml_add_child(xml, .value = "image") %>%
-    xml_set_attribute("fileName", paste0(teaser_image_element$image_dir, "/", teaser_image_element$filename)) %>%
+    xml_set_attribute("fileName", paste0(teaser_image_element$image_dir, "/", teaser_image_element$filename), languages = bulletin$languages) %>%
     xml_set_attribute("source", metadata$teaser_source, languages = bulletin$languages)
   
   # publication node
@@ -125,24 +123,34 @@ xml_fill_element_publication_page <- function(xml, bulletin) {
 
 # set attribute of xml node
 # if languages is set to a (set of) language identifier, the languaged version of the attributes are set. 
-# If the attribute is not multilanguage, and error is thrown.
+# If the value is not multilanguage, a multilanguage version will be created with identical values for all languages
 xml_set_attribute <- function(xml, attribute, value, languages = NULL) {
   
   if (is.null(value)) {
     return(xml)
   }
   
+  # non languaged
   if (is.null(languages)) {
     xml2::xml_attr(xml, attribute) <- value
-  } else {
-    # languaged versions
+    return(xml)
+  } 
+  
+  ## languaged versions
+  
+  # first check if the value is languaged, create one if not
+  if (!is_multi_language_string(value, languages)) {
+    log_debug("Value is not multi language. Will create multilange version with identical values for all languages")
+    value <- rep(value[1], length(languages))
+    names(value) <- languages
     assert_multi_language_string(value, languages = languages, name = attribute)
-    for (language in languages) {
-      if (has_name(value, language)) {
-        xml2::xml_attr(xml, languaged(attribute, language)) <- value[language]
-      } else {
-        warning(paste("Cannot set attribute", attribute, "for language", language))
-      }
+  }
+  
+  for (language in languages) {
+    if (has_name(value, language)) {
+      xml2::xml_attr(xml, languaged(attribute, language)) <- value[language]
+    } else {
+      warning(paste("Cannot set attribute", attribute, "for language", language))
     }
   }
   
