@@ -14,7 +14,7 @@ bulletin_to_pdf <- function(bulletin,
 ) {
   #documentation: https://bookdown.org/yihui/rmarkdown/pdf-document.html
   
-  log_info("Processing bulletin for language", language, "to pdf via markdown...")
+  log_info("Processing bulletin for {.emph language", language, "} to pdf via markdown...", style = "h3")
   #cat.report::load.cat.report()
   
   markdown_file = bulletin_to_markdown(bulletin, language = language)
@@ -22,17 +22,21 @@ bulletin_to_pdf <- function(bulletin,
   log_debug("Expected pdf-file:", filename)
   
   quiet = get_log_level() < 2 # be verbose on debug level
-  tryCatch(
+  # !! latex / pandoc won't work within tryCatch block !! 
+#  tryCatch(
     rmarkdown::render(markdown_file, 
                       envir = bulletin$bulletin_envir, 
                       # output_format = "pdf_document", 
                       output_file = filename, 
                       quiet = quiet,
-                      clean = FALSE),
-    warning = function(w) {
-      log_debug("Latex warning in bulletin_to_pdf:", w$message)
-    }
-  )
+                      clean = FALSE)
+  #   warning = function(w) {
+  #     log_debug("Latex warning in bulletin_to_pdf:", w$message)
+  #   },
+  #   error = function(e) {
+  #     stop(paste("Could not produce pdf for language", language, ".", e$message))
+  #   }
+  # )
   log_info("PDF produced for language", language, ".", style = "success")
   return(filename)
 }
@@ -117,6 +121,7 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                     "header-includes:",
                     "  - \\usepackage[utf8]{inputenc}",
                     "  - \\usepackage{xcolor}",
+                    "  - \\usepackage{tcolorbox}",                    
                     paste0("  - \\usepackage[", babel, "]{babel}"),
                     #"includes:",
                     #    "      in_header: 'preamble.tex',

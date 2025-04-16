@@ -12,7 +12,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                                            ".zip"
                                          ),
                                          path = "test-bulletin",
-                                         sections = c("text", "image", "markdown", "table", "shorties")) {
+                                         sections = c("text", "image", "markdown", "table", "shorties", "disclaimer")) {
   
   sections <- match.arg(sections, several.ok = TRUE)
   
@@ -45,6 +45,15 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   )
   
   bulletin <- bulletin %>% set_metadata(metadata)
+  
+  ## Disclaimer element
+  if ("disclaimer" %in% sections) {
+    text_id <- "disclaimer"
+    bulletin <- bulletin %>%
+      set_active_language(language = "de") %>%
+      add_disclaimer(caption_text = "Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.",
+                     body_Rmd_element_id = "element")
+  }
   
   ## Text element
   

@@ -10,7 +10,7 @@ create_test_bulletin_for_web(
   zipfilename = paste0("webtest_", format(Sys.time(), format = "\%Y\%m\%d\%H\%M"),
     ".zip"),
   path = "test-bulletin",
-  sections = c("text", "image", "markdown", "table", "shorties")
+  sections = c("text", "image", "markdown", "table", "shorties", "disclaimer")
 )
 }
 \arguments{
