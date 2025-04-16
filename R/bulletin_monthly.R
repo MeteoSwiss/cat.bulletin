@@ -53,6 +53,7 @@ create_bulletin_monthly <- function(year = 2024,
     
     # add sections
     bulletin <- bulletin %>%
+      add_bulletin_monthly_disclaimer(language = language) %>% 
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
@@ -152,6 +153,13 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
   )
   
   metadata
+}
+
+add_bulletin_monthly_disclaimer <- function(bulletin, language) {
+  bulletin <- bulletin %>%
+    add_disclaimer(caption_text = "Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.",
+                   body_Rmd_element_id = "disclaimer",
+                   id = "disclaimer")
 }
 
 monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {

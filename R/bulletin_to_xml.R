@@ -40,6 +40,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
     
     withr::with_locale(
       new = c("LC_TIME" = get_locale(default_language)), {
+        # catch the xml_node to add other languages later
         xml_node <- tryCatch({
           do.call(what = function_name, 
                   args = list(xml = content_node, element = element, language = default_language))
@@ -59,6 +60,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
       # find element
       if (has_element(bulletin, language = language, id = element$id)) {
         lang_element <- get_elements(bulletin, language = language, id = element$id)[[1]]
+        # use catched xml_node above to append further languages
         withr::with_locale(
           new = c("LC_TIME" = get_locale(language)), {
             tryCatch({

@@ -2,6 +2,7 @@
 
 export("%>%")
 export(add_Rmd)
+export(add_disclaimer)
 export(add_flextable)
 export(add_image)
 export(add_log)
