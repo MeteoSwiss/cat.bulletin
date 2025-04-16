@@ -1,3 +1,24 @@
+#' deprecated short for creating the monthly bulletin webzip 
+#' @details
+#' Use \code{bulletin_monthly} and one of the rendering functions instead.
+#' @inheritParams bulletin_monthly
+#' @export
+create_bulletin_monthly <- function(year = 2024, 
+                                    month = 8,
+                                    workdir = ".",
+                                    ...) {
+  
+  bulletin <- bulletin_monthly(year = year, month = month, workdir = workdir, ...)
+  
+  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
+                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
+                       ".zip")
+  
+  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
+  
+}
+
+
 #' Create the monthly bulletin
 #' @param year Bulletin year
 #' @param month Bulletin month
@@ -7,11 +28,13 @@
 #' @inheritParams create_bulletin
 #' @importFrom magrittr %>%
 #' @export
-create_bulletin_monthly <- function(year = 2024, 
-                                    month = 8, 
-                                    provisional,
-                                    workdir = ".",
-                                    ...) {
+#' @examples 
+#' bulletin <- bulletin_monthly(year = 2024, month = 8)
+bulletin_monthly <- function(year = 2024, 
+                             month = 8, 
+                             provisional,
+                             workdir = ".",
+                             ...) {
   
   cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
   cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12) 
@@ -68,15 +91,8 @@ create_bulletin_monthly <- function(year = 2024,
                                       swissmean = swissmean,
                                       regdiff = regdiff)
   
-  
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
-  
-  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
-                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
-                       ".zip")
-  
-  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
   
   log_info("Finished creating bulletin monthly for year =", year, "and month = ", month, ".", style = "success")
   
@@ -183,6 +199,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
       caption = paste(glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
                       glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom"))
       ),
+      filename = image_filename,
       id = image_id
     )
   
@@ -326,16 +343,16 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   ## Add table
   sun_table <- regdiff$subset_climtab_S
   colnames(sun_table) <- c(cat.lang::get.text("climtab_stat"),
-                            cat.lang::get.text("climtab_altitude"),
-                            cat.lang::get.text("climtab_sun_mean"),
-                            cat.lang::get.text("climtab_sun_ref"),
-                            cat.lang::get.text("climtab_sun_dev")
+                           cat.lang::get.text("climtab_altitude"),
+                           cat.lang::get.text("climtab_sun_mean"),
+                           cat.lang::get.text("climtab_sun_ref"),
+                           cat.lang::get.text("climtab_sun_dev")
   )
   print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
-
+  
   bulletin  
 }
 

@@ -2,28 +2,22 @@
 % Please edit documentation in R/bulletin_monthly.R
 \name{create_bulletin_monthly}
 \alias{create_bulletin_monthly}
-\title{Create the monthly bulletin}
+\title{deprecated short for creating the monthly bulletin webzip}
 \usage{
-create_bulletin_monthly(
-  year = 2024,
-  month = 8,
-  provisional,
-  workdir = ".",
-  ...
-)
+create_bulletin_monthly(year = 2024, month = 8, workdir = ".", ...)
 }
 \arguments{
 \item{year}{Bulletin year}
 
 \item{month}{Bulletin month}
 
-\item{provisional}{boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
-\code{get_bulletin_monthly_provisional}.}
-
 \item{workdir}{working directory for bulletin creation}
 
 \item{...}{further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc.}
 }
 \description{
-Create the monthly bulletin
+deprecated short for creating the monthly bulletin webzip
+}
+\details{
+Use \code{bulletin_monthly} and one of the rendering functions instead.
 }
