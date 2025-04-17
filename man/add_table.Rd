@@ -4,18 +4,30 @@
 \alias{add_table}
 \title{Add a table to a bulletin}
 \usage{
-add_table(bulletin, table, id = NULL, caption = NULL, appear = c("xml", "pdf"))
+add_table(
+  bulletin,
+  table,
+  colwidths = NULL,
+  align = NULL,
+  id = NULL,
+  caption = NULL,
+  appear = c("xml", "pdf")
+)
 }
 \arguments{
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 
 \item{table}{a table object created with the \code{table} package.}
 
+\item{colwidths}{optional numeric vector of column widths in cm to use in \code{\link[kableExtra]{column_spec}} (pdf only).}
+
+\item{align}{optional column align specification, see \code{\link[kableExtra]{kbl}}. Use "lcc" for a left aligned first column followed by two centered columns.}
+
 \item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
 be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
 The default is a composition of type and a random string.}
 
-\item{caption}{The caption for the table.}
+\item{caption}{optional table caption.}
 
 \item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
 }

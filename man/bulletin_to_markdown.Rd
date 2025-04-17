@@ -33,6 +33,9 @@ This function will set the current active language to language as a side effect.
 
 \code{flextable_to_markdown}: Rendering of flextables to markdown is not possible (only directly to either html or pdf). 
 The flextable object is thus stored by element_id in the bulletin environment and rendered in the final rendering step.
+
+Documentation for how to use kableExtra to create pdf tables can be found here: 
+\url{https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf}
 }
 \seealso{
 Bulletin rendering functions

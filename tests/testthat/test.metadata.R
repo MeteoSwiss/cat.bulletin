@@ -14,5 +14,6 @@ test_that("Update multilanguage element", {
 
 test_that("is_multi_language string", {
   expect_false(is_multi_language_string(c(de="a", "a", fr="a")))
-  expect_true(is_multi_language_string(c(de="a", it = "a", fr="a"))) 
+  expect_true(is_multi_language_string(c(de="a", it = "a", fr="a"), 
+                                       languages = c("de", "it", "fr"))) 
 })

@@ -45,7 +45,6 @@ bulletin_monthly <- function(year = 2024,
   log_info("Creating bulletin monthly for year =", year, "and month = ", month,".", style = "h1")
   log_debug("Provisional:", provisional, "; workdir:", workdir)
   
-  
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               bulletin_dir = "climate-bulletin-monthly",
                               workdir = workdir,
@@ -66,14 +65,8 @@ bulletin_monthly <- function(year = 2024,
     bulletin <- bulletin %>% set_active_language(language = language)
     
     # add lead (add default if no Rmd element exists)
-    bulletin <- tryCatch({
-      add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
-    }, 
-    error = function(e) {
-      warning(paste("Could not add lead element for language", language, ". Adding lore_ipsum default."))
-      add_text(bulletin = bulletin, text = lore_ipsum(language = language), id = "leadtext", appear = c())
-    })
-    
+    bulletin <- add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
+   
     # add sections
     bulletin <- bulletin %>%
       add_bulletin_monthly_disclaimer(language = language) %>% 
@@ -215,7 +208,10 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   )
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")),
+              colwidths = c(5,rep(2, ncol(temp_table) - 1)),
+              align = "lcccc"
+              )
   
   bulletin
 }
