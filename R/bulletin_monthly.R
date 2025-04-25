@@ -74,7 +74,8 @@ bulletin_monthly <- function(year = 2024,
       temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
       monatsbilanz_sun(regdiff = regdiff, language = language) %>%
-      monthly_events(language = language)
+      monthly_events(language = language) %>%
+      monthly_vegetation(language = language)
       #monatsbulletin_daily_timeseries(language = language)
   }
   
@@ -384,6 +385,23 @@ monthly_events <- function(bulletin, language) {
 
   bulletin
 }
+
+monthly_vegetation <- function(bulletin, language) {
+  
+  log_info("monthly_vegetation")
+  
+  element_id = "vegetation_list"
+  
+  bulletin <- bulletin %>% 
+    add_shorties_list(group_id = "vegetation",
+                      title = cat.lang::get.text("bulletin_monthly_vegetation_title"),
+                      path =  file.path(get_config_value("bulletin_prod_path")),
+                      subdir = bulletin$yearmonth,
+                      id = element_id)
+  
+  bulletin
+}
+
 
 monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
