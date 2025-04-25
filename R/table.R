@@ -75,7 +75,6 @@ table_to_markdown <- function(element) {
   # optional kable options
   if (!is.null(element$align)) {
     md <- c(md,
-            #paste0("align = rep('c', ncol(", element$table_var, "))"),
             paste0("align = '", element$align, "',")
             )
   }

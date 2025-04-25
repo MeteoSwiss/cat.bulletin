@@ -32,7 +32,7 @@ bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
                                     files = c("publication.xml",
                                               publication,
                                               "images",
-                                              "files/*.pdf"
+                                              "files"
                                     )
                   )
   )
