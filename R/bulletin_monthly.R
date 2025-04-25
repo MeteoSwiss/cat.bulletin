@@ -66,7 +66,7 @@ bulletin_monthly <- function(year = 2024,
     
     # add lead (add default if no Rmd element exists)
     bulletin <- add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
-   
+    
     # add sections
     bulletin <- bulletin %>%
       add_bulletin_monthly_disclaimer(language = language) %>% 
@@ -107,11 +107,12 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
     bulletin = set_active_language(bulletin, language = language)
-    switch(lead_element$type,
-           text = lead_element$text,
-           Rmd = Rmd_to_text(element = lead_element),
-           stop("lead element type not supported")
+    lead <- switch(lead_element$type,
+                   text = lead_element$text,
+                   Rmd = Rmd_to_text(element = lead_element),
+                   stop("lead element type not supported")
     )
+    return(lead)
   }
   
   bulletin_edition <- function(language, provisional) {
@@ -206,12 +207,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
                             cat.lang::get.text("climtab_temp_ref"),
                             cat.lang::get.text("climtab_temp_dev")
   )
+  if (get_log_level() >= 2) print(temp_table)
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")),
               colwidths = c(5,rep(2, ncol(temp_table) - 1)),
               align = "lcccc"
-              )
+    )
   
   bulletin
 }
@@ -293,7 +295,7 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
                             cat.lang::get.text("climtab_prec_ref"),
                             cat.lang::get.text("climtab_prec_dev")
   )
-  print(prec_table)
+  if (get_log_level() >= 2) print(prec_table)
   bulletin <- bulletin %>%
     add_table(prec_table, id = "monatsbilanz_prec_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
@@ -344,7 +346,7 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
                            cat.lang::get.text("climtab_sun_ref"),
                            cat.lang::get.text("climtab_sun_dev")
   )
-  print(sun_table)
+  if (get_log_level() >= 2) print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
