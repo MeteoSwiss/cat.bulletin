@@ -73,8 +73,8 @@ bulletin_monthly <- function(year = 2024,
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language)
-    #monatsbulletin_daily_timeseries(language = language)
+      monatsbilanz_sun(regdiff = regdiff, language = language) #%>%
+      #monatsbulletin_daily_timeseries(language = language)
   }
   
   log_info("Creating publication metadata", style = "h2")
@@ -190,10 +190,8 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_and_cropped_filepath,
-      caption = paste(glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
-                      glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom"))
-      ),
-      filename = image_filename,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_map")),
+      alt = cat.lang::get.text("bulletin_monthly_temp_map_alt"),
       id = image_id
     )
   
@@ -259,23 +257,20 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-precip-p1")
   
-  # Add image for absolute precipitation
-  image_id <- "monatsbilanz_prec_map_abs"
-  filename_in <- paste0(image_id,".png")
-  bulletin <- bulletin %>% 
-    add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_abs")),
-      id = image_id
-    )
+  ## Add joined image with monthly precipitation maps (abs/anom)
+  image_id <- "monatsbilanz_prec_map"
+  image_filename <- paste0(image_id,".png")
   
-  # Add image for precipitation anomalies
-  image_id <- "monatsbilanz_prec_map_anom"
-  filename_in <- paste0(image_id,".png")
+  abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_abs.png")
+  anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_anom.png")
+
+  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
+  
   bulletin <- bulletin %>% 
     add_image(
-      filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", filename = filename_in),
-      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map_anom")),
+      filepath = joined_and_cropped_filepath,
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_map")),
+      alt = cat.lang::get.text("bulletin_monthly_prec_map_alt"),
       id = image_id
     )
   
@@ -309,23 +304,20 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   bulletin <- bulletin %>% add_Rmd(element_id = "monatsbilanz-sun-p1")
   
   if (!bulletin$provisional) {
-    # Add image for sunshine duration relative to maximum
-    image_id <- "monatsbilanz_sunshine_map_abs"
-    filename_in <- paste0(image_id,".png")
-    bulletin <- bulletin %>% 
-      add_image(
-        filepath = download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
-        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_abs")),
-        id = image_id
-      )
+    ## Add joined image with monthly sunshine maps (abs/anom)
+    image_id <- "monatsbilanz_sunshine_map"
+    image_filename <- paste0(image_id,".png")
     
-    # Add image for sunshine duration anomalies
-    image_id <- "monatsbilanz_sunshine_map_anom"
-    filename_in <- paste0(image_id,".png")
+    abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", out_path = bulletin$cache_path, filename = "monatsbilanz_sunshine_map_abs.png")
+    anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", out_path = bulletin$cache_path, filename = "monatsbilanz_sunshine_map_anom.png")
+    
+    joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
+    
     bulletin <- bulletin %>% 
       add_image(
-        filepath = download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", filename = filename_in),
-        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map_anom")),
+        filepath = joined_and_cropped_filepath,
+        caption = glue::glue(cat.lang::get.text("bulletin_monthly_sunshine_map")),
+        alt = cat.lang::get.text("bulletin_monthly_sunshine_map_alt"),
         id = image_id
       )
   }
@@ -376,18 +368,22 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   log_info("monatsbulletin_daily_timeseries")
   
-  station <- c(de = "SMA", fr = "GVE", it = "LUG")
-  station_name <- mchdwh::station_info(nat_abbr=station[language])$station_name
+  witterungsverlauf_station <- c(de = "SMA", fr = "GVE", it = "LUG")
+  witterungsverlauf_station_name <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[language])$station_name
   
   bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
   
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
-  filename_in  <- paste0(image_id,"_",language,".png")
+  image_filename <- paste0(image_id,"_",language,".png")
+
+  image_filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[language]), language=language, filename = image_filename)
+  
   bulletin <- bulletin %>% 
     add_image(
-      filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(station[language]), language=language, filename = filename_in),
+      filepath = image_filepath,
       caption = glue::glue(cat.lang::get.text("daily_timeseries")),
+      alt = "test",
       id = image_id
     )
   
@@ -448,17 +444,34 @@ ordinal_number <- function(number, gender, language) {
   }
 }
 
-collapse_sentence <- function(strings) {
+collapse_sentence <- function(strings, language = "de") {
   n <- length(strings)
   
   # Handle different cases based on the number of strings
   if (n == 1) {
     return(strings)  # No need to collapse if there's only one string
   } else if (n == 2) {
-    return(paste(strings, collapse = " und "))  # Two strings, collapse with " und "
+    if (language == "de") {
+      return(paste(strings, collapse = " und "))  # Two strings, collapse with " und "
+    }
+    if (language == "fr") {
+      return(paste(strings, collapse = " et "))  # Two strings, collapse with " et "
+    }
+    if (language == "it") {
+      return(paste(strings, collapse = " e "))  # Two strings, collapse with " e "
+    }
+    
   } else {
     # More than two strings, collapse with ", " and " und " for the last two
-    return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " und "))
+    if (language == "de") {
+      return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " und "))
+    }
+    if (language == "fr") {
+      return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " et "))
+    }
+    if (language == "it") {
+      return(paste(paste(strings[1:(n-1)], collapse = ", "), strings[n], sep = " e "))
+    }
   }
 }
 

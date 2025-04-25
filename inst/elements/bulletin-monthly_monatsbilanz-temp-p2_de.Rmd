@@ -17,4 +17,4 @@ low_dev_gt0 <- min(regdiff$sellow_abw) > 0
 
 Die `r ifelse(high_dev_gt0, "höchsten positiven Abweichungen", "geringsten negativen Abweichungen")` zur Referenzperiode 1991-2020 `r if (number_regions_temp_high_eq1) {"verzeichnete die Region"} else {"verzeichneten die Regionen"}` `r regdiff$regshigh`. Beispiele für Messstandorte sind `r regdiff$selhigh_stats` (siehe Tabelle 1). Die `r ifelse(low_dev_gt0, "kleinsten positiven Abweichungen", "grössten negativen Abweichungen")` `r if (number_regions_temp_low_eq1) {"stammten aus der Region"} else {"stammten aus den Regionen"}` `r regdiff$regslow` (z.B. die Stationen `r regdiff$sellow_stats`). `r if (higher_values_at_high_altitude) {"In höheren Lagen waren die Abweichungen zur Referenzperiode grösser als in den tiefergelegenen Regionen der Schweiz."} else if (higher_values_at_low_altitude) {"In tieferen Lagen waren die Abweichungen zur Referenzperiode grösser als in den höhergelegenen Gebieten der Schweiz."}`
 
-Die folgende Tabelle zeigt Monatsmittelwerte der Temperatur an ausgewählten Stationen.
+Tabelle 1 zeigt Monatsmittelwerte der Temperatur an ausgewählten Stationen.
