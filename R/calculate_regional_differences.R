@@ -200,7 +200,7 @@ process_extreme_values <- function(param_short, bulletin) {
     previous_record_info <- paste0(word_record, sprintf("%.1f", previous_records$value), "\u00A0", unit, ", ", 
                                    substr(previous_records$datetime, 1, 4), ")")
     
-    station_record_info <- collapse_sentence(paste0(station_with_vals, previous_record_info))
+    station_record_info <- collapse_sentence(paste0(station_with_vals, previous_record_info), "de")
   }
   
   rec_avail <- FALSE
@@ -289,10 +289,10 @@ comp_regdiff <- function(parameter, vals, regsort) {
   }
   mhigh <- which(mr_h==max(mr_h))
   mhigh <- which(member_h == mhigh)
-  regshigh <- collapse_sentence(regs[mhigh])
+  regshigh <- collapse_sentence(regs[mhigh], "de")
   mlow <- which(mr_l==min(mr_l))
   mlow <- which(member_l == mlow)
-  regslow <- collapse_sentence(regs[mlow])
+  regslow <- collapse_sentence(regs[mlow], "de")
   # add a few relevant stations to the list below
   selhigh <- vals[which(vals$Region %in% regs[mhigh]),]
   selhigh <- selhigh[order(match(selhigh[[deviations]], sort(selhigh[[deviations]],decreasing = TRUE))), ]
@@ -300,8 +300,8 @@ comp_regdiff <- function(parameter, vals, regsort) {
   sellow <- vals[which(vals$Region %in% regs[mlow]),]
   sellow <- sellow[order(match(sellow[[deviations]], sort(sellow[[deviations]],decreasing = FALSE))), ]
   sellow <- sellow[1:2,]
-  sellow_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow$Station)$station_name)
-  selhigh_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh$Station)$station_name)
+  sellow_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=sellow$Station)$station_name, "de")
+  selhigh_stats <- collapse_sentence(mchdwh::station_info(nat_abbr=selhigh$Station)$station_name, "de")
   selreg <- rbind(selhigh,sellow)
   selreg <- selreg[!(selreg$Station %in% standard_stations), ]
   

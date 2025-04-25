@@ -25,5 +25,5 @@ number_regions_sun_low_eq1 <- length(regdiff$numb_stats_low_S)==1
 
 Il soleggiamento più abbondante rispetto alla norma 1991-2020 è stato registrato `r translate_regions(regdiff$regshigh_S, "it")`. Fra le stazioni di misura che hanno misurato il maggior numero di ore di sole ritroviamo `r translate_stations(regdiff$selhigh_stats_S, "it", use_art=FALSE)` (si veda la tabella 2). Il soleggiamento più scarso rispetto alla norma 1991-2020 è stato registrato `r translate_regions(regdiff$regslow_S, "it")` (ad es. dalle stazioni `r translate_stations(regdiff$sellow_stats_S, "it", use_art=FALSE)`).
 
-`r ifelse(bulletin$provisional == FALSE, glue::glue("La figura 3 mostra la durata del soleggiamento mensile e la sua deviazione rispetto alla media del periodo di riferimento 1991-2020 per {tolower(month_str(bulletin$month))} {bulletin$year}."),"")`
+`r ifelse(bulletin$provisional == FALSE, glue::glue("La figura 4 mostra la durata del soleggiamento mensile e la sua deviazione rispetto alla media del periodo di riferimento 1991-2020 per {tolower(month_str(bulletin$month))} {bulletin$year}."),"")`
 

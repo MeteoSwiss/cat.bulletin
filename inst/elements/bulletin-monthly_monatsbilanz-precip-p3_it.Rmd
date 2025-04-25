@@ -5,5 +5,5 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-La tabella seguente mostra i totali mensili delle precipitazioni e la loro deviazione rispetto al periodo di riferimento in stazioni selezionate della rete di misurazione di MeteoSvizzera.
+La tabella 2 mostra i totali mensili delle precipitazioni e la loro deviazione rispetto al periodo di riferimento in stazioni selezionate della rete di misurazione di MeteoSvizzera.
 

@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 numb_similar_years_eq1 <- length(swissmean$ind_simyears) == 1
 numb_similar_years_gt1 <- length(swissmean$ind_simyears) > 1
 if (length(swissmean$ind_simyears) >= 1) {
-  similar_years <- collapse_sentence(swissmean$all_years[swissmean$ind_simyears])  
+  similar_years <- collapse_sentence(swissmean$all_years[swissmean$ind_simyears], "de")  
 }
 not_new_record <- swissmean$curr_rank != 1
 ```

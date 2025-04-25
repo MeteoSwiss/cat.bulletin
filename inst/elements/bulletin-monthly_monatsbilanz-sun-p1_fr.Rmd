@@ -25,5 +25,5 @@ number_regions_sun_low_eq1 <- length(regdiff$numb_stats_low_S)==1
 
 L'ensoleillement le plus important par rapport à la période de référence 1991-2020 a été enregistré dans `r translate_regions(regdiff$regshigh_S)`. Par exemple, les stations `r translate_stations(regdiff$selhigh_stats_S, "fr", use_art=TRUE)` sont celles qui ont connu un ensoleillement relativement important (voir Tableau 3). L'ensoleillement le plus faible par rapport à la référence a été enregistré dans `r translate_regions(regdiff$regslow_S)` (par exemple les stations `r translate_stations(regdiff$sellow_stats_S, "fr", use_art=TRUE)`).
 
-`r ifelse(bulletin$provisional == FALSE, glue::glue("La Figure 3 montre l'ensoleillement mensuel et l'écart par rapport à la moyenne de la période de référence 1991-2020 pour {tolower(month_str(bulletin$month))} {bulletin$year}."),"")`
+`r ifelse(bulletin$provisional == FALSE, glue::glue("La Figure 4 montre l'ensoleillement mensuel et l'écart par rapport à la moyenne de la période de référence 1991-2020 pour {tolower(month_str(bulletin$month))} {bulletin$year}."),"")`
 
