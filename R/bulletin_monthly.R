@@ -73,7 +73,8 @@ bulletin_monthly <- function(year = 2024,
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language) #%>%
+      monatsbilanz_sun(regdiff = regdiff, language = language) %>%
+      monthly_events(language = language)
       #monatsbulletin_daily_timeseries(language = language)
   }
   
@@ -365,6 +366,22 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p3")
   
+  bulletin
+}
+
+monthly_events <- function(bulletin, language) {
+  
+  log_info("monthly_events")
+  
+  element_id = "event_list"
+  
+  bulletin <- bulletin %>% 
+    add_shorties_list(group_id = "event",
+                    title = cat.lang::get.text("bulletin_monthly_events_title"),
+                    path =  file.path(get_config_value("bulletin_prod_path")),
+                    subdir = bulletin$yearmonth,
+                    id = element_id)
+
   bulletin
 }
 
