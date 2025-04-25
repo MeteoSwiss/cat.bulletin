@@ -293,7 +293,9 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   if (get_log_level() >= 2) print(prec_table)
   bulletin <- bulletin %>%
     add_table(prec_table, id = "monatsbilanz_prec_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")),
+              colwidths = c(5,rep(2, ncol(prec_table) - 1)),
+              align = "lcccc")
   
   bulletin
 }
@@ -341,7 +343,9 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   if (get_log_level() >= 2) print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")),
+              colwidths = c(5,rep(2, ncol(sun_table) - 1)),
+              align = "lcccc")
   
   bulletin  
 }
