@@ -36,7 +36,7 @@ add_image <- function(bulletin, filepath, filename = basename(filepath),
   if (file.exists(newpath)) {
     log_debug("add_image: file", bulletin$image_dir, "/", filename, "alread exists. Using existing file.")
   } else {
-    file.copy(filepath, newpath, overwrite = TRUE)
+    file.copy(filepath, newpath)
   }
   add_element(bulletin, image_element(filename = filename, image_dir = bulletin$image_dir, 
                                       filepath = newpath, caption = caption, 

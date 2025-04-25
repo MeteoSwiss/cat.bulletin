@@ -111,7 +111,10 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       set_active_language(language = language) %>%
       add_table(regdata,
                 id = element_id,
-                caption = paste(language, "caption"))
+                caption = paste(language, "caption"),
+                colwidths = rep(2, ncol(regdata)),
+                align = "lcccc"
+                )
   }
   
   ## Shorties list element
@@ -130,7 +133,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   ## Generate pdfs in all languages and the xml and zip everything up
   
-  #language = "de"
+  #language = "fr"
   #filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)

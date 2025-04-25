@@ -52,12 +52,13 @@ shorties_list_to_markdown <- function(element) {
 # A shorty is rendered as a title that works as a link and the lead text below.
 shorty_to_markdown <- function(shorty) {
   md <- c(
-    paste("###", 
-          if (is.null(shorty$link)) shorty$title else paste0("[", shorty$title, "](", shorty$link, ")"),
-          "\n"),
+    paste("###", shorty$title, "\n"),
     paste(shorty$lead, "\n"),
     "\n"
   )
+  if (!is.null(shorty$link)) {
+    md <- c(md, paste0("[", cat.lang::get.text("bulletin_monthly_shorties_linktext"), "](", shorty$link, ")\n"))
+  }
   paste(md, collapse = "\n")
 }
 

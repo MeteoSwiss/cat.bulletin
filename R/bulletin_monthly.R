@@ -1,3 +1,24 @@
+#' deprecated short for creating the monthly bulletin webzip 
+#' @details
+#' Use \code{bulletin_monthly} and one of the rendering functions instead.
+#' @inheritParams bulletin_monthly
+#' @export
+create_bulletin_monthly <- function(year = 2024, 
+                                    month = 8,
+                                    workdir = ".",
+                                    ...) {
+  
+  bulletin <- bulletin_monthly(year = year, month = month, workdir = workdir, ...)
+  
+  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
+                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
+                       ".zip")
+  
+  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
+  
+}
+
+
 #' Create the monthly bulletin
 #' @param year Bulletin year
 #' @param month Bulletin month
@@ -7,11 +28,13 @@
 #' @inheritParams create_bulletin
 #' @importFrom magrittr %>%
 #' @export
-create_bulletin_monthly <- function(year = 2024, 
-                                    month = 8, 
-                                    provisional,
-                                    workdir = ".",
-                                    ...) {
+#' @examples 
+#' bulletin <- bulletin_monthly(year = 2024, month = 8)
+bulletin_monthly <- function(year = 2024, 
+                             month = 8, 
+                             provisional,
+                             workdir = ".",
+                             ...) {
   
   cat.func::assert.integer(year, "year", length = 1, minimum = 1900, maximum = 2100)
   cat.func::assert.integer(month, "month", length = 1, minimum = 1, maximum = 12) 
@@ -21,7 +44,6 @@ create_bulletin_monthly <- function(year = 2024,
   
   log_info("Creating bulletin monthly for year =", year, "and month = ", month,".", style = "h1")
   log_debug("Provisional:", provisional, "; workdir:", workdir)
-  
   
   bulletin <- create_bulletin(bulletin_id = "bulletin-monthly",
                               bulletin_dir = "climate-bulletin-monthly",
@@ -43,13 +65,7 @@ create_bulletin_monthly <- function(year = 2024,
     bulletin <- bulletin %>% set_active_language(language = language)
     
     # add lead (add default if no Rmd element exists)
-    bulletin <- tryCatch({
-      add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
-    }, 
-    error = function(e) {
-      warning(paste("Could not add lead element for language", language, ". Adding lore_ipsum default."))
-      add_text(bulletin = bulletin, text = lore_ipsum(language = language), id = "leadtext", appear = c())
-    })
+    bulletin <- add_Rmd(bulletin = bulletin, element_id = "leadtext", appear = c())
     
     # add sections
     bulletin <- bulletin %>%
@@ -68,15 +84,8 @@ create_bulletin_monthly <- function(year = 2024,
                                       swissmean = swissmean,
                                       regdiff = regdiff)
   
-  
   bulletin <- bulletin %>% 
     set_metadata(metadata) 
-  
-  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
-                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
-                       ".zip")
-  
-  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
   
   log_info("Finished creating bulletin monthly for year =", year, "and month = ", month, ".", style = "success")
   
@@ -98,11 +107,12 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     assert_that(has_element(bulletin = bulletin, language = language, id = lead_element_id))
     lead_element <- get_elements(bulletin = bulletin, language = language, id = lead_element_id)[[1]]
     bulletin = set_active_language(bulletin, language = language)
-    switch(lead_element$type,
-           text = lead_element$text,
-           Rmd = Rmd_to_text(element = lead_element),
-           stop("lead element type not supported")
+    lead <- switch(lead_element$type,
+                   text = lead_element$text,
+                   Rmd = Rmd_to_text(element = lead_element),
+                   stop("lead element type not supported")
     )
+    return(lead)
   }
   
   bulletin_edition <- function(language, provisional) {
@@ -183,6 +193,7 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
       caption = paste(glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_abs")),
                       glue::glue(cat.lang::get.text("bulletin_monthly_temp_map_anom"))
       ),
+      filename = image_filename,
       id = image_id
     )
   
@@ -196,9 +207,13 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
                             cat.lang::get.text("climtab_temp_ref"),
                             cat.lang::get.text("climtab_temp_dev")
   )
+  if (get_log_level() >= 2) print(temp_table)
   bulletin <- bulletin %>%
     add_table(temp_table, id = "monatsbilanz_temp_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_temp_table")),
+              colwidths = c(5,rep(2, ncol(temp_table) - 1)),
+              align = "lcccc"
+    )
   
   bulletin
 }
@@ -280,7 +295,7 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
                             cat.lang::get.text("climtab_prec_ref"),
                             cat.lang::get.text("climtab_prec_dev")
   )
-  print(prec_table)
+  if (get_log_level() >= 2) print(prec_table)
   bulletin <- bulletin %>%
     add_table(prec_table, id = "monatsbilanz_prec_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
@@ -326,16 +341,16 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   ## Add table
   sun_table <- regdiff$subset_climtab_S
   colnames(sun_table) <- c(cat.lang::get.text("climtab_stat"),
-                            cat.lang::get.text("climtab_altitude"),
-                            cat.lang::get.text("climtab_sun_mean"),
-                            cat.lang::get.text("climtab_sun_ref"),
-                            cat.lang::get.text("climtab_sun_dev")
+                           cat.lang::get.text("climtab_altitude"),
+                           cat.lang::get.text("climtab_sun_mean"),
+                           cat.lang::get.text("climtab_sun_ref"),
+                           cat.lang::get.text("climtab_sun_dev")
   )
-  print(sun_table)
+  if (get_log_level() >= 2) print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
               caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
-
+  
   bulletin  
 }
 

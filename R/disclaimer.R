@@ -52,6 +52,37 @@ disclaimer_to_markdown <- function(element) {
 }
 
 disclaimer_to_xml <- function(xml, element, language) {
+  box_node <- assure_node_of_type(xml, type = "box")
+  
+  title = element$caption_text_element$text
+  body = Rmd_to_html(element$body_Rmd_element)
+  
+  log_debug("Processing disclaimer to xml with title", title)
+  
+  # get text node
+  text_node  <- if (xml2::xml_length(box_node) == 0) {
+    xml2::xml_add_child(box_node, .value = "text")
+  } else {
+    xml2::xml_child(box_node)
+  }
+  # set title
+  set_languaged_attribute(box_node,
+                          attribute = "heading", 
+                          language = language, 
+                          value = title)
+  
+  # set body
+  set_languaged_attribute(text_node, 
+                          attribute = "html", 
+                          language = language, 
+                          value = body)
+  
+  return(box_node)
+}
+
+# this version of the code sets the disclaimer inside an accordeon
+# did not work on the website in April 2025
+disclaimer_to_xml2 <- function(xml, element, language) {
   accordion_node <- assure_node_of_type(xml, type = "accordion")
   
   title = element$caption_text_element$text
@@ -70,16 +101,22 @@ disclaimer_to_xml <- function(xml, element, language) {
                           value = title)
   
   # get text node inside box
-  text_node <- if (xml2::xml_length(accordion_panel_node) == 0) {
+  if (xml2::xml_length(accordion_panel_node) == 0) {
     box_node <- xml2::xml_add_child(accordion_panel_node, .value = "box")
     text_node <- xml2::xml_add_child(box_node, .value = "text")
-    text_node
   } else {
     box_node <- xml2::xml_child(accordion_panel_node)
     text_node <-xml2::xml_child(box_node)
   }
+  
   # set body
   set_languaged_attribute(text_node, attribute = "html", language = language, value = body)
+  
+  # set title
+  set_languaged_attribute(box_node,
+                          attribute = "heading", 
+                          language = language, 
+                          value = title)
   
   return(accordion_node)
 }

@@ -21,16 +21,16 @@ add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_i
 
 Rmd_to_markdown_file <- function(element) {
   tmpfile <- tempfile(fileext = ".md")
-  tryCatch({
-    quiet = get_log_level() < 2 # be verbose on debug level
-    knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]], quiet = quiet)
-  },
-  warning = function(w) {
-    log_debug("Warning from knitr::knit in function Rmd_to_markdown_file:", w$message)
-  },
-  error = function(e)
-    warning(paste("Could not knit Rmd file", element[["Rmd_file"]], "to markdown."))
-  )
+  #tryCatch({
+  quiet = get_log_level() < 2 # be verbose on debug level
+  knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]], quiet = quiet)
+  #},
+  # warning = function(w) {
+  #   log_debug("Warning from knitr::knit in function Rmd_to_markdown_file:", w$message)
+  # },
+  # error = function(e)
+  #   warning(paste("Could not knit Rmd file", element[["Rmd_file"]], "to markdown."))
+  # )
   tmpfile
 }
 
@@ -51,10 +51,10 @@ Rmd_to_html <- function(element) {
   md_in <- Rmd_to_markdown_file(element) 
   html_out <- tempfile(fileext = ".html")
   tryCatch({
-      markdown::markdownToHTML(file = md_in, output = html_out, fragment.only = TRUE)
+    markdown::markdownToHTML(file = md_in, output = html_out, fragment.only = TRUE)
   },
   error = function(e)
-    warning(paste("Could not knit markdown file ", element[["Rmd_file"]], "to html from markdown."))
+    warning(paste("Could not render markdown file ", element[["Rmd_file"]], "to html from markdown."))
   )
   html <- readr::read_lines(html_out)
   html <- paste(html, collapse = " ") # join all lines to one

@@ -17,19 +17,22 @@ bulletin_to_pdf <- function(bulletin,
   log_info("Processing bulletin for {.emph language", language, "} to pdf via markdown...", style = "h3")
   #cat.report::load.cat.report()
   
-  markdown_file = bulletin_to_markdown(bulletin, language = language)
+  markdown_file = bulletin_to_markdown(bulletin, language = language,
+                                       filename = file.path(bulletin$bulletin_path, 
+                                                            paste0(bulletin$bulletin_id, "_", language, ".Rmd"))
+  )
   log_debug("Processing file", markdown_file, "to pdf.")
   log_debug("Expected pdf-file:", filename)
   
   quiet = get_log_level() < 2 # be verbose on debug level
   # !! latex / pandoc won't work within tryCatch block !! 
-#  tryCatch(
-    rmarkdown::render(markdown_file, 
-                      envir = bulletin$bulletin_envir, 
-                      # output_format = "pdf_document", 
-                      output_file = filename, 
-                      quiet = quiet,
-                      clean = FALSE)
+  #  tryCatch(
+  rmarkdown::render(markdown_file, 
+                    envir = bulletin$bulletin_envir, 
+                    # output_format = "pdf_document", 
+                    output_file = filename, 
+                    quiet = quiet,
+                    clean = FALSE)
   #   warning = function(w) {
   #     log_debug("Latex warning in bulletin_to_pdf:", w$message)
   #   },
@@ -107,6 +110,7 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                   stop("unknown language")
   )
   
+  keep_tex = getOption("log_level", default = 1) > 1
   front_matter <- c(front_matter,
                     "documentclass: |",
                     "  ```{=latex}",
@@ -114,7 +118,7 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                     "   ```",
                     "output:",
                     "  pdf_document:",
-                    "    keep_tex: true",
+                    paste0("    keep_tex: ", if (keep_tex) "true" else "false"),
                     "    fig_caption: true",
                     "    fig_width: 3",
                     #                    paste0("    lang: ", bulletin$language, "-CH"),

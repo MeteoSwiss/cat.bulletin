@@ -36,7 +36,7 @@ publication_metadata <- function(path = NULL,
     path <- paste0("/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/climate-bulletins/", path)
   
   metadata <- list(
-    sender = paste0("Climate Analysis Tools (CATs), package cat.bulletin (v", packageVersion("cat.bulletin")),
+    sender = paste0("Climate Analysis Tools (CATs), package cat.bulletin (v", utils::packageVersion("cat.bulletin")),
     publication_type = "reportOrBulletin",
     path = path, 
     alias = alias, 
