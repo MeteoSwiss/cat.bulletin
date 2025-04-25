@@ -5,7 +5,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r echo=FALSE, results="hide"}
-formatted_date <- format(Sys.Date(), "%d. %B %Y")
+formatted_date <- format(Sys.Date(), "%d %B %Y")
 
 current_date <- Sys.Date()
 last_day_of_month <- lubridate::ceiling_date(current_date, "month") - lubridate::days(1)
@@ -21,13 +21,13 @@ warning_early <- data.frame(
            "Warning: Publication date more than 5 days before the end of the month! Values may still change significantly."),
   row.names = c("de", "fr", "it", "en")
 )
-
+nextmon <- tolower(nextmonth_str(bulletin$month))
 ```
 
-Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Schweizer Klimas im aktuellen Monat, vergleicht diesen mit der momentan gültigen Referenzperiode 1991-2020 gemäss Vorgabe der Weltorganisation für Meteorologie WMO und ordnet ihn in den historischen Kontext seit Messbeginn 1864 ein. 
+Il bollettino mensile di MeteoSvizzera descrive lo stato del clima in Svizzera nel mese in corso, lo confronta con il periodo di riferimento attualmente in vigore 1991-2020 secondo le direttive dell'Organizzazione Meteorologica Mondiale (OMM) e lo colloca nel contesto storico dall'inizio delle misurazioni nel 1864.
 
-**Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.** `r ifelse(bulletin$provisional, "In dieser Phase basieren die Angaben im Bulletin auf provisorischen Daten. Landesweite Angaben zu Temperatur und Niederschlag berücksichtigen die Prognose bis zum Monatsende mit den dazugehörigen Unsicherheiten. Lokale Informationen beziehen sich auf den bisherigen Monatsverlauf.","")` 
+**La produzione giornaliera del bollettino inizia a partire dal quintultimo giorno del mese.** `r ifelse(bulletin$provisional, "Fino alla fine del mese, le informazioni contenute nel bollettino si basano su dati provvisori. Le informazioni sulle temperature e le precipitazioni a livello nazionale tengono conto delle previsioni fino alla fine del mese con le relative incertezze. Le informazioni locali si riferiscono all'andamento del mese disponibili fino al momento della pubblicazione.","")` 
 
-`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {nextmonth_str(bulletin$month)} hier auch als PDF zu finden."), glue::glue("Dies ist das definitive Bulletin für den {month_str(bulletin$month)} {bulletin$year}."))`
+`r ifelse(bulletin$provisional, glue::glue("Il bollettino definitivo è disponibile su questo sito a partire dal 10 {nextmon}."), glue::glue("Questo è il bollettino definitivo per {tolower(month_str(bulletin$month))} {bulletin$year}."))`
 
-**Publikationsdatum: `r formatted_date``r ifelse(days_to_eom > 5 & bulletin$provisional, paste0("; ", warning_early[bulletin$language,]), "")`**
+**Data di pubblicazione: `r formatted_date``r ifelse(days_to_eom > 5 & bulletin$provisional, paste0("; ", warning_early[bulletin$language,]), "")`**

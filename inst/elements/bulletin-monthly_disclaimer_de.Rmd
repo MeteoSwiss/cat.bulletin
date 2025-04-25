@@ -26,8 +26,8 @@ warning_early <- data.frame(
 
 Das Monatsbulletin von MeteoSchweiz beschreibt den Zustand des Schweizer Klimas im aktuellen Monat, vergleicht diesen mit der momentan gültigen Referenzperiode 1991-2020 gemäss Vorgabe der Weltorganisation für Meteorologie WMO und ordnet ihn in den historischen Kontext seit Messbeginn 1864 ein. 
 
-**Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.** `r ifelse(bulletin$provisional, "In dieser Phase basieren die Angaben im Bulletin auf provisorischen Daten. Landesweite Angaben zu Temperatur und Niederschlag berücksichtigen die Prognose bis zum Monatsende mit den dazugehörigen Unsicherheiten. Lokale Informationen beziehen sich auf den bisherigen Monatsverlauf.","")` 
+**Die tägliche Produktion des Bulletins startet ab dem fünftletzten Tag des Monats.** `r ifelse(bulletin$provisional, "Bis zum Monatsende basieren die Angaben im Bulletin auf provisorischen Daten. Landesweite Angaben zu Temperatur und Niederschlag berücksichtigen die Prognose bis zum Monatsende mit den dazugehörigen Unsicherheiten. Lokale Informationen beziehen sich auf den bisherigen Monatsverlauf.","")` 
 
-`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {nextmonth_str(bulletin$month)} hier auch als PDF zu finden."), glue::glue("Dies ist das definitive Bulletin für den {month_str(bulletin$month)} {bulletin$year}."))`
+`r ifelse(bulletin$provisional, glue::glue("Das definitive Bulletin ist ab dem 10. {nextmonth_str(bulletin$month)} hier verfügbar."), glue::glue("Dies ist das definitive Bulletin für den {month_str(bulletin$month)} {bulletin$year}."))`
 
 **Publikationsdatum: `r formatted_date``r ifelse(days_to_eom > 5 & bulletin$provisional, paste0("; ", warning_early[bulletin$language,]), "")`**
