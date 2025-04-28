@@ -35,6 +35,7 @@ add_log <-function(..., log_level = 1, style = "none") {
          "h2" = cli::cli_h2(message),
          "h3" = cli::cli_h3(message),
          "success" = cli::cli_alert_success(message),
+         "warning" = cli::cli_alert_warning(message),
          switch(as.character(user_log_level),
                 "1" = cli::cli_alert_info(message),
                 cat(message, fill = TRUE)

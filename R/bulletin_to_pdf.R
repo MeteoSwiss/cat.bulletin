@@ -124,7 +124,6 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                     #                    paste0("    lang: ", bulletin$language, "-CH"),
                     "header-includes:",
                     "  - \\usepackage[utf8]{inputenc}",
-                    "  - \\usepackage{xcolor}",
                     "  - \\usepackage{tcolorbox}",                    
                     paste0("  - \\usepackage[", babel, "]{babel}"),
                     #"includes:",

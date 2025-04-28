@@ -73,7 +73,9 @@ bulletin_monthly <- function(year = 2024,
       monatsbilanz_temp(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       temporal_evolution(swissmean = swissmean, regdiff = regdiff, language = language) %>%
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
-      monatsbilanz_sun(regdiff = regdiff, language = language) #%>%
+      monatsbilanz_sun(regdiff = regdiff, language = language) %>%
+      monthly_events(language = language) %>%
+      monthly_vegetation(language = language)
       #monatsbulletin_daily_timeseries(language = language)
   }
   
@@ -293,7 +295,9 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   if (get_log_level() >= 2) print(prec_table)
   bulletin <- bulletin %>%
     add_table(prec_table, id = "monatsbilanz_prec_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_prec_table")),
+              colwidths = c(5,rep(2, ncol(prec_table) - 1)),
+              align = "lcccc")
   
   bulletin
 }
@@ -341,7 +345,9 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
   if (get_log_level() >= 2) print(sun_table)
   bulletin <- bulletin %>%
     add_table(sun_table, id = "monatsbilanz_sun_table",
-              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")))
+              caption = glue::glue(cat.lang::get.text("bulletin_monthly_sun_table")),
+              colwidths = c(5,rep(2, ncol(sun_table) - 1)),
+              align = "lcccc")
   
   bulletin  
 }
@@ -363,6 +369,51 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   bulletin
 }
+
+monthly_events <- function(bulletin, language) {
+  
+  log_info("monthly_events")
+  
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
+  if (!see_if(is.readable(bulletin_prod_path))) {
+    log_info("bulletin_prod_path not readable -> omitting monthly_events section", style = "warning")
+    return(bulletin)
+  }
+  
+  element_id = "event_list"
+  
+  bulletin <- bulletin %>% 
+    add_shorties_list(group_id = "event",
+                    title = cat.lang::get.text("bulletin_monthly_events_title"),
+                    path =  bulletin_prod_path,
+                    subdir = bulletin$yearmonth,
+                    id = element_id)
+
+  bulletin
+}
+
+monthly_vegetation <- function(bulletin, language) {
+  
+  log_info("monthly_vegetation")
+  
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
+  if (!see_if(is.readable(bulletin_prod_path))) {
+    log_info("bulletin_prod_path not readable -> omitting monthly_vegetation section", style = "warning")
+    return(bulletin)
+  }
+  
+  element_id = "vegetation_list"
+  
+  bulletin <- bulletin %>% 
+    add_shorties_list(group_id = "vegetation",
+                      title = cat.lang::get.text("bulletin_monthly_vegetation_title"),
+                      path =  bulletin_prod_path,
+                      subdir = bulletin$yearmonth,
+                      id = element_id)
+  
+  bulletin
+}
+
 
 monatsbulletin_daily_timeseries <- function(bulletin, language) {
   

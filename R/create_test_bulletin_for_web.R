@@ -16,12 +16,16 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   sections <- match.arg(sections, several.ok = TRUE)
   
+  log_info("Creating cat.bulletin test bulletin in workdir", workdir, style = "h1")
+  
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
     languages = c("de", "fr", "it"),
     bulletin_dir = bulletin_dir,
     workdir = workdir
   ) 
+  
+  log_info("Adding publication metadata")
   
   metadata <- publication_metadata(
     path = path,
@@ -45,6 +49,8 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   )
   
   bulletin <- bulletin %>% set_metadata(metadata)
+  
+  log_info("Adding elements")
   
   ## Disclaimer element
   if ("disclaimer" %in% sections) {
@@ -130,13 +136,18 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
         )
   }
   
+  log_info("Finished adding elements", style = "success")
   
   ## Generate pdfs in all languages and the xml and zip everything up
+  
+  log_info("Generating pdfs, xml and zip file", style = "h2")
   
   #language = "fr"
   #filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
   
   bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
+  
+  log_info("Finished generation of pdfs, xml and zip file in workdir", workdir, style = "success")
   
   invisible(bulletin)
 }
