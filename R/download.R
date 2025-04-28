@@ -80,13 +80,16 @@ download_monatsbilanz_maps <- function(bulletin,
   
 }
 
-download_monatsbilanz_temp <- function(bulletin,
-                                       filename = NULL,
-                                       valueBase = c("abs", "anom9120"),
-                                       provisional = FALSE, 
-                                       mediaType = "text/plain") {
+download_temporal_evolution <- function(bulletin,
+                                        filename = NULL,
+                                        valueBase = c("abs", "anom9120", "climanom"),
+                                        trend = c("loess30", "loess30nostats"),
+                                        provisional = FALSE, 
+                                        mediaType = c("text/plain", "image/png")) {
   
   valueBase = match.arg(valueBase)
+  mediaType = match.arg(mediaType)
+  trend = match.arg(trend)
   assertthat::assert_that(is.logical(provisional))
   
   product = paste0("climate-temperature-evolution-region-", valueBase)
@@ -95,7 +98,7 @@ download_monatsbilanz_temp <- function(bulletin,
   attributevalues <- 
     list(
       valueBase = valueBase,
-      trend = "loess30",
+      trend = trend,
       parameter ="ths200m0",
       loctype ="region",
       location = "regSwiss",
