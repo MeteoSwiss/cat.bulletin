@@ -1,5 +1,5 @@
 devtools::unload();devtools::load_all()
 bulletin <- bulletin_monthly(year = 2025, month = 4, workdir = ".")
 bulletin_to_pdf(bulletin, language = "de", filename = file.path(getwd(),"de.pdf"))
-
+bulletin_to_webzip(bulletin)
 #create_bulletin_monthly(year=2025,month=3)

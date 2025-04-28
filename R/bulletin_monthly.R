@@ -374,12 +374,18 @@ monthly_events <- function(bulletin, language) {
   
   log_info("monthly_events")
   
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
+  if (!is.readable(bulletin_prod_path)) {
+    log_info("bulletin_prod_path not readable -> omitting monthly_events section", style = "warning")
+    return(bulletin)
+  }
+  
   element_id = "event_list"
   
   bulletin <- bulletin %>% 
     add_shorties_list(group_id = "event",
                     title = cat.lang::get.text("bulletin_monthly_events_title"),
-                    path =  file.path(get_config_value("bulletin_prod_path")),
+                    path =  bulletin_prod_path,
                     subdir = bulletin$yearmonth,
                     id = element_id)
 
@@ -390,12 +396,18 @@ monthly_vegetation <- function(bulletin, language) {
   
   log_info("monthly_vegetation")
   
+  bulletin_prod_path <- get_config_value("bulletin_prod_path")
+  if (!is.readable(bulletin_prod_path)) {
+    log_info("bulletin_prod_path not readable -> omitting monthly_vegetation section", style = "warning")
+    return(bulletin)
+  }
+  
   element_id = "vegetation_list"
   
   bulletin <- bulletin %>% 
     add_shorties_list(group_id = "vegetation",
                       title = cat.lang::get.text("bulletin_monthly_vegetation_title"),
-                      path =  file.path(get_config_value("bulletin_prod_path")),
+                      path =  bulletin_prod_path,
                       subdir = bulletin$yearmonth,
                       id = element_id)
   
