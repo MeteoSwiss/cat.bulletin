@@ -356,6 +356,19 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   log_info("temporal_evolution")
   
+  # Add LOESS figure
+  image_id <- "temperature_evolution_loess"
+
+  image_filepath <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30nostats", mediaType = "image/png")
+  
+  bulletin <- bulletin %>% 
+    add_image(
+      filepath = image_filepath,
+      caption = "test",
+      alt = "test",
+      id = image_id
+    )
+  
   bulletin <- bulletin %>% add_Rmd(element_id = "temporal-evolution-p1")
   
   if (regdiff$high_temp_rec_avail) {
