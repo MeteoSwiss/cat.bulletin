@@ -364,7 +364,7 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   bulletin <- bulletin %>% 
     add_image(
       filepath = image_filepath,
-      caption = "test",
+      caption = glue::glue(cat.lang::get.text("bulletin_monthly_evolution")),
       alt = "test",
       id = image_id
     )
