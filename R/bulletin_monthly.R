@@ -360,12 +360,18 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   image_id <- "temperature_evolution_loess"
 
   image_filepath <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30nostats", mediaType = "image/png")
-  
+
+  cropped_filepath <- crop_image(image_filepath,
+                                 outpath = tempfile(fileext = ".png"),
+                                 side = "bottom",
+                                 margin = 85)
+    
   bulletin <- bulletin %>% 
     add_image(
-      filepath = image_filepath,
+#      filepath = image_filepath,
+      filepath = cropped_filepath,
       caption = glue::glue(cat.lang::get.text("bulletin_monthly_evolution")),
-      alt = "test",
+      alt = glue::glue(cat.lang::get.text("bulletin_monthly_evolution_alt")),
       id = image_id
     )
   
