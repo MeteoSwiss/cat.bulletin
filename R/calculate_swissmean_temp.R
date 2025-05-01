@@ -77,13 +77,13 @@ calculate_swissmean_temp <- function (bulletin) {
   signif <- as.numeric(loess$incr.pval)
   diff <- round(c(loess$incr.cf[1],loess$t.incr,loess$incr.cf[2]),1)
   ydiff_ca <- round(ycurr-1885+1,-1)
+
+  filename_climanom <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30", mediaType = "text/plain", filename = "monatsbilanz_temp_climanom.txt")
+  data_climanom <- utils::read.table(filename_climanom, header = TRUE)
   
-  resid1 <- as.numeric(stats::quantile(abs-loess$fit,probs=c(0.16,0.84)))
-  resid2 <- as.numeric(stats::quantile(abs-loess$fit,probs=c(0.025,0.975)))
-  
-  bounds1 <- format(round(c(loess$val2+resid1[1],loess$val2+resid1[2]),1), nsmall=1)
-  bounds2 <- format(round(c(loess$val2+resid2[1],loess$val2+resid2[2]),1), nsmall=1)
-  
+  bounds1 <- format(c(data_climanom$q.l[poscurr]-data_climanom$unc, 
+                      data_climanom$q.u[poscurr]+data_climanom$unc), nsmall=1)
+
   swissmean_temp <- list(
     curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
     curr_rank = rankcurr, meas_start = ybeg,
@@ -91,8 +91,7 @@ calculate_swissmean_temp <- function (bulletin) {
     val_form_rec = recval_t, dev_form_rec = reca_t,
     all_years = year, loess = loess, signif = signif,
     climate_change_signal = diff,
-    y_since_preind = ydiff_ca, loess_bounds1 = bounds1,
-    loess_bounds2 = bounds2
+    y_since_preind = ydiff_ca, loess_bounds1 = bounds1
   )
   
   if (bulletin$provisional) {
