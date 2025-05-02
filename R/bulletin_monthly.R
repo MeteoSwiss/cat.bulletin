@@ -463,8 +463,8 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_filepath,
-      caption = "Diese Caption ist erst ein Test.",
-      # caption = glue::glue(cat.lang::get.text("daily_timeseries")),
+      # caption = "Diese Caption ist erst ein Test.",
+      caption = glue::glue(cat.lang::get.text("daily_timeseries")),
       alt = "test",
       id = image_id
     )
