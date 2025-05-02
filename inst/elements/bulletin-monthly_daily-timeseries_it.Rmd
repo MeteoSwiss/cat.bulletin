@@ -4,6 +4,7 @@
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Monatsverlauf wichtiger Messgrössen
+## Andamento mensile di importanti metriche
 
-Abbildung X zeigt den täglichen Verlauf einiger wichtiger Messgrössen im `r month_str(bulletin$month)` `r bulletin$year` beispielhaft für die Station `r witterungsverlauf_station_name`.
+La figura `r ifelse(bulletin$provisional, "4", "5")` mostra l'andamento giornaliero di alcune importanti variabili misurate in `r month_str(bulletin$month)` `r bulletin$year` come esempio per una stazione in pianura e un sito di misura in posizione elevata.
+
