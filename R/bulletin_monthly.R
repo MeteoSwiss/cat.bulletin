@@ -75,8 +75,8 @@ bulletin_monthly <- function(year = 2024,
       monatsbilanz_precip(regdiff = regdiff, language = language) %>%
       monatsbilanz_sun(regdiff = regdiff, language = language) %>%
       monthly_events(language = language) %>%
-      monthly_vegetation(language = language)
-      #monatsbulletin_daily_timeseries(language = language)
+      monthly_vegetation(language = language) %>%
+      monatsbulletin_daily_timeseries(language = language)
   }
   
   log_info("Creating publication metadata", style = "h2")
@@ -437,21 +437,34 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   log_info("monatsbulletin_daily_timeseries")
   
-  witterungsverlauf_station <- c(de = "SMA", fr = "GVE", it = "LUG")
-  witterungsverlauf_station_name <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[language])$station_name
+  # witterungsverlauf_station <- c(de = "SMA", fr = "GVE", it = "LUG")
+  witterungsverlauf_station <- list(
+    de = c("SMA", "ENG"),
+    fr = c("GVE", "CHD"),
+    it = c("LUG", "SAM")
+  )
+  # witterungsverlauf_station_name <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[language])$station_name
+  wv_statname1 <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[[language]][1])$station_name
+  wv_statname2 <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[[language]][2])$station_name
   
   bulletin <- bulletin %>% add_Rmd(element_id = "daily-timeseries")
   
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
-  image_filename <- paste0(image_id,"_",language,".png")
 
-  image_filepath = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[language]), language=language, filename = image_filename)
+  image_filepath1 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][1]), language=language)
+  image_filepath2 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][2]), language=language)
+
+  joined_filepath <- join_images(
+    image_filepaths = c(image_filepath1, image_filepath2),
+    outpath = tempfile(fileext = ".png")
+  )
   
   bulletin <- bulletin %>% 
     add_image(
-      filepath = image_filepath,
-      caption = glue::glue(cat.lang::get.text("daily_timeseries")),
+      filepath = joined_filepath,
+      caption = "Diese Caption ist erst ein Test.",
+      # caption = glue::glue(cat.lang::get.text("daily_timeseries")),
       alt = "test",
       id = image_id
     )
