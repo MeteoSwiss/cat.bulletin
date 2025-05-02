@@ -6,8 +6,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Monatsverlauf wichtiger Messgrössen
 
-Hier folgt Text.
-
-<!-- Abbildung X zeigt den täglichen Verlauf einiger wichtiger Messgrössen im `r month_str(bulletin$month)` `r bulletin$year` beispielhaft für die Stationen `r wv_statname1` und `r wv_statname2`. -->
+Abbildung `r ifelse(bulletin$provisional, "4", "5")` zeigt den täglichen Verlauf einiger wichtiger Messgrössen im `r month_str(bulletin$month)` `r bulletin$year` beispielhaft für eine Station in den Niederungen und einen Messstandort in erhöhter Lage.
 
 
