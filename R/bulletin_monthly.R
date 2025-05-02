@@ -265,7 +265,7 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   
   abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_abs.png")
   anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_anom.png")
-
+  
   joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
   
   bulletin <- bulletin %>% 
@@ -358,14 +358,14 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   # Add LOESS figure
   image_id <- "temperature_evolution_loess"
-
+  
   image_filepath <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30nostats", mediaType = "image/png")
-
+  
   cropped_filepath <- crop_image(image_filepath,
                                  outpath = tempfile(fileext = ".png"),
                                  side = "bottom",
                                  margin = 85)
-    
+  
   bulletin <- bulletin %>% 
     add_image(
       filepath = cropped_filepath,
@@ -402,11 +402,11 @@ monthly_events <- function(bulletin, language) {
   
   bulletin <- bulletin %>% 
     add_shorties_list(group_id = "event",
-                    title = cat.lang::get.text("bulletin_monthly_events_title"),
-                    path =  bulletin_prod_path,
-                    subdir = bulletin$yearmonth,
-                    id = element_id)
-
+                      title = cat.lang::get.text("bulletin_monthly_events_title"),
+                      path =  bulletin_prod_path,
+                      subdir = bulletin$yearmonth,
+                      id = element_id)
+  
   bulletin
 }
 
@@ -443,7 +443,7 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
     fr = c("GVE", "CHD"),
     it = c("LUG", "SAM")
   )
-  # witterungsverlauf_station_name <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[language])$station_name
+  
   wv_statname1 <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[[language]][1])$station_name
   wv_statname2 <- mchdwh::station_info(nat_abbr=witterungsverlauf_station[[language]][2])$station_name
   
@@ -451,10 +451,10 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
-
+  
   image_filepath1 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][1]), language=language)
   image_filepath2 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][2]), language=language)
-
+  
   joined_filepath <- join_images(
     image_filepaths = c(image_filepath1, image_filepath2),
     outpath = tempfile(fileext = ".png")
@@ -463,7 +463,6 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_filepath,
-      # caption = "Diese Caption ist erst ein Test.",
       caption = glue::glue(cat.lang::get.text("daily_timeseries")),
       alt = "test",
       id = image_id
