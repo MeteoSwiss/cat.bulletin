@@ -81,8 +81,8 @@ calculate_swissmean_temp <- function (bulletin) {
   filename_climanom <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30", mediaType = "text/plain", filename = "monatsbilanz_temp_climanom.txt")
   data_climanom <- utils::read.table(filename_climanom, header = TRUE)
   
-  bounds1 <- format(c(data_climanom$q.l[poscurr]-data_climanom$unc, 
-                      data_climanom$q.u[poscurr]+data_climanom$unc), nsmall=1)
+  bounds1 <- c(data_climanom$q.l[poscurr]-data_climanom$unc[poscurr], 
+               data_climanom$q.u[poscurr]+data_climanom$unc[poscurr])
 
   swissmean_temp <- list(
     curr_temp = vcurr_t, curr_temp_dev = acurr_t, 
