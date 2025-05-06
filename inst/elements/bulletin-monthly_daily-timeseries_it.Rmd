@@ -6,5 +6,5 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Andamento mensile di importanti metriche
 
-La figura `r ifelse(bulletin$provisional, "4", "5")` mostra l'andamento giornaliero di alcune importanti variabili misurate in `r month_str(bulletin$month)` `r bulletin$year` come esempio per una stazione in pianura e un sito di misura in posizione elevata.
+La figura `r ifelse(bulletin$provisional, "4", "5")` mostra l'andamento giornaliero di alcune importanti variabili misurate in `r tolower(month_str(bulletin$month))` `r bulletin$year` come esempio per una stazione in pianura e un sito di misura in posizione elevata.
 
