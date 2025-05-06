@@ -707,11 +707,13 @@ translate_record_text <- function(text, language = c("fr", "it")) {
   translations <- list(
     fr = list(
       and_word = "et",
-      record_phrase = "record précédent "
+      record_phrase1 = "record précédent ",
+      record_phrase2 = "record "
     ),
     it = list(
       and_word = "e",
-      record_phrase = "record precedente"
+      record_phrase1 = "record precedente",
+      record_phrase2 = "record"
     )
   )
   
@@ -722,8 +724,8 @@ translate_record_text <- function(text, language = c("fr", "it")) {
   
   # Replace "bisheriger Rekord" or just "Rekord"
   # Make sure to only replace "Rekord" if not already matched as "bisheriger Rekord"
-  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase, text)
-  text <- gsub("\\bRekord\\b", tr$record_phrase, text)
+  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase1, text)
+  text <- gsub("\\bRekord\\b", tr$record_phrase2, text)
   
   return(text)
 }
