@@ -625,18 +625,18 @@ nextmonth_str <- function(month, language) {
 
 translate_regions <- function(text, lang = "fr") {
   dict_fr <- list(
-    "Alpennordhang" = "le versant nord des Alpes",
-    "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
-    "Jura" = "le Jura",
-    "Alpensüdseite" = "le Sud des Alpes",
-    "Mittelland" = "le Plateau",
-    "Wallis" = "le Valais",
-    "Engadin" = "l'Engadine"
+    "Alpennordhang" = "sur le versant nord des Alpes",
+    "Nord- und Mittelbünden" = "sur le nord et le centre des Grisons",
+    "Jura" = "dans le Jura",
+    "Alpensüdseite" = "au Sud des Alpes",
+    "Mittelland" = "sur le Plateau",
+    "Wallis" = "en Valais",
+    "Engadin" = "en Engadine"
   )
   
   dict_it <- list(
-    "Alpennordhang" = "nel Pendio nordalpino",
-    "Nord- und Mittelbünden" = "al nord e nel centro dei Grigioni",
+    "Alpennordhang" = "lungo il versante nordalpino",
+    "Nord- und Mittelbünden" = "nel nord e nel centro dei Grigioni",
     "Jura" = "nel Giura",
     "Alpensüdseite" = "al Sud delle Alpi",
     "Mittelland" = "nell'Altopiano",
