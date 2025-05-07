@@ -726,16 +726,17 @@ translate_record_text <- function(text, language = c("fr", "it")) {
   text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase1, text)
   text <- gsub("\\bRekord\\b", tr$record_phrase2, text)
   
-  # Add "con" after station name before value+unit (but only outside parentheses) for Italian
   if (language == "it") {
-    # Match: [Name] [value][space][unit], e.g. Elm 5.4 °C or Sion 22 mm or Biasca 4.2 h
-    # Ensure it's followed by a space and an opening parenthesis, so we only modify the outside part
+    # Add "con" between place name and value+unit (generalized)
     text <- gsub(
-      "(\\b[A-ZÄÖÜa-zäöüßéèàùîç]+)\\s+(\\d+(?:\\.\\d+)?\\s*[^\\s,()]+)(?=\\s*\\()",
+      "(\\b[A-ZÄÖÜa-zäöüßéèàùîç\\-]+)\\s+(\\d+(?:\\.\\d+)?\\s*[^\\s,()]+)",
       "\\1 con \\2",
       text,
       perl = TRUE
     )
+    
+    # Replace "h" with "ore" (e.g., "4.2 h" → "4.2 ore") everywhere
+    text <- gsub("\\b(\\d+(?:\\.\\d+)?)\\s*h\\b", "\\1 ore", text)
   }
   
   return(text)
