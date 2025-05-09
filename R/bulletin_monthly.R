@@ -184,11 +184,14 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   image_id <- "monatsbilanz_temp_map"
   image_filename <- paste0(image_id,".png")
   
+  # download images to cache
   abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_abs.png")
   anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "temp", out_path = bulletin$cache_path, filename = "monatsbilanz_temp_map_anom.png")
   
-  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
+  # join and crop to tempdir
+  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath, outpath = image_filename)
   
+  # add to image dir
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_and_cropped_filepath,
@@ -218,15 +221,19 @@ monatsbilanz_temp <- function(bulletin, swissmean, regdiff, language) {
   bulletin
 }
 
-join_and_crop_monthly_maps <- function(abs_filepath, anom_filepath) {
+
+join_and_crop_monthly_maps <- function(abs_filepath, anom_filepath, outpath) {
   
   joined_filepath <- join_images(
     image_filepaths = c(abs_filepath, anom_filepath),
     outpath = tempfile(fileext = ".png")
   )
   
+  if (missing(outpath))
+    outpath = tempfile(fileext = ".png")
+  
   cropped_filepath <- crop_image(joined_filepath,
-                                 outpath = tempfile(fileext = ".png"),
+                                 outpath = outpath,
                                  side = "top",
                                  margin = 23)
   
@@ -266,8 +273,8 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_abs.png")
   anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_anom.png")
   
-  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
-  
+  joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath, outpath = image_filename)
+
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_and_cropped_filepath,
@@ -315,7 +322,7 @@ monatsbilanz_sun <- function(bulletin, regdiff, language) {
     abs_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "abs", provisional = bulletin$provisional, parameter = "sunshine", out_path = bulletin$cache_path, filename = "monatsbilanz_sunshine_map_abs.png")
     anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "sunshine", out_path = bulletin$cache_path, filename = "monatsbilanz_sunshine_map_anom.png")
     
-    joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath)
+    joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath, outpath = image_filename)
     
     bulletin <- bulletin %>% 
       add_image(
@@ -358,14 +365,17 @@ temporal_evolution <- function(bulletin, swissmean, regdiff, language) {
   
   # Add LOESS figure
   image_id <- "temperature_evolution_loess"
+  image_filename = paste0(image_id, "_", language, ".png")
   
-  image_filepath <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30nostats", mediaType = "image/png")
+  # download to cache
+  image_filepath <- download_temporal_evolution(bulletin, valueBase = "climanom", provisional = bulletin$provisional, trend = "loess30nostats", mediaType = "image/png", filename = image_filename)
   
+  # crop to tempdir
   cropped_filepath <- crop_image(image_filepath,
-                                 outpath = tempfile(fileext = ".png"),
+                                 outpath = image_filename,
                                  side = "bottom",
                                  margin = 85)
-  
+  # add to image dir
   bulletin <- bulletin %>% 
     add_image(
       filepath = cropped_filepath,
@@ -451,17 +461,21 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
-
+  image_filename = paste0(image_id, "_", language, ".png")
+  
+  # download two images per language to cache
   locations = as.character(witterungsverlauf_station[[language]][1:2])
-  filenames = paste0("witterungsverlauf_", locations, "_", language, ".png")
+  filenames = paste0(image_id, "_", locations, "_", language, ".png")
   image_filepath1 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location = locations[1], language = language, filename = filenames[1])
   image_filepath2 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location = locations[2], language = language, filename = filenames[2])
   
+  # join images in tempdir
   joined_filepath <- join_images(
     image_filepaths = c(image_filepath1, image_filepath2),
-    outpath = tempfile(fileext = ".png")
+    outpath = image_filename
   )
   
+  # add image to image dir
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_filepath,

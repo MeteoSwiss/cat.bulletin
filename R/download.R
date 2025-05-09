@@ -7,7 +7,7 @@ download_realization <- function(bulletin, product, filter, filename, out_path, 
     if (has_name(filter, "mediaType")) {
       out_path <- switch(filter$mediaType,
                          "text/plain" = bulletin$data_path,
-                         bulletin$image_path
+                         bulletin$cache_path
       )
     }
     log_debug("out_path missing, setting to '", out_path, "'.")
@@ -132,8 +132,6 @@ download_witterungsverlauf <- function(bulletin,
                                        year = 2024, 
                                        location = "SMA",
                                        language = bulletin$language) {
-  
-  #  valueBase = match.arg(valueBase)
   
   attributevalues <- 
     list(
