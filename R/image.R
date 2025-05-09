@@ -22,6 +22,7 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' @family bulletin_element#' 
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
+#' @family bulletin_elements
 #' @examples 
 #' image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
 #' bulletin <- create_bulletin() %>%

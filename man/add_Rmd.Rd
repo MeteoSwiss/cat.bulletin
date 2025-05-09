@@ -28,3 +28,14 @@ The default is a composition of type and a random string.}
 \description{
 Add R markdown to a bulletin
 }
+\seealso{
+Bulletin elements
+\code{\link{add_disclaimer}()},
+\code{\link{add_flextable}()},
+\code{\link{add_image}()},
+\code{\link{add_link_list}()},
+\code{\link{add_shorties_list}()},
+\code{\link{add_table}()},
+\code{\link{add_text}()}
+}
+\concept{bulletin_elements}

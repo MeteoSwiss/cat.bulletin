@@ -41,7 +41,11 @@ bulletin <- create_bulletin() \%>\%
 }
 \seealso{
 Bulletin elements
+\code{\link{add_Rmd}()},
+\code{\link{add_disclaimer}()},
 \code{\link{add_flextable}()},
+\code{\link{add_image}()},
+\code{\link{add_link_list}()},
 \code{\link{add_shorties_list}()},
 \code{\link{add_text}()}
 }

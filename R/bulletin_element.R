@@ -21,3 +21,7 @@ randomString <- function(length = 10) {
 generate_element_id <- function(type) {
   paste(type, randomString(), sep ="_")
 }
+
+bulletin_element_is_of_type <- function(element, type) {
+  element[["type"]] == type
+}

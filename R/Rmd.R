@@ -12,6 +12,7 @@ Rmd_element <- function(filename, envir, appear = NULL, id = NULL) {
 #' @param envir environment in which to knit the Rmd later. 
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
+#' @family bulletin_elements
 #' @export
 add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_id, appear = c("xml", "pdf")) {
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")

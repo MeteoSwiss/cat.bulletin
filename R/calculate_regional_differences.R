@@ -1,6 +1,6 @@
 calculate_regional_differences <- function(bulletin) {
   
-  log_info("Calculating regional differences")
+  log_info("Calculating regional differences", style = "h1")
   
   cache_file <- file.path(bulletin$cache_path, "regional_differences.Rdata")
   if (file.exists(cache_file)) {

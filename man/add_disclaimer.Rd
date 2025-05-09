@@ -33,3 +33,14 @@ A disclaimer element consists of a caption (given as text) and a body (specified
 On the website (xml), the disclaimer is rendered as an accordeon.
 In the pdf, the caption is omitted and the body is set in a gray box.
 }
+\seealso{
+Bulletin elements
+\code{\link{add_Rmd}()},
+\code{\link{add_flextable}()},
+\code{\link{add_image}()},
+\code{\link{add_link_list}()},
+\code{\link{add_shorties_list}()},
+\code{\link{add_table}()},
+\code{\link{add_text}()}
+}
+\concept{bulletin_elements}

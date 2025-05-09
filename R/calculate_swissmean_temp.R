@@ -1,6 +1,6 @@
 calculate_swissmean_temp <- function (bulletin) {
   
-  log_info("Calculating swissmean for temperature")
+  log_info("Calculating swissmean for temperature", level = "h1")
   
   cache_file <- file.path(bulletin$cache_path, "swissmean_temp.Rdata")
   if (file.exists(cache_file)) {

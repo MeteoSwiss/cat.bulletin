@@ -16,6 +16,7 @@ disclaimer_element <- function(caption_text_element, body_Rmd_element, appear = 
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
 #' @inheritParams add_Rmd
+#' @family bulletin_elements
 #' @export
 add_disclaimer <- function(bulletin, 
                            caption_text, 

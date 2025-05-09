@@ -45,4 +45,15 @@ image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_t
 bulletin <- create_bulletin() \%>\%
   add_image(filepath = image_filepath, caption = "An example figure.")
 }
+\seealso{
+Bulletin elements
+\code{\link{add_Rmd}()},
+\code{\link{add_disclaimer}()},
+\code{\link{add_flextable}()},
+\code{\link{add_link_list}()},
+\code{\link{add_shorties_list}()},
+\code{\link{add_table}()},
+\code{\link{add_text}()}
+}
 \concept{bulletin_element#'}
+\concept{bulletin_elements}
