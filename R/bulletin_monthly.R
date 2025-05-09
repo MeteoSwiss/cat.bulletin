@@ -452,8 +452,10 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   # Add image for daily weather conditions
   image_id <- "witterungsverlauf"
 
-  image_filepath1 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][1]), language=language)
-  image_filepath2 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location=as.character(witterungsverlauf_station[[language]][2]), language=language)
+  locations = as.character(witterungsverlauf_station[[language]][1:2])
+  filenames = paste0("witterungsverlauf_", locations, "_", language, ".png")
+  image_filepath1 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location = locations[1], language = language, filename = filenames[1])
+  image_filepath2 = download_witterungsverlauf(bulletin, month=bulletin$month, year=bulletin$year, location = locations[2], language = language, filename = filenames[2])
   
   joined_filepath <- join_images(
     image_filepaths = c(image_filepath1, image_filepath2),

@@ -155,6 +155,15 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
     "```"
   )
   
+  # load required R packages
+  preamble <- c(
+    preamble, c(
+      "```{r initalSetup, results=FALSE, echo=FALSE}",
+      "require(kableExtra)",
+      "```"
+    )
+  )
+  
   readr::write_lines(preamble, file = file_conn)
   
 }
