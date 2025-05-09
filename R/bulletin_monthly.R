@@ -76,7 +76,8 @@ bulletin_monthly <- function(year = 2024,
       monatsbilanz_sun(regdiff = regdiff, language = language) %>%
       monthly_events(language = language) %>%
       monthly_vegetation(language = language) %>%
-      monatsbulletin_daily_timeseries(language = language)
+      monatsbulletin_daily_timeseries(language = language) %>%
+      monatsbulletin_more_info(language = language)
   }
   
   log_info("Creating publication metadata", style = "h2")
@@ -471,13 +472,60 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   bulletin
 }
 
-monatsbulletin_more_info <- function(bulletin) {
-  bulletin <- bulletin %>% add_Rmd(element_id = "more-info")
-  bulletin
-}
+monatsbulletin_more_info <- function(bulletin, language) {
 
-monatsbulletin_disclaimer <- function(bulletin) {
-  bulletin <- bulletin %>% add_Rmd(element_id = "disclaimer")
+  ## Link list element
+  element_id = "more_info"
+  link_list <- link_list_element(title = cat.lang::get.text("more_info_title"), 
+                                 id = element_id) %>%
+    add_link(
+      path = "/meteoswiss/homepage/climate/climate-of-switzerland", 
+      label = switch(language,
+                     de = "Klima der Schweiz",
+                     fr = "Climat de la Suisse",
+                     it = "Il clima della Svizzera"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz.html",
+                   fr = "https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse.html",
+                   it = "https://www.meteosvizzera.admin.ch/clima/il-clima-della-svizzera.html")
+      ) %>%
+    add_link(
+      path = "/meteoswiss/homepage/climate/climate-change", 
+      label = switch(language,
+                     de = "Klimawandel",
+                     fr = "Changement climatique",
+                     it = "I cambiamenti climatici"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/klima/klimawandel.html",
+                   fr = "https://www.meteosuisse.admin.ch/climat/changement-climatique.html",
+                   it = "https://www.meteosvizzera.admin.ch/clima/i-cambiamenti-climatici.html")
+    ) %>%
+    add_link(
+      path = "/meteoswiss/homepage/service-and-publications/publications", 
+      label = switch(language,
+                     de = "Publikationen",
+                     fr = "Publications",
+                     it = "Pubblicazioni"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/service-und-publikationen/publikationen.html",
+                   fr = "https://www.meteosuisse.admin.ch/services-et-publications/publications.html",
+                   it = "https://www.meteosvizzera.admin.ch/servizi-e-pubblicazioni/pubblicazioni.html")
+    ) %>% 
+    add_link(
+    path = "/meteoswiss/homepage/weather/weather-and-climate-from-a-to-z/the-swiss-weather-archive", 
+    label = switch(language,
+                   de = "Wetterarchiv der Schweiz",
+                   fr = "Archives météorologiques suisses",
+                   it = "Archivio del tempo svizzero"),
+    url = switch(language,
+                 de = "https://www.meteoschweiz.admin.ch/wetter/wetter-und-klima-von-a-bis-z/wetterarchiv-der-schweiz.html",
+                 fr = "https://www.meteosuisse.admin.ch/meteo/meteo-et-climat-de-a-a-z/archives-meteorologiques-suisses.html",
+                 it = "https://www.meteosvizzera.admin.ch/tempo/tempo-e-clima-dalla-a-alla-z/archivio-del-tempo-svizzero.html")
+  )
+  
+  
+  bulletin <- bulletin %>% add_link_list(link_list)
+  
   bulletin
 }
 
