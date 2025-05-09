@@ -403,7 +403,7 @@ monthly_events <- function(bulletin, language) {
   log_info("monthly_events")
   
   bulletin_prod_path <- get_config_value("bulletin_prod_path")
-  if (!see_if(is.readable(bulletin_prod_path))) {
+  if (!see_if(is.readable(file.path(bulletin_prod_path, bulletin$yearmonth)))) {
     log_info("bulletin_prod_path not readable -> omitting monthly_events section", style = "warning")
     return(bulletin)
   }
@@ -425,7 +425,7 @@ monthly_vegetation <- function(bulletin, language) {
   log_info("monthly_vegetation")
   
   bulletin_prod_path <- get_config_value("bulletin_prod_path")
-  if (!see_if(is.readable(bulletin_prod_path))) {
+  if (!see_if(is.readable(file.path(bulletin_prod_path, bulletin$yearmonth)))) {
     log_info("bulletin_prod_path not readable -> omitting monthly_vegetation section", style = "warning")
     return(bulletin)
   }
