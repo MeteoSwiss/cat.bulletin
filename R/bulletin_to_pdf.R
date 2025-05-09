@@ -141,11 +141,10 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
   preamble <- c(
     "```{=latex}
     % define variables used in headers and footers
-    \\catpackage{cat.bulletin}
-    %\\copyrightmeteo{}
-    %\\contact{}
-    
-    %\\headerleft{left header}
+    \\catpackage{cat.bulletin}",
+    paste0("\\copyrightmeteo{", cat.lang::get.text("copyright"), "}"),
+    paste0("\\contact{", cat.lang::get.text("contact"), ": ", cat.lang::get.text("email.kud"), "}"),
+    "%\\headerleft{left header}
     %\\headercenter{center header}
     %\\headerright{right header}
     ",
