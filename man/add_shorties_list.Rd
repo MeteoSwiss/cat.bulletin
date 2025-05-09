@@ -40,7 +40,11 @@ If there are several language versions for a shorty (i.e., same group and id), t
 }
 \seealso{
 Bulletin elements
+\code{\link{add_Rmd}()},
+\code{\link{add_disclaimer}()},
 \code{\link{add_flextable}()},
+\code{\link{add_image}()},
+\code{\link{add_link_list}()},
 \code{\link{add_table}()},
 \code{\link{add_text}()}
 }

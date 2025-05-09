@@ -99,7 +99,7 @@ table_to_markdown <- function(element) {
   
   # close the Rmd chunk
   md <- c(md,
-          "kable_styling(latex_options = 'striped')",
+          "kableExtra::kable_styling(latex_options = 'striped')",
           "```"
   )
  

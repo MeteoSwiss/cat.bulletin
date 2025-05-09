@@ -12,3 +12,6 @@ withr::with_envvar(list(R_CONFIG_ACTIVE = "testNonReadableProdPath"),
                      bulletin_to_webzip(bulletin = bulletin)
                    }
 )
+
+
+

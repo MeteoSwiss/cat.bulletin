@@ -12,7 +12,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                                            ".zip"
                                          ),
                                          path = "test-bulletin",
-                                         sections = c("text", "image", "markdown", "table", "shorties", "disclaimer")) {
+                                         sections = c("text", "image", "markdown", "table", "shorties", "disclaimer", "link_list")) {
   
   sections <- match.arg(sections, several.ok = TRUE)
   
@@ -120,7 +120,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                 caption = paste(language, "caption"),
                 colwidths = rep(2, ncol(regdata)),
                 align = "lcccc"
-                )
+      )
   }
   
   ## Shorties list element
@@ -136,18 +136,46 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
         )
   }
   
+  ## Link List element
+  if ("link_list" %in% sections) {
+    element_id = "myLinkList"
+    for (language in bulletin$languages) {
+      link_list <- link_list_element(title = "My Link List",
+                                     id = element_id) %>%
+        add_link(path = "/meteoswiss/.../", 
+                 label = "MeteoSwiss Home",
+                 url = "https://www-integ.meteoschweiz.ch/klima/klima-der-schweiz/klima-normwerte.html"
+        ) %>%
+        add_link(
+          path = "/meteoswiss/homepage/service-and-publications/publications", 
+          label = switch(language,
+                         it = "Pubblicazioni",
+                         de = "Publikationen",
+                         fr = "Publications"
+          ),
+          url = switch(language,
+                       de = "https://www-integ.meteoschweiz.ch/service-und-publikationen/publikationen.html",
+                       fr = "https://www-integ.meteosuisse.ch/services-et-publications/publications.html",
+                       it = "https://www-integ.meteosvizzera.ch/servizi-e-pubblicazioni/pubblicazioni.html"
+          )
+        )
+      
+      bulletin <- bulletin %>%
+        set_active_language(language = language) %>%
+        add_link_list(link_list)
+    }
+  }
+  
   log_info("Finished adding elements", style = "success")
   
   ## Generate pdfs in all languages and the xml and zip everything up
   
-  log_info("Generating pdfs, xml and zip file", style = "h2")
-  
-  #language = "fr"
+  #language = "de"
   #filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
   
-  bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
+  #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   
-  log_info("Finished generation of pdfs, xml and zip file in workdir", workdir, style = "success")
+  bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   
   invisible(bulletin)
 }
