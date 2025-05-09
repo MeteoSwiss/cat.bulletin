@@ -4,7 +4,7 @@
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-#### Evolution depuis le début des mesures en 1864
+#### Évolution depuis le début des mesures en 1864
 
 ```{r echo=FALSE, results="hide"}
 numb_similar_years_eq1 <- length(swissmean$ind_simyears) == 1

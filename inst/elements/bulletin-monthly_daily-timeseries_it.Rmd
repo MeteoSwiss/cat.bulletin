@@ -2,9 +2,11 @@
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+mon_name <- tolower(month_str(bulletin$month))
 ```
 
-## Andamento mensile di importanti metriche
+## Andamento mensile di importanti grandezze meteorologiche
 
-La figura `r ifelse(bulletin$provisional, "4", "5")` mostra l'andamento giornaliero di alcune importanti variabili misurate in `r month_str(bulletin$month)` `r bulletin$year` come esempio per una stazione in pianura e un sito di misura in posizione elevata.
+La figura `r ifelse(bulletin$provisional, "4", "5")` mostra l'andamento giornaliero di alcune importanti variabili atmosferiche misurate in `r mon_name` `r bulletin$year` come esempio per una stazione in pianura e una in montagna.
 

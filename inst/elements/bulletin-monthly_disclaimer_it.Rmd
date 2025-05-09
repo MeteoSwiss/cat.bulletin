@@ -24,7 +24,7 @@ warning_early <- data.frame(
 nextmon <- tolower(nextmonth_str(bulletin$month))
 ```
 
-Il bollettino mensile di MeteoSvizzera descrive lo stato del clima in Svizzera nel mese in corso, lo confronta con il periodo di riferimento attualmente in vigore 1991-2020 secondo le direttive dell'Organizzazione Meteorologica Mondiale (OMM) e lo colloca nel contesto storico dall'inizio delle misurazioni nel 1864.
+Il bollettino mensile di MeteoSvizzera descrive lo stato del clima in Svizzera del mese in oggetto, lo confronta con il periodo di riferimento attualmente in vigore 1991-2020 secondo le direttive dell'Organizzazione Meteorologica Mondiale (OMM) e lo colloca nel contesto storico dall'inizio delle misurazioni nel 1864.
 
 **La produzione giornaliera del bollettino inizia a partire dal quintultimo giorno del mese.** `r ifelse(bulletin$provisional, "Fino alla fine del mese, le informazioni contenute nel bollettino si basano su dati provvisori. Le informazioni sulle temperature e le precipitazioni a livello nazionale tengono conto delle previsioni fino alla fine del mese con le relative incertezze. Le informazioni locali si riferiscono all'andamento del mese disponibili fino al momento della pubblicazione.","")` 
 

@@ -484,7 +484,7 @@ monatsbulletin_disclaimer <- function(bulletin) {
 # further helping functions
 add_article <- function(word, lang = "fr", to_lower = TRUE) {
   # Check if the word starts with a vowel (h, a, e, i, o, u, y)
-  if (grepl("^[haeéèiouyAEÉÈIOUYH]", word)) {
+  if (grepl("^[aeéèiouyAEÉÈIOUY]", word)) {
     article <- "d'"
   } else {
     article <- ifelse(lang == "fr", "de ", "di ")
@@ -625,18 +625,18 @@ nextmonth_str <- function(month, language) {
 
 translate_regions <- function(text, lang = "fr") {
   dict_fr <- list(
-    "Alpennordhang" = "le versant nord des Alpes",
-    "Nord- und Mittelbünden" = "le nord et le centre des Grisons",
-    "Jura" = "le Jura",
-    "Alpensüdseite" = "le Sud des Alpes",
-    "Mittelland" = "le Plateau",
-    "Wallis" = "le Valais",
-    "Engadin" = "l'Engadine"
+    "Alpennordhang" = "sur le versant nord des Alpes",
+    "Nord- und Mittelbünden" = "sur le nord et le centre des Grisons",
+    "Jura" = "dans le Jura",
+    "Alpensüdseite" = "au Sud des Alpes",
+    "Mittelland" = "sur le Plateau",
+    "Wallis" = "en Valais",
+    "Engadin" = "en Engadine"
   )
   
   dict_it <- list(
-    "Alpennordhang" = "nel Pendio nordalpino",
-    "Nord- und Mittelbünden" = "al nord e nel centro dei Grigioni",
+    "Alpennordhang" = "lungo il versante nordalpino",
+    "Nord- und Mittelbünden" = "nel nord e nel centro dei Grigioni",
     "Jura" = "nel Giura",
     "Alpensüdseite" = "al Sud delle Alpi",
     "Mittelland" = "nell'Altopiano",
@@ -707,11 +707,13 @@ translate_record_text <- function(text, language = c("fr", "it")) {
   translations <- list(
     fr = list(
       and_word = "et",
-      record_phrase = "record précédent "
+      record_phrase1 = "record précédent ",
+      record_phrase2 = "record "
     ),
     it = list(
       and_word = "e",
-      record_phrase = "record precedente"
+      record_phrase1 = "record precedente",
+      record_phrase2 = "record"
     )
   )
   
@@ -721,9 +723,21 @@ translate_record_text <- function(text, language = c("fr", "it")) {
   text <- gsub("\\bund\\b", tr$and_word, text)
   
   # Replace "bisheriger Rekord" or just "Rekord"
-  # Make sure to only replace "Rekord" if not already matched as "bisheriger Rekord"
-  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase, text)
-  text <- gsub("\\bRekord\\b", tr$record_phrase, text)
+  text <- gsub("\\bbisheriger Rekord\\b", tr$record_phrase1, text)
+  text <- gsub("\\bRekord\\b", tr$record_phrase2, text)
+  
+  if (language == "it") {
+    # Add "con" between place name and value+unit (generalized)
+    text <- gsub(
+      "(\\b[A-ZÄÖÜa-zäöüßéèàùîç\\-]+)\\s+(\\d+(?:\\.\\d+)?\\s*[^\\s,()]+)",
+      "\\1 con \\2",
+      text,
+      perl = TRUE
+    )
+    
+    # Replace "h" with "ore" (e.g., "4.2 h" → "4.2 ore") everywhere
+    text <- gsub("\\b(\\d+(?:\\.\\d+)?)\\s*h\\b", "\\1 ore", text)
+  }
   
   return(text)
 }
