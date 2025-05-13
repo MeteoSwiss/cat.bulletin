@@ -48,6 +48,7 @@ disclaimer_to_markdown <- function(element) {
     Rmd_to_markdown(element$body_Rmd_element), "\n",
     "```{=tex}",
     "\\end{tcolorbox}",
+    "\\clearpage",
     "```"
   )
 }
