@@ -32,7 +32,6 @@
 \RequirePackage[absolute]{textpos} % define text boxes with absolute positions as needed in header and footer
 \RequirePackage{setspace} % allows to modify spacing
 
-
 % Define frontpage style
 \def\@defaultfooter{
  \vbox{
