@@ -59,6 +59,7 @@ Rmd_clearpage_instruction <- function() {
   c(
     "```{=tex}",
     "\\clearpage",
+    "\\restoregeometry",
     "```"
   )
 }
