@@ -7,9 +7,9 @@
 bulletin_monthly(year = 2024, month = 8, provisional, workdir = ".", ...)
 }
 \arguments{
-\item{year}{Bulletin year}
+\item{year}{publication year}
 
-\item{month}{Bulletin month}
+\item{month}{publication month}
 
 \item{provisional}{boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
 \code{get_bulletin_monthly_provisional}.}
@@ -17,10 +17,19 @@ bulletin_monthly(year = 2024, month = 8, provisional, workdir = ".", ...)
 \item{workdir}{working directory for bulletin creation}
 
 \item{...}{further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc.}
+
+\item{language}{iso country id
+Get default provisional value for \code{create_bulletin_monthly}}
+}
+\value{
+a string of the date
+
+boolean value to use for the provisional parameter in \code{create_bulletin_monthly}
 }
 \description{
 Create the monthly bulletin
 }
 \examples{
 bulletin <- bulletin_monthly(year = 2024, month = 8)
+Get the publication date for the monthly bulletin formatted as string
 }

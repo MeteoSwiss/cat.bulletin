@@ -8,6 +8,7 @@ add_Rmd(
   bulletin,
   element_id,
   envir = parent.frame(),
+  clear_page = FALSE,
   id = element_id,
   appear = c("xml", "pdf")
 )
@@ -18,6 +19,9 @@ add_Rmd(
 \item{element_id}{the name of the Rmd file in the elements folder of the package.}
 
 \item{envir}{environment in which to knit the Rmd later.}
+
+\item{clear_page}{boolean indicating if the page should be cleared after this Rmd element when generating the pdf. 
+This means that a new page will be started after the output of the Rmd element.}
 
 \item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
 be the same across languages. During xml generation, elements with the same id are processed into the same xml node.

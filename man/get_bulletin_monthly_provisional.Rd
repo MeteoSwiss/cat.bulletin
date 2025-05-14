@@ -7,9 +7,9 @@
 get_bulletin_monthly_provisional(year, month)
 }
 \arguments{
-\item{year}{Bulletin year}
+\item{year}{publication year}
 
-\item{month}{Bulletin month}
+\item{month}{publication month}
 }
 \value{
 boolean value to use for the provisional parameter in \code{create_bulletin_monthly}

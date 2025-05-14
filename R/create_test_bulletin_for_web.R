@@ -6,11 +6,6 @@
 #' @export
 create_test_bulletin_for_web <- function(workdir = tempdir(),
                                          bulletin_dir = "bulletin",
-                                         zipfilename = paste0(
-                                           "webtest_",
-                                           format(Sys.time(), format = "%Y%m%d%H%M"),
-                                           ".zip"
-                                         ),
                                          path = "test-bulletin",
                                          sections = c("text", "image", "markdown", "table", "shorties", "disclaimer", "link_list")) {
   
@@ -175,7 +170,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   #bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   
-  bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
+  #bulletin_to_webzip(bulletin = bulletin, zipfilename = zipfilename)
   
   invisible(bulletin)
 }

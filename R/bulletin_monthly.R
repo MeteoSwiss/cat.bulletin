@@ -1,24 +1,3 @@
-#' deprecated short for creating the monthly bulletin webzip 
-#' @details
-#' Use \code{bulletin_monthly} and one of the rendering functions instead.
-#' @inheritParams bulletin_monthly
-#' @export
-create_bulletin_monthly <- function(year = 2024, 
-                                    month = 8,
-                                    workdir = ".",
-                                    ...) {
-  
-  bulletin <- bulletin_monthly(year = year, month = month, workdir = workdir, ...)
-  
-  zipfilename = paste0("climate-bulletin-", bulletin$year, "-", bulletin$month,
-                       "-", format(Sys.time(), format = "%Y%m%d%H%M"),
-                       ".zip")
-  
-  bulletin_to_webzip(bulletin, zipfilename = zipfilename)
-  
-}
-
-
 #' Create the monthly bulletin
 #' @param year Bulletin year
 #' @param month Bulletin month
@@ -95,7 +74,7 @@ bulletin_monthly <- function(year = 2024,
 }
 
 #' Create the publication_metadata for the monthly bulletin.
-#' @inheritParams create_bulletin_monthly
+#' @inheritParams bulletin_monthly
 #' @inheritParams bulletin_to_webzip
 #' @param lead_element_id the id of the (hidden) bulletin element that contains the lead text. Can be either of type Rmd or text. 
 #' @param swissmean output of \code{calculate_swissmean_temp}
@@ -169,8 +148,8 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
 
 add_bulletin_monthly_disclaimer <- function(bulletin, language) {
   bulletin <- bulletin %>%
-    add_disclaimer(caption_text = "Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.",
-                   body_Rmd_element_id = "disclaimer",
+    add_disclaimer(body_Rmd_element_id = "disclaimer",
+                   clear_page = TRUE,
                    id = "disclaimer")
 }
 
@@ -274,7 +253,7 @@ monatsbilanz_precip <- function(bulletin, regdiff, language) {
   anom_filepath <- download_monatsbilanz_maps(bulletin, valueBase = "anom9120", provisional = bulletin$provisional, parameter = "prec", out_path = bulletin$cache_path, filename = "monatsbilanz_prec_map_anom.png")
   
   joined_and_cropped_filepath <- join_and_crop_monthly_maps(abs_filepath, anom_filepath, outpath = image_filename)
-
+  
   bulletin <- bulletin %>% 
     add_image(
       filepath = joined_and_cropped_filepath,
@@ -487,13 +466,59 @@ monatsbulletin_daily_timeseries <- function(bulletin, language) {
   bulletin
 }
 
-monatsbulletin_more_info <- function(bulletin) {
-  bulletin <- bulletin %>% add_Rmd(element_id = "more-info")
-  bulletin
-}
-
-monatsbulletin_disclaimer <- function(bulletin) {
-  bulletin <- bulletin %>% add_Rmd(element_id = "disclaimer")
+monatsbulletin_more_info <- function(bulletin, language) {
+  ## Link list element
+  element_id = "more_info"
+  link_list <- link_list_element(title = cat.lang::get.text("more_info_title"), 
+                                 id = element_id) %>%
+    add_link(
+      path = "/meteoswiss/homepage/climate/climate-of-switzerland", 
+      label = switch(language,
+                     de = "Klima der Schweiz",
+                     fr = "Climat de la Suisse",
+                     it = "Il clima della Svizzera"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/klima/klima-der-schweiz.html",
+                   fr = "https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse.html",
+                   it = "https://www.meteosvizzera.admin.ch/clima/il-clima-della-svizzera.html")
+    ) %>%
+    add_link(
+      path = "/meteoswiss/homepage/climate/climate-change", 
+      label = switch(language,
+                     de = "Klimawandel",
+                     fr = "Changement climatique",
+                     it = "I cambiamenti climatici"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/klima/klimawandel.html",
+                   fr = "https://www.meteosuisse.admin.ch/climat/changement-climatique.html",
+                   it = "https://www.meteosvizzera.admin.ch/clima/i-cambiamenti-climatici.html")
+    ) %>%
+    add_link(
+      path = "/meteoswiss/homepage/service-and-publications/publications", 
+      label = switch(language,
+                     de = "Publikationen",
+                     fr = "Publications",
+                     it = "Pubblicazioni"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/service-und-publikationen/publikationen.html",
+                   fr = "https://www.meteosuisse.admin.ch/services-et-publications/publications.html",
+                   it = "https://www.meteosvizzera.admin.ch/servizi-e-pubblicazioni/pubblicazioni.html")
+    ) %>% 
+    add_link(
+      path = "/meteoswiss/homepage/weather/weather-and-climate-from-a-to-z/the-swiss-weather-archive", 
+      label = switch(language,
+                     de = "Wetterarchiv der Schweiz",
+                     fr = "Archives météorologiques suisses",
+                     it = "Archivio del tempo svizzero"),
+      url = switch(language,
+                   de = "https://www.meteoschweiz.admin.ch/wetter/wetter-und-klima-von-a-bis-z/wetterarchiv-der-schweiz.html",
+                   fr = "https://www.meteosuisse.admin.ch/meteo/meteo-et-climat-de-a-a-z/archives-meteorologiques-suisses.html",
+                   it = "https://www.meteosvizzera.admin.ch/tempo/tempo-e-clima-dalla-a-alla-z/archivio-del-tempo-svizzero.html")
+    )
+  
+  
+  bulletin <- bulletin %>% add_link_list(link_list)
+  
   bulletin
 }
 
@@ -601,7 +626,7 @@ get_final_date <- function(year, month, language) {
 }
 
 #' Get default provisional value for \code{create_bulletin_monthly}
-#' @inheritParams create_bulletin_monthly
+#' @inheritParams bulletin_monthly
 #' @return  boolean value to use for the provisional parameter in \code{create_bulletin_monthly}
 #' @export
 get_bulletin_monthly_provisional <- function(year, month) {
