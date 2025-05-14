@@ -49,9 +49,8 @@ image_to_markdown <- function(element) {
   # try to use knitr::include_graphics(rep("images/knit-logo.png", 3)) in an knitr junk!
   # see also https://bookdown.org/yihui/rmarkdown-cookbook/figure-placement.html
   # or https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
-  # control size: ![A nice image.](foo/bar.png){width=50%}
   label <- if (!is.null(element$label)) paste0("\\label{", element$label, "}") else ""
-  paste0("![", element$caption, " ", label, "](", element$filepath, '){width=50%,pos="h"}', "\n",
+  paste0("![", element$caption, " ", label, "](", element$filepath, ')', "\n",
          element$source, "\n")
 }
 

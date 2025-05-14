@@ -66,7 +66,6 @@ add_table <- function(bulletin, table, colwidths = NULL, align = NULL, id = NULL
 #' \url{https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf}
 table_to_markdown <- function(element) {
   md  <- c(paste0("```{r", element$element_id, ", echo=FALSE}"),
-           "require(kableExtra)",
            "kableExtra::kbl(",
            element$table_var, ",",
            paste0("caption = '", element$caption, "',")
