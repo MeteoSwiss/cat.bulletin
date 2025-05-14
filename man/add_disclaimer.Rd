@@ -34,7 +34,7 @@ The default is a composition of type and a random string.}
 }
 \description{
 A disclaimer element consists of a caption (given as text) and a body (specified as a Rmd file).
-On the website (xml), the disclaimer is rendered as an accordeon.
+On the website (xml), the disclaimer is rendered as a box.
 In the pdf, the caption is omitted and the body is set in a gray box.
 }
 \seealso{
