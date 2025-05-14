@@ -20,7 +20,8 @@ disclaimer_element <- function(caption_text_element, body_Rmd_element, appear = 
 #' @export
 add_disclaimer <- function(bulletin, 
                            caption_text, 
-                           body_Rmd_element_id, 
+                           body_Rmd_element_id,
+                           clear_page = FALSE,
                            envir = parent.frame(), 
                            appear = c("xml", "pdf"),
                            id = NULL) {
@@ -31,7 +32,7 @@ add_disclaimer <- function(bulletin,
   
   # body as Rmd
   filename <- paste0(paste(bulletin$bulletin_id, body_Rmd_element_id, bulletin$language, sep ="_"), ".Rmd")
-  body_Rmd_element <- Rmd_element(filename = filename, envir = envir)
+  body_Rmd_element <- Rmd_element(filename = filename, clear_page = clear_page, envir = envir)
   
   add_element(bulletin, disclaimer_element(
     caption_text_element = caption_text_element,
@@ -40,17 +41,26 @@ add_disclaimer <- function(bulletin,
 }
 
 disclaimer_to_markdown <- function(element) {
-  c(
+  # markdown of element is put into tcolorbox latex environment
+  # make sure that a clear_page instruction comes after end of tcolorbox environment
+  md <- c(
     "```{=tex}",
     "\\begin{tcolorbox}",
     "```",
     # text_to_markdown(element$caption_text_element), "\n",
-    Rmd_to_markdown(element$body_Rmd_element), "\n",
+    Rmd_to_markdown(element$body_Rmd_element, clear_page = FALSE), "\n",
     "```{=tex}",
     "\\end{tcolorbox}",
-    "\\clearpage",
     "```"
   )
+  # add a clearpage instruction if needed
+  if (element$body_Rmd_element$clear_page) {
+    md <- c(
+      md,
+      Rmd_clearpage_instruction()
+    )
+  }
+  md
 }
 
 disclaimer_to_xml <- function(xml, element, language) {

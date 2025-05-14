@@ -1,23 +1,28 @@
-Rmd_element <- function(filename, envir, appear = NULL, id = NULL) {
+Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id = NULL) {
   file <- system.file("elements", filename, package = "cat.bulletin")
   assertthat::assert_that(assertthat::is.readable(file), msg = paste("Rmd element with filename", filename, "does not exist"))
+  assert_that(is.logical(clear_page), length(clear_page) == 1)
+  
   Rmd_element <- bulletin_element(type = "Rmd", id = id, appear = appear)
   Rmd_element[["Rmd_file"]] <- file
   Rmd_element[["envir"]] <- envir
+  Rmd_element[["clear_page"]] <- clear_page  
   Rmd_element
 }
 
 #' Add R markdown to a bulletin
 #' @param element_id the name of the Rmd file in the elements folder of the package. 
 #' @param envir environment in which to knit the Rmd later. 
+#' @param clear_page boolean indicating if the page should be cleared after this Rmd element when generating the pdf. 
+#' This means that a new page will be started after the output of the Rmd element.
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
 #' @family bulletin_elements
 #' @export
-add_Rmd <- function(bulletin, element_id, envir = parent.frame(), id = element_id, appear = c("xml", "pdf")) {
+add_Rmd <- function(bulletin, element_id, envir = parent.frame(), clear_page = FALSE, id = element_id, appear = c("xml", "pdf")) {
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")
   log_debug("Adding RMD element with filename", filename, ". 'appear'=", paste(appear, collapse = ","))
-  add_element(bulletin, Rmd_element(filename, envir = envir, id = id, appear = appear))
+  add_element(bulletin, Rmd_element(filename, envir = envir, clear_page = clear_page, id = id, appear = appear))
 }
 
 Rmd_to_markdown_file <- function(element) {
@@ -35,10 +40,27 @@ Rmd_to_markdown_file <- function(element) {
   tmpfile
 }
 
-Rmd_to_markdown <- function(element) {
+Rmd_to_markdown <- function(element, clear_page = element$clear_page) {
+  # knit the element markdown file
   tmpfile <- Rmd_to_markdown_file(element) 
   md <- readr::read_lines(tmpfile)
+  
+  # add a clearpage instruction if needed
+  if (clear_page) {
+    md <- c(
+      md,
+      Rmd_clearpage_instruction()
+    )
+  }
   md
+}
+
+Rmd_clearpage_instruction <- function() {
+  c(
+    "```{=tex}",
+    "\\clearpage",
+    "```"
+  )
 }
 
 Rmd_to_xml <- function(xml, element, language) {
