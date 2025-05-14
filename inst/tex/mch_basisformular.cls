@@ -10,7 +10,7 @@
 
 \RequirePackage{graphicx} % allow including images
 
-\RequirePackage[top=48mm,bottom=16mm,left=30mm,right=20mm]{geometry} % set margins of the document
+\RequirePackage[top=20mm,bottom=16mm,left=30mm,right=20mm]{geometry} % set margins of the document
 
 \RequirePackage[T1]{fontenc} %define font encoding
 %\RequirePackage[utf8]{inputenc} %define file encoding
@@ -31,7 +31,6 @@
 
 \RequirePackage[absolute]{textpos} % define text boxes with absolute positions as needed in header and footer
 \RequirePackage{setspace} % allows to modify spacing
-
 
 % Define frontpage style
 \def\@defaultfooter{

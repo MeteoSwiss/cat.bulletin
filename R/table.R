@@ -81,6 +81,7 @@ table_to_markdown <- function(element) {
 
   # Finish base kable expression
   md <- c(md,
+          "linesep = '',",
           "booktabs = TRUE",
           ") %>%"
           )
@@ -99,7 +100,7 @@ table_to_markdown <- function(element) {
   
   # close the Rmd chunk
   md <- c(md,
-          "kableExtra::kable_styling(latex_options = 'striped')",
+          "kableExtra::kable_styling(latex_options = c('striped','condensed'))",
           "```"
   )
  
