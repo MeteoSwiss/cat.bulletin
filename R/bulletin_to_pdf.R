@@ -95,19 +95,12 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
     "---"
   )
   
-  if (!is.null(bulletin$metadata$title)) {
-    front_matter <- c(
-      front_matter,
-      paste("title:", bulletin$metadata$title[bulletin$language])
-    )
-  }
-  
   babel_lang <- switch(bulletin$language,
-                  "de" = "ngerman",
-                  "fr" = "french", 
-                  "it" = "italian",
-                  "en" = "british",
-                  stop("unknown language")
+                       "de" = "ngerman",
+                       "fr" = "french", 
+                       "it" = "italian",
+                       "en" = "british",
+                       stop("unknown language")
   )
   
   keep_tex = getOption("log_level", default = 1) > 1
@@ -126,7 +119,7 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                     paste0("  - \\usepackage[", babel_lang, "]{babel}"),
                     paste0("  - \\addto\\captions", babel_lang, "{\\renewcommand{\\figurename}{", cat.lang::get.text("figure_label"),"}}"),
                     paste0("  - \\addto\\captions", babel_lang, "{\\renewcommand{\\tablename}{", cat.lang::get.text("table_label"),"}}"),
-                   "---"
+                    "---"
   )
   readr::write_lines(front_matter, file = file_conn)
 }
@@ -146,6 +139,10 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
     ",
     #language for header picture
     paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
+    paste0("\\title{",bulletin$metadata$title[bulletin$language],"}"),
+    "% make room for frontpage header - has to come before maketitle",
+    "\\newgeometry{top=48mm,bottom=16mm,left=30mm,right=20mm}",
+    "\\maketitle",
     "% show the MeteoSwiss logo on the first page
     \\thispagestyle{frontpage}",
     "```"
@@ -161,6 +158,12 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
   )
   
   readr::write_lines(preamble, file = file_conn)
+  # if (!is.null(bulletin$metadata$title)) {
+  #   front_matter <- c(
+  #     front_matter,
+  #     paste("title:", bulletin$metadata$title[bulletin$language])
+  #   )
+  # }
   
 }
 
@@ -169,13 +172,6 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   write_lines <- function(lines) readr::write_lines(lines, file = file_conn)
   metadata <- bulletin$metadata
   language <- bulletin$language
-  
-  # already rendered by frontmatter -> remove there if treated here
-  #if (!is.null(metadata$title)) {
-  #title <- paste("#", metadata$title[language]) # level 1 title
-  #lines <- text_to_markdown(element = text_element(text = title))
-  #write_lines(lines)
-  #}
   
   if (!is.null(metadata$lead)) {
     lead <- metadata$lead[language]
