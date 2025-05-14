@@ -2,8 +2,19 @@
 % Please edit documentation in R/cat.bulletin-package.R
 \docType{package}
 \name{cat.bulletin-package}
+\alias{cat.bulletin}
 \alias{cat.bulletin-package}
 \title{Generation of MeteoSwiss climate bulletins}
 \description{
 cat.bulletin is used to automate climate bulletins to be published on the MeteoSwiss website as both html (xml) and pdf.
 }
+\author{
+\strong{Maintainer}: Felix Maurer \email{felix.maurer@meteoswiss.ch}
+
+Authors:
+\itemize{
+  \item Elias Zubler \email{elias.zubler@meteoswiss.ch}
+}
+
+}
+\keyword{internal}

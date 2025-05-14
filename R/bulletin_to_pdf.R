@@ -95,12 +95,12 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
     "---"
   )
   
-  babel <- switch(bulletin$language,
-                  "de" = "ngerman",
-                  "fr" = "french", 
-                  "it" = "italian",
-                  "en" = "british",
-                  stop("unknown language")
+  babel_lang <- switch(bulletin$language,
+                       "de" = "ngerman",
+                       "fr" = "french", 
+                       "it" = "italian",
+                       "en" = "british",
+                       stop("unknown language")
   )
   
   keep_tex = getOption("log_level", default = 1) > 1
@@ -112,17 +112,13 @@ write_markdown_frontmatter <- function(bulletin, file_conn) {
                     "output:",
                     "  pdf_document:",
                     paste0("    keep_tex: ", if (keep_tex) "true" else "false"),
-                    "    fig_caption: true",
-                    "    fig_width: 3",
-                    #                    paste0("    lang: ", bulletin$language, "-CH"),
                     "header-includes:",
                     "  - \\usepackage[utf8]{inputenc}",
-                    "  - \\usepackage{tcolorbox}",                    
-                    paste0("  - \\usepackage[", babel, "]{babel}"),
-                    #"includes:",
-                    #    "      in_header: 'preamble.tex',
-                    #"  before_body: 'before_body.tex'",
-                    #paste0("before_body: ", system.file("tex", 'before_body.tex', package = "cat.bulletin")),
+                    "  - \\usepackage{tcolorbox}",
+                    # use babel for language specific formatting, redefine labels for figures and tables
+                    paste0("  - \\usepackage[", babel_lang, "]{babel}"),
+                    paste0("  - \\addto\\captions", babel_lang, "{\\renewcommand{\\figurename}{", cat.lang::get.text("figure_label"),"}}"),
+                    paste0("  - \\addto\\captions", babel_lang, "{\\renewcommand{\\tablename}{", cat.lang::get.text("table_label"),"}}"),
                     "---"
   )
   readr::write_lines(front_matter, file = file_conn)
@@ -135,10 +131,9 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
     "```{=latex}
     % define variables used in headers and footers
     \\catpackage{cat.bulletin}",
-    "%\\copyrightmeteo{}
-    %\\contact{}
-    
-    %\\headerleft{left header}
+    paste0("\\copyrightmeteo{", cat.lang::get.text("copyright"), "}"),
+    paste0("\\contact{", cat.lang::get.text("contact"), ": ", cat.lang::get.text("email.kud"), "}"),
+    "%\\headerleft{left header}
     %\\headercenter{center header}
     %\\headerright{right header}
     ",
@@ -151,6 +146,15 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
     "% show the MeteoSwiss logo on the first page
     \\thispagestyle{frontpage}",
     "```"
+  )
+  
+  # load required R packages
+  preamble <- c(
+    preamble, c(
+      "```{r initalSetup, include=FALSE}",
+      "require(kableExtra)",
+      "```"
+    )
   )
   
   readr::write_lines(preamble, file = file_conn)

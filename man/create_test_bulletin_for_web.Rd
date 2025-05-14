@@ -7,8 +7,6 @@
 create_test_bulletin_for_web(
   workdir = tempdir(),
   bulletin_dir = "bulletin",
-  zipfilename = paste0("webtest_", format(Sys.time(), format = "\%Y\%m\%d\%H\%M"),
-    ".zip"),
   path = "test-bulletin",
   sections = c("text", "image", "markdown", "table", "shorties", "disclaimer",
     "link_list")
@@ -18,8 +16,6 @@ create_test_bulletin_for_web(
 \item{workdir}{working directory for bulletin creation}
 
 \item{bulletin_dir}{the name of the directory within the bulletin_path where bulletin related files will be stored.}
-
-\item{zipfilename}{The name of the zipfile to be created. The zip file will be created within \code{bulletin$bulletin_path}.}
 
 \item{path}{a string denoting the CMS path. If the path does not start with a \code{/}, 
 it will be interpreted as relative to \code{"/meteoswiss/homepage/service-and-publications/publications/reports-and-bulletins/climate-bulletins/"}.}

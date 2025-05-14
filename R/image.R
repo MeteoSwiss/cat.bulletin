@@ -24,7 +24,7 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' @inheritParams add_element
 #' @family bulletin_elements
 #' @examples 
-#' image_filepath = system.file("example-data", "bulletin_monthly", "monatsbilanz_temp", "climate-temperature-evolution-outlook_abs_1864-today_1991-2020_month_regSwiss_de.txt", package = "cat.bulletin")
+#' image_filepath = system.file("example-data", "bulletin_monthly", "evolution-outlook_abs_regSwiss_de.txt", package = "cat.bulletin")
 #' bulletin <- create_bulletin() %>%
 #'   add_image(filepath = image_filepath, caption = "An example figure.")
 #' @export
@@ -49,9 +49,8 @@ image_to_markdown <- function(element) {
   # try to use knitr::include_graphics(rep("images/knit-logo.png", 3)) in an knitr junk!
   # see also https://bookdown.org/yihui/rmarkdown-cookbook/figure-placement.html
   # or https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
-  # control size: ![A nice image.](foo/bar.png){width=50%}
   label <- if (!is.null(element$label)) paste0("\\label{", element$label, "}") else ""
-  paste0("![", element$caption, " ", label, "](", element$filepath, '){width=50%,pos="h"}', "\n",
+  paste0("![", element$caption, " ", label, "](", element$filepath, ')', "\n",
          element$source, "\n")
 }
 

@@ -150,7 +150,7 @@ read_shorty <- function(filepath) {
     stop(paste("Could not extract id and language from shorty filename", filename))
   })
   
-  lines <- readLines(filepath)
+  lines <- readr::read_lines(filepath)
   if (length(lines) > 3)
     warning(paste("shorty file", filepath, "contains more than 3 lines. Using only the first three lines."))
   assert_that(length(lines) >= 1,

@@ -8,6 +8,7 @@ add_disclaimer(
   bulletin,
   caption_text,
   body_Rmd_element_id,
+  clear_page = FALSE,
   envir = parent.frame(),
   appear = c("xml", "pdf"),
   id = NULL
@@ -20,6 +21,9 @@ add_disclaimer(
 
 \item{body_Rmd_element_id}{element_id of the Rmd element for the body of the disclaimer (see \code{\link{add_Rmd}}).}
 
+\item{clear_page}{boolean indicating if the page should be cleared after this Rmd element when generating the pdf. 
+This means that a new page will be started after the output of the Rmd element.}
+
 \item{envir}{environment in which to knit the Rmd later.}
 
 \item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
@@ -30,7 +34,7 @@ The default is a composition of type and a random string.}
 }
 \description{
 A disclaimer element consists of a caption (given as text) and a body (specified as a Rmd file).
-On the website (xml), the disclaimer is rendered as an accordeon.
+On the website (xml), the disclaimer is rendered as a box.
 In the pdf, the caption is omitted and the body is set in a gray box.
 }
 \seealso{
