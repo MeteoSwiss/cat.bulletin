@@ -14,7 +14,12 @@ bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
   # generate all pdfs
   for (language in bulletin$languages) {
     tryCatch({
-      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, languaged_filename(bulletin$bulletin_id, language, "pdf")), language = language)
+      pdf_filename <- languaged_filename(
+        filename = paste(bulletin$bulletin_id, bulletin$year, bulletin$month, sep = "_"),
+        language = language,
+        ending = "pdf"
+        )
+      filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, pdf_filename), language = language)
        publication <- update_multi_language_string(publication, language, paste0(bulletin$files_dir, "/", basename(filename)))
     },
       error = function(e) stop(e)
