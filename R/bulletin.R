@@ -10,6 +10,8 @@
 #' @param workdir working directory for bulletin creation
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
 #' @param metadata a publication_metadata object with metadata for the publication. Can also be set later with \code{\link{set_metadata}}.
+#' @param pdf_file_base_name a string that will be used for naming generated pdfs for that bulletin. 
+#' The name will be constructed by adding "_<language_identifer>.pdf" to the \code{pdf_file_base_name}.
 #' @return an object that represents the bulletin content
 #' @details 
 #' The path where the bulletin artefacts will be put (bulletin_path) will be created within the \code{workdir} and named \code{bulletin_dir}. 
@@ -20,7 +22,8 @@ create_bulletin <- function(bulletin_id,
                             bulletin_args = list(),
                             bulletin_dir = bulletin_id, 
                             workdir = tempdir(),
-                            metadata = publication_metadata()
+                            metadata = publication_metadata(),
+                            pdf_file_base_name = bulletin_id
 ) {
   
   # use a random string for id when no is given (testing purposes)
@@ -78,6 +81,7 @@ create_bulletin <- function(bulletin_id,
                      image_path = image_path,
                      files_dir = files_dir,
                      files_path = files_path,
+                     pdf_file_base_name = pdf_file_base_name,
                      cache_dir = cache_dir,
                      cache_path = cache_path,
                      bulletin_envir = new.env(),
@@ -182,7 +186,7 @@ get_elements <- function(bulletin, language = bulletin$language, type = NULL, id
   
   elements <- 
     if (!is.null(type)) {
-      types = unique(sapply(bulletin[[slot]], "[[", "type"))
+      types = sapply(bulletin[[slot]], "[[", "type")
       i <- which(sapply(types, "%in%", type))
       bulletin[[slot]][i]
     } else  if (!is.null(id)) {

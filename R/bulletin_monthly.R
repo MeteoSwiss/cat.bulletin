@@ -34,6 +34,7 @@ bulletin_monthly <- function(year = 2024,
                                                    provisional = provisional,
                                                    yearmonth = paste0(year, sprintf("%02d", month))
                               ),
+                              pdf_file_base_name = paste("bulletin-monthly", year, month, sep = "_"),
                               ...)
   
   

@@ -14,7 +14,8 @@ create_bulletin(
   bulletin_args = list(),
   bulletin_dir = bulletin_id,
   workdir = tempdir(),
-  metadata = publication_metadata()
+  metadata = publication_metadata(),
+  pdf_file_base_name = bulletin_id
 )
 
 set_metadata(bulletin, metadata)
@@ -37,6 +38,9 @@ has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
 \item{workdir}{working directory for bulletin creation}
 
 \item{metadata}{A list of metadata information created with \code{\link{publication_metadata}}.}
+
+\item{pdf_file_base_name}{a string that will be used for naming generated pdfs for that bulletin. 
+The name will be constructed by adding "_<language_identifer>.pdf" to the \code{pdf_file_base_name}.}
 
 \item{bulletin}{a bulletin created by \code{\link{create_bulletin}}.}
 

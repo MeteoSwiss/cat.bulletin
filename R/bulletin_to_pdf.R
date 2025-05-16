@@ -22,7 +22,14 @@ bulletin_to_pdf <- function(bulletin,
                                                             paste0(bulletin$bulletin_id, "_", language, ".Rmd"))
   )
   log_debug("Processing file", markdown_file, "to pdf.")
-  log_debug("Expected pdf-file:", filename)
+  
+  # create file in workdir 
+  pdf_outfile <- tempfile(tmpdir = bulletin$bulletin_path, 
+                          pattern = paste0(bulletin$bulletin_id, "_", language, "_"),
+                          fileext = ".pdf"
+  )
+  
+  log_debug("Expected pdf-file:", pdf_outfile)
   
   quiet = get_log_level() < 2 # be verbose on debug level
   # !! latex / pandoc won't work within tryCatch block !! 
@@ -30,7 +37,7 @@ bulletin_to_pdf <- function(bulletin,
   rmarkdown::render(markdown_file, 
                     envir = bulletin$bulletin_envir, 
                     # output_format = "pdf_document", 
-                    output_file = filename, 
+                    output_file = pdf_outfile, 
                     quiet = quiet,
                     clean = FALSE)
   #   warning = function(w) {
@@ -40,6 +47,39 @@ bulletin_to_pdf <- function(bulletin,
   #     stop(paste("Could not produce pdf for language", language, ".", e$message))
   #   }
   # )
+  
+  combined_outfile <- NULL
+  if (has_element(bulletin, type = "shorties_list")) {
+    log_debug("Looking for pdfs to attach from shorties_list.")
+    
+    shorties_list <- get_elements(bulletin, language = language, type = "shorties_list")[[1]]
+    pdfs <- get_shorties_pdfs(shorties_list)
+    
+    if (length(pdfs) > 0) {
+      log_info("Attaching ", length(pdfs), "pdf files to bulletin pdf.")
+      tryCatch({
+        combined_outfile <- file.path(bulletin$bulletin_path, 
+                             paste0(bulletin$bulletin_id, "_combined_", language, ".pdf")
+        )
+        qpdf::pdf_combine(input = c(pdf_outfile, pdfs),
+                          output = combined_outfile)
+        log_debug("Successfully merged pdfs to file", combined_outfile)
+      },
+      error = function(e) {
+        log_info("Error during combination of bulletin pdf with pdfs from shorties.", e$message, style = "warning")
+        combined_outfile <- NULL
+      }
+      )
+    }
+    
+    # Copying outfile to the final location
+    if (!is.null(combined_outfile)) 
+      pdf_outfile <- combined_outfile
+    
+    log_debug("Copy outfile", pdf_outfile, "to final location", filename)
+    file.copy(pdf_outfile, filename, overwrite = TRUE)
+  }
+  
   log_info("PDF produced for language", language, ".", style = "success")
   return(filename)
 }
@@ -192,3 +232,4 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   bulletin
   
 }
+

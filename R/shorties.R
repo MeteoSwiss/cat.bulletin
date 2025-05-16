@@ -37,6 +37,13 @@ add_shorties_list <- function(bulletin,
   )
 }
 
+# Return list of pdf files for the given list
+get_shorties_pdfs <- function(shorties_list) {
+  assert_that(shorties_list$type == "shorties_list")
+  pdfs <- sapply(shorties_list$shorties, "[", "pdf_file")
+  unlist(unname(pdfs))
+}
+
 shorties_list_to_markdown <- function(element) {
   if (length(element$shorties) > 0) {
     md <- c(
@@ -77,24 +84,31 @@ shorties_list_to_xml <- function(xml, element, language) {
 
 #' Create a shorty list object
 #' @param title title element
-#' @param lead lead/content of the shorty
-#' @param link optional link of the shorty. Must start with 'https://'.
+#' @param link optional https link that links to additional information. Must start with 'https://'.
 #' @param language language identifier for this shorty
 #' @param id string identifying the shorty
-create_shorty <- function(title, lead, link = NULL, language, id) {
+#' @param pdf_file optional path to a pdf file that contains the printable version of the additional information. 
+#' Will be merged with the bulletin pdf when creating the pdf of the bulletin for this language.
+create_shorty <- function(title, lead, link = NULL, language, id, pdf_file = NULL) {
   
   # assert link
   if (!is.null(link) && !(startsWith(link, "https://"))) {
     log_info("link for shorty with title '", title, "' does not start with 'https://'. Ignoring it.", style = "warning")
     link = NULL
   }
-  
+
+  # assert pdf path
+  if (!is.null(pdf_file)) {
+    assert_that(is.readable(pdf_file))
+  }
+
   list(
     title = title,
     lead = lead,
     link = link,
     language = language,
-    id = id
+    id = id,
+    pdf_file = pdf_file
   )
 }
 
@@ -102,7 +116,7 @@ create_shorty <- function(title, lead, link = NULL, language, id) {
 #' @param group_id The string that identifies the group of shorties in the directory given.
 #' @param language language identifier
 #' @param path The base directory from where to read the shorties text files.
-#' @param subdir An optional string giving a subdirectory within the base directory to look for the shorties text files.
+#' @param subdir An optional string denoting a subdirectory within the base directory to look for the shorties text files.
 #' @seealso read_shorty
 #' @keywords internal
 read_shorties <- function(group_id, language, path, subdir = NULL) {
@@ -167,11 +181,22 @@ read_shorty <- function(filepath) {
   lead <- lines[2]
   link <- if(length(lines) >= 3) lines[3] else NULL
   
+  # look for a pdf file with the same base name
+  pdf_filepath <- sub(".txt$", ".pdf", filepath)
+  pdf_file <- if (see_if(is.readable(pdf_filepath))) {
+    log_debug("Found pdf file for shorty", filename)
+    pdf_filepath
+  } else {
+    log_debug("No pdf file for shorty", filename)
+    NULL
+  }
+  
   create_shorty(title = title,
                 lead = lead,
                 link = link,
                 id = id,
-                language = language
+                language = language,
+                pdf_file = pdf_file
   )
 }
 

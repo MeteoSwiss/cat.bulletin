@@ -13,7 +13,7 @@ read_shorties(group_id, language, path, subdir = NULL)
 
 \item{path}{The base directory from where to read the shorties text files.}
 
-\item{subdir}{An optional string giving a subdirectory within the base directory to look for the shorties text files.}
+\item{subdir}{An optional string denoting a subdirectory within the base directory to look for the shorties text files.}
 }
 \description{
 Read all shorties for the given group_id and language from the bulletin_prod_path given in config.
