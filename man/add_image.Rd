@@ -2,7 +2,7 @@
 % Please edit documentation in R/image.R
 \name{add_image}
 \alias{add_image}
-\title{add an image with caption to a bulletin}
+\title{Add an image with caption to a bulletin}
 \usage{
 add_image(
   bulletin,

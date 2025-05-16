@@ -2,7 +2,7 @@
 % Please edit documentation in R/disclaimer.R
 \name{add_disclaimer}
 \alias{add_disclaimer}
-\title{add disclaimer element to a bulletin}
+\title{Add disclaimer element to a bulletin}
 \usage{
 add_disclaimer(
   bulletin,

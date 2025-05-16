@@ -2,7 +2,7 @@
 % Please edit documentation in R/shorties.R
 \name{add_shorties_list}
 \alias{add_shorties_list}
-\title{add shorties list to a bulletin}
+\title{Add shorties list to a bulletin}
 \usage{
 add_shorties_list(
   bulletin,

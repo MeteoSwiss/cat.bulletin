@@ -8,6 +8,12 @@ link_list_element(title = NULL, appear = c("xml", "pdf"), id = NULL)
 }
 \arguments{
 \item{title}{The text to be used as title for the group of links in the pdf and xml.}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
+
+\item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
+be the same across languages. During xml generation, elements with the same id are processed into the same xml node.
+The default is a composition of type and a random string.}
 }
 \description{
 Create a link list element

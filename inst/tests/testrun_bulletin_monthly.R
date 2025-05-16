@@ -1,5 +1,5 @@
 devtools::unload();devtools::load_all()
-bulletin <- bulletin_monthly(year = 2025, month = 4, workdir = ".")
+bulletin <- bulletin_monthly(year = 2025, month = 5, workdir = ".")
 bulletin_to_pdf(bulletin, language = "fr", filename = file.path(getwd(),"fr.pdf"))
 bulletin_to_webzip(bulletin)
 
@@ -12,6 +12,3 @@ withr::with_envvar(list(R_CONFIG_ACTIVE = "testNonReadableProdPath"),
                      bulletin_to_webzip(bulletin = bulletin)
                    }
 )
-
-
-

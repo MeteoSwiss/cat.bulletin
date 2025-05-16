@@ -61,7 +61,7 @@ monthlybulletin_teaser_text <- function(yearmonth, language) {
 read_monthlybulletin_teaser_text <- function(path, language) {
   filepath <- file.path(path, paste0("teaser_", language, ".txt"))
   text <- if (assertthat::is.readable(filepath)) {
-    lines <- readLines(filepath)
+    lines <- readr::read_lines(filepath)
     if (length(lines) > 1)
       warning(paste("teaser text", filepath, "contains more than one line. Using only the first."))
     lines[1]

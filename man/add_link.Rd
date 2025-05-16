@@ -2,12 +2,12 @@
 % Please edit documentation in R/link_list.R
 \name{add_link}
 \alias{add_link}
-\title{Create a shorty list object}
+\title{Create a link_list object}
 \usage{
 add_link(link_list, path, label, url)
 }
 \arguments{
-\item{link_list}{the link_list element to add the link}
+\item{link_list}{the link_list element to add the link to}
 
 \item{path}{the CMS path to link to for this link}
 
@@ -16,5 +16,5 @@ add_link(link_list, path, label, url)
 \item{url}{the link url used in the pdf export}
 }
 \description{
-Create a shorty list object
+Create a link_list object
 }

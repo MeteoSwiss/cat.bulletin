@@ -21,7 +21,7 @@ test_that("Create markdown file from bulletin", {
     add_text(text[1]) %>%
     add_text(text[2])
   
-  filename <- bulletin_to_markdown(bulletin)
+  filename <- bulletin_to_markdown(bulletin, filename = "markdown_test.md")
   md <- readr::read_lines(filename)
   expect_snapshot(md)
 })
@@ -35,7 +35,7 @@ test_that("Create pdf from bulletin", {
     add_text(text[2])
   
   filename <- bulletin_to_pdf(bulletin, language = "de")
-  expect_snapshot_file(filename)
+  expect_snapshot_file(filename, name = "test_bulletin.pdf")
 })
 
 
@@ -58,7 +58,7 @@ test_that("Create pdf from bulletin with metadata", {
     add_text(text[2])
   
   filename <- bulletin_to_pdf(bulletin, language = "en")
-  expect_snapshot_file(filename)
+  expect_snapshot_file(filename, name = "test_bulletin_metadata.pdf")
 })
 
 
@@ -95,10 +95,10 @@ test_that("get_elements", {
   
   text_element = bulletin[[languaged_elements(language)]][[1]]
 
-  expect_equivalent(get_elements(bulletin, type = "text"), list(text_element))
-  expect_equivalent(get_elements(bulletin, type = "blabla"), list())
-  expect_equivalent(get_elements(bulletin, id = text_element$id), list(text_element))
-  expect_equivalent(get_elements(bulletin, id = "asdfasfd"), list())
+  expect_equal(get_elements(bulletin, type = "text"), list(text_element), ignore_attr = TRUE)
+  expect_equal(get_elements(bulletin, type = "blabla"), list(), ignore_attr = TRUE)
+  expect_equal(get_elements(bulletin, id = text_element$id), list(text_element), ignore_attr = TRUE)
+  expect_equal(get_elements(bulletin, id = "asdfasfd"), list(), ignore_attr = TRUE)
   expect_error(get_elements(bulletin, type = "asdf", id = "asdf"))
   expect_equal(get_elements(bulletin), bulletin$elements)
   
@@ -112,5 +112,6 @@ test_that("frontmatter", {
   # write the R markdong front matter first
   write_markdown_frontmatter(bulletin = bulletin, file_conn = file_conn)
   close(file_conn)
-  expect_snapshot_file(filename)
+  fm <- readr::read_lines(filename)
+  expect_snapshot(fm)
 })

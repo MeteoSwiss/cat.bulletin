@@ -95,7 +95,7 @@ my_metadata <- publication_metadata(
   publishedAt = Sys.Date()
 )
 my_metadata <- publication_metadata(
-  title = c(de = "deutscher titel", fr = "titre français")
+  title = c(de = "deutscher titel", fr = "titre fran\u00e7ais")
 )
 # update an element 
 my_metadata <- update_metadata_element(my_metadata, path = "/my_new_path")

@@ -2,9 +2,9 @@
 % Please edit documentation in R/pipe.R
 \name{\%>\%}
 \alias{\%>\%}
-\title{Pipe graphics}
+\title{Pipe operator}
 \arguments{
-\item{lhs, rhs}{A visualisation and a function to apply to it}
+\item{lhs, rhs}{A bulletin and a function to apply to it.}
 }
 \description{
 Like dplyr, cat.bulletin also uses the pipe function, \code{\%>\%} to turn

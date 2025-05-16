@@ -1,5 +1,6 @@
 #' Create a link list element
 #' @param title The text to be used as title for the group of links in the pdf and xml.
+#' @inheritParams bulletin_element
 #' @export
 link_list_element <- function(title = NULL, appear = c("xml", "pdf"), id = NULL) {
   link_list_element <- bulletin_element(type = "link_list", id = id, appear = appear)
@@ -97,8 +98,8 @@ create_link <- function(path, label, url) {
   )
 }
 
-#' Create a shorty list object
-#' @param link_list the link_list element to add the link
+#' Create a link_list object
+#' @param link_list the link_list element to add the link to
 #' @inheritParams create_link
 #' @export
 add_link <- function(link_list, path, label, url) {
