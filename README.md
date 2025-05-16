@@ -33,7 +33,8 @@ See the function [create_test_bulletin_for_web](https://service.meteoswiss.ch/do
 The [bulletin_to_webzip](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_webzip.html) function will create a zip file with both pdf and xml files that can be sent to the MeteoSwiss website.
 
 The CMS elements that are supported by the website are documented on the Quatico Confluence:
-[CMS elements for automatic publications](https://quatico.atlassian.net/wiki/spaces/MCHW2C/pages/414842883). A pdf of the documentation is available in the [documentation folder](inst/doc/MCHW2C-Automatisierte_Publikationen_(Schnittstellendefinition)-150525-133432).
+
+[CMS elements for automatic publications](https://quatico.atlassian.net/wiki/spaces/MCHW2C/pages/414842883). A pdf of the documentation is available in the [documentation folder](Schnittstellendefinition_Automatisierte_Publikationen.pdf)
 
 ### Auxiliary functions
 

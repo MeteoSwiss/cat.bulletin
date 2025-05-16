@@ -4,18 +4,19 @@
 \alias{create_shorty}
 \title{Create a shorty list object}
 \usage{
-create_shorty(title, lead, link = NULL, language, id)
+create_shorty(title, lead, link = NULL, language, id, pdf_file = NULL)
 }
 \arguments{
 \item{title}{title element}
 
-\item{lead}{lead/content of the shorty}
-
-\item{link}{optional link of the shorty. Must start with 'https://'.}
+\item{link}{optional https link that links to additional information. Must start with 'https://'.}
 
 \item{language}{language identifier for this shorty}
 
 \item{id}{string identifying the shorty}
+
+\item{pdf_file}{optional path to a pdf file that contains the printable version of the additional information. 
+Will be merged with the bulletin pdf when creating the pdf of the bulletin for this language.}
 }
 \description{
 Create a shorty list object

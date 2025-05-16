@@ -23,7 +23,7 @@ add_shorties_list(
 
 \item{path}{The base directory from where to read the shorties text files.}
 
-\item{subdir}{An optional string giving a subdirectory within the base directory to look for the shorties text files.}
+\item{subdir}{An optional string denoting a subdirectory within the base directory to look for the shorties text files.}
 
 \item{id}{a string giving a unique identifier. The id must be unique within one language but can (should) 
 be the same across languages. During xml generation, elements with the same id are processed into the same xml node.

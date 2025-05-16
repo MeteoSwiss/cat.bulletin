@@ -115,3 +115,5 @@ test_that("frontmatter", {
   fm <- readr::read_lines(filename)
   expect_snapshot(fm)
 })
+
+

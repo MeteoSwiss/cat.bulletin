@@ -1,7 +1,7 @@
 Package: cat.bulletin
 Type: Package
 Title: Automation of bulletion creation for publication on the MeteoSwiss website
-Version: 0.16.1
+Version: 0.17.0
 Authors@R: c(person(given="Elias", family="Zubler", email="elias.zubler@meteoswiss.ch", role=c("aut")),
     person(given="Felix", family="Maurer", email="felix.maurer@meteoswiss.ch", role=c("aut","cre"))
     )
@@ -34,5 +34,6 @@ Imports:
     mchdwh (>= 1.14.1),
     mmtpred,
     withr,
-    cli
+    cli,
+    qpdf
 RoxygenNote: 7.3.2

@@ -4,7 +4,7 @@
 #' @family rendering
 #' @export
 bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
-
+  
   log_info("Starting the webzip build process for bulletin ", bulletin$bulletin_id, style = "h1")
   
   publication <- empty_multi_language_string(languages = bulletin$languages)
@@ -15,19 +15,19 @@ bulletin_to_webzip <- function(bulletin, zipfilename = "climate-bulletin.zip") {
   for (language in bulletin$languages) {
     tryCatch({
       pdf_filename <- languaged_filename(
-        filename = paste(bulletin$bulletin_id, bulletin$year, bulletin$month, sep = "_"),
+        filename = bulletin$pdf_file_base_name,
         language = language,
         ending = "pdf"
-        )
+      )
       filename <- bulletin_to_pdf(bulletin, filename = file.path(bulletin$files_path, pdf_filename), language = language)
-       publication <- update_multi_language_string(publication, language, paste0(bulletin$files_dir, "/", basename(filename)))
+      publication <- update_multi_language_string(publication, language, paste0(bulletin$files_dir, "/", basename(filename)))
     },
-      error = function(e) stop(e)
+    error = function(e) stop(e)
     )
   }
   
   bulletin$metadata <- update_metadata_element(metadata = bulletin$metadata, publication = publication)
-
+  
   bulletin_to_xml(bulletin, filename = file.path(bulletin$bulletin_path, "publication.xml"))
   
   log_info("... webzip build process: creating zip file", style = "h2")
