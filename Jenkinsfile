@@ -1,6 +1,6 @@
 class Globals {
     // docker: builder image
-    static String docker_base = 'climateanalysis/cat-build'
+    static String docker_base = 'climateanalysis/cat-build/ubuntu-noble/r-4.4'
     static String docker_version = 'latest'
     static String docker_image = ''
 
@@ -9,9 +9,6 @@ class Globals {
     static String package_name = ''
     static String package_version = ''
     static String package_file = ''
-
-    // git tag
-    static String git_tag = ''
 
     // deployment stages setup (check vs deploy vs abort)
     static String deploy_stages = 'check'
@@ -74,10 +71,8 @@ pipeline {
 
 		    echo "Package specs: ${Globals.package_file}"
 
-		    // get Global variables from git
-		    Globals.git_tag = sh( script: 'cd source; git tag --contains | head -1 | sed "s/[a-zA-Z]//g"', returnStdout: true).trim()
-
-		    echo "GIT specs: ${Globals.git_tag}, ${env.TAG_NAME}, ${env.BRANCH_NAME}"
+		    // get env variables from git
+		    echo "GIT specs: ${env.BRANCH_NAME}"
 
 		    // set docker image name
 		    Globals.docker_image = "${DOCKER_REPO}/${Globals.docker_base}:${Globals.docker_version}"

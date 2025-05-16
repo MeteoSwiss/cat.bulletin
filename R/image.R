@@ -10,7 +10,7 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
   element
 }
 
-#' add an image with caption to a bulletin
+#' Add an image with caption to a bulletin
 #' 
 #' copies the image from the filepath to the bulletin directory and adds an image element
 #' @param filepath the path of the image to add

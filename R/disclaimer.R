@@ -6,7 +6,7 @@ disclaimer_element <- function(caption_text_element, body_Rmd_element, appear = 
   disclaimer_element
 }
 
-#' add disclaimer element to a bulletin
+#' Add disclaimer element to a bulletin
 #' 
 #' A disclaimer element consists of a caption (given as text) and a body (specified as a Rmd file).
 #' On the website (xml), the disclaimer is rendered as a box.

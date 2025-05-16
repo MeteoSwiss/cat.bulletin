@@ -2,13 +2,14 @@
 #' @param year Bulletin year
 #' @param month Bulletin month
 #' @param provisional boolean indicating if the provisional version of the bulletin shall be created. If missing, this will determined using 
-#' \code{get_bulletin_monthly_provisional}.
-#' @param ... further general bulletin arguments forwarded to the create_bulletin function. Use them to set working directory etc. 
+#' \code{\link{get_bulletin_monthly_provisional}}.
+#' @param ... further general bulletin arguments forwarded to the \code{\link{create_bulletin}} function. Use them to set working directory etc. 
 #' @inheritParams create_bulletin
 #' @importFrom magrittr %>%
 #' @export
 #' @examples 
 #' bulletin <- bulletin_monthly(year = 2024, month = 8)
+#' bulletin_to_pdf <- function(bulletin, language = "fr")
 bulletin_monthly <- function(year = 2024, 
                              month = 8, 
                              provisional,

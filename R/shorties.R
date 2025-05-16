@@ -5,7 +5,7 @@ shorties_list_element <- function(shorties, title = NULL, appear = NULL, id = NU
   shorties_list_element
 }
 
-#' add shorties list to a bulletin
+#' Add shorties list to a bulletin
 #' 
 #' A shorty is a text element with title, text and optional link. The content is read from a file 
 #' (see \code{\link{read_shorties}} and \code{\link{read_shorty}}).
@@ -78,10 +78,17 @@ shorties_list_to_xml <- function(xml, element, language) {
 #' Create a shorty list object
 #' @param title title element
 #' @param lead lead/content of the shorty
-#' @param link optional link of the shorty
+#' @param link optional link of the shorty. Must start with 'https://'.
 #' @param language language identifier for this shorty
 #' @param id string identifying the shorty
 create_shorty <- function(title, lead, link = NULL, language, id) {
+  
+  # assert link
+  if (!is.null(link) && !(startsWith(link, "https://"))) {
+    log_info("link for shorty with title '", title, "' does not start with 'https://'. Ignoring it.", style = "warning")
+    link = NULL
+  }
+  
   list(
     title = title,
     lead = lead,

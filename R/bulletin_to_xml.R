@@ -36,6 +36,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
     bulletin <- set_active_language(bulletin, language = default_language)
     function_name <- paste0(element$type, "_to_xml")
     
+    process_alternate_languages = TRUE
     withr::with_locale(
       new = c("LC_TIME" = get_locale(default_language)), {
         # catch the xml_node to add other languages later
@@ -46,10 +47,14 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
         error = function(e) {
           warning_message <- paste("Could not process xml element", element$id, "for default language", default_language, ":", e)
           warning(warning_message)
-          next
+          process_alternate_languages = FALSE
         }
         )
       })
+    
+    # skipp rest of the loop if we encountered a problem above
+    if (!process_alternate_languages)
+      next
     
     # process other languages
     for (language in bulletin$languages[-1]) {
@@ -68,7 +73,6 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
             error = function(e) {
               warning_message <- paste("Could not process xml element", element$id, "for language", language, ":", e)
               warning(warning_message)
-              next
             })
           })
       } else {

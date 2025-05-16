@@ -1,4 +1,4 @@
-#' Pipe graphics
+#' Pipe operator
 #'
 #' Like dplyr, cat.bulletin also uses the pipe function, \code{\%>\%} to turn
 #' function composition into a series of imperative statements.
@@ -7,7 +7,7 @@
 #' @name %>%
 #' @rdname pipe
 #' @export
-#' @param lhs,rhs A visualisation and a function to apply to it
+#' @param lhs,rhs A bulletin and a function to apply to it. 
 #' @examples
 #' \dontrun{
 #' # Instead of

@@ -52,7 +52,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     text_id <- "disclaimer"
     bulletin <- bulletin %>%
       set_active_language(language = "de") %>%
-      add_disclaimer(caption_text = "Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann täglich aufdatiert bis zum letzten Tag des Monats.",
+      add_disclaimer(caption_text = "Das Bulletin wird jeweils 5 Tage vor Monatsende ein erstes Mal publiziert und ab dann t\u005cglich aufdatiert bis zum letzten Tag des Monats.",
                      body_Rmd_element_id = "element")
   }
   
@@ -62,11 +62,11 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     text_id <- generate_element_id("text")
     bulletin <- bulletin %>%
       set_active_language(language = "de") %>%
-      add_text("Das ist ein Text auf Deutsch mit ös und äs.", id = text_id) %>%
+      add_text("Das ist ein Text auf Deutsch mit \u00F6s und \u00E4s.", id = text_id) %>%
       set_active_language(language = "fr") %>%
-      add_text("C'est un texte en français avec é et è.", id = text_id)%>%
+      add_text("C'est un texte en fran\u00e7ais avec \u00E9 et \u00E8.", id = text_id)%>%
       set_active_language(language = "it") %>%
-      add_text("Questo è un testo in italiano con & et %.", id = text_id)
+      add_text("Questo \u00e8 un testo in italiano con \u0026 et \u0025.", id = text_id)
   }
   
   ## Image element
@@ -83,7 +83,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       set_active_language(language = "fr") %>%
       add_image(filepath = filepath, 
                 filename = "image1_fr.png", 
-                caption = "Légende de l'image",
+                caption = "L\u00e9gende de l'image",
                 id = image_id)  %>%
       set_active_language(language = "it") %>%
       add_image(filepath = filepath, 
@@ -137,8 +137,8 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     for (language in bulletin$languages) {
       link_list <- link_list_element(title = "My Link List",
                                      id = element_id) %>%
-        add_link(path = "/meteoswiss/.../", 
-                 label = "MeteoSwiss Home",
+        add_link(path = "/meteoswiss/homepage/climate/climate-of-switzerland/climate-normals", 
+                 label = "Climate normals",
                  url = "https://www-integ.meteoschweiz.ch/klima/klima-der-schweiz/klima-normwerte.html"
         ) %>%
         add_link(

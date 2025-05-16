@@ -11,7 +11,7 @@ create_shorty(title, lead, link = NULL, language, id)
 
 \item{lead}{lead/content of the shorty}
 
-\item{link}{optional link of the shorty}
+\item{link}{optional link of the shorty. Must start with 'https://'.}
 
 \item{language}{language identifier for this shorty}
 
