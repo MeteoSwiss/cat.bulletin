@@ -34,7 +34,7 @@ The [bulletin_to_webzip](https://service.meteoswiss.ch/documentation/cat.bulleti
 
 The CMS elements that are supported by the website are documented on the Quatico Confluence:
 
-[CMS elements for automatic publications](https://quatico.atlassian.net/wiki/spaces/MCHW2C/pages/414842883). A pdf of the documentation is available in the [documentation folder](Schnittstellendefinition_Automatisierte_Publikationen.pdf)
+[CMS elements for automatic publications](https://quatico.atlassian.net/wiki/spaces/MCHW2C/pages/414842883). A pdf of the documentation is available in the [documentation folder](inst/cms-doc/Schnittstellendefinition_Automatisierte_Publikationen.pdf)
 
 ### Auxiliary functions
 

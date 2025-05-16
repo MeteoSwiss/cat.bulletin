@@ -9,6 +9,8 @@ create_shorty(title, lead, link = NULL, language, id, pdf_file = NULL)
 \arguments{
 \item{title}{title element}
 
+\item{lead}{lead/content of the shorty}
+
 \item{link}{optional https link that links to additional information. Must start with 'https://'.}
 
 \item{language}{language identifier for this shorty}
