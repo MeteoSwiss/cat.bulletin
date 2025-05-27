@@ -114,7 +114,7 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     title = c(
       de = "Klimabulletin",
       fr = "Bulletin climatologique",
-      it = "Bolletino del clima"
+      it = "Bollettino del clima"
     )
     
     for (lang in names(title)) {

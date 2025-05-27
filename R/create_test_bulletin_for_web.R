@@ -27,7 +27,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     title = c(
       de = paste("Klimabulletin - Testpublikation", Sys.Date()),
       fr = "Bulletin climatologique - test",
-      it = "Bolletino del clima - test"
+      it = "Bollettino del clima - test"
     ),
     lead = c(
       de = lore_ipsum("de"),

@@ -4,7 +4,7 @@ my_metadata <- publication_metadata(
   title = c(
     de = "Klimabulletin - Testpublikation",
     fr = "Bulletin climatologique - test",
-    it = "Bolletino del clima - test"
+    it = "Bollettino del clima - test"
   ),
   lead = c(
     de = lore_ipsum("de"),
