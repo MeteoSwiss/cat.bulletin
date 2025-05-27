@@ -274,8 +274,8 @@ comp_regdiff <- function(parameter, vals, regsort) {
   vlowest <- 1
   for (r in 1:length(regs)) {
     indr <- which(vals$Region == regs[r])
-    vhighest[r] <- stats::quantile(abs(vals[[deviations]][indr]),0.75,na.rm=TRUE)
-    vlowest[r] <- stats::quantile(abs(vals[[deviations]][indr]),0.25,na.rm=TRUE)
+    vhighest[r] <- stats::quantile(vals[[deviations]][indr],0.75,na.rm=TRUE)
+    vlowest[r] <- stats::quantile(vals[[deviations]][indr],0.25,na.rm=TRUE)
   }
   member_h <- stats::cutree(stats::hclust(stats::dist(vhighest)),3)
   member_l <- stats::cutree(stats::hclust(stats::dist(vlowest)),3)
