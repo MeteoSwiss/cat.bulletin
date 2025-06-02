@@ -129,6 +129,15 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
                           path = system.file(package = "cat.bulletin", "example-data", "shorties"),
                           id = element_id
         )
+    element_id = "my_shorties2"
+    for (language in bulletin$languages)
+      bulletin <- bulletin %>%
+      set_active_language(language = language) %>%
+      add_shorties_list(group_id = "vegi",
+                        title = cat.lang::get.text("bulletin_monthly_vegetation_title"),
+                        path = system.file(package = "cat.bulletin", "example-data", "shorties"),
+                        id = element_id
+      )
   }
   
   ## Link List element
