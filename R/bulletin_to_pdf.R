@@ -48,18 +48,22 @@ bulletin_to_pdf <- function(bulletin,
   #   }
   # )
   
-  combined_outfile <- NULL
   if (has_element(bulletin, type = "shorties_list")) {
-    log_debug("Looking for pdfs to attach from shorties_list.")
+    log_debug("Looking for pdfs to attach from shorties lists.")
     
-    shorties_list <- get_elements(bulletin, language = language, type = "shorties_list")[[1]]
-    pdfs <- get_shorties_pdfs(shorties_list)
+    shorties_lists <- get_elements(bulletin, language = language, type = "shorties_list")
+    
+    log_debug("Found", length(shorties_lists), "shorties_lists")
+    
+    combined_outfile <- NULL
+    
+    pdfs <- unlist(sapply(shorties_lists, get_shorties_pdfs))
     
     if (length(pdfs) > 0) {
-      log_info("Attaching ", length(pdfs), "pdf files to bulletin pdf.")
+      log_info("Attaching ", length(pdfs), "pdf files to bulletin")
       tryCatch({
         combined_outfile <- file.path(bulletin$bulletin_path, 
-                             paste0(bulletin$bulletin_id, "_combined_", language, ".pdf")
+                                      paste0(bulletin$bulletin_id, "_combined_", language, ".pdf")
         )
         qpdf::pdf_combine(input = c(pdf_outfile, pdfs),
                           output = combined_outfile)
@@ -75,10 +79,10 @@ bulletin_to_pdf <- function(bulletin,
     # Copying outfile to the final location
     if (!is.null(combined_outfile)) 
       pdf_outfile <- combined_outfile
-    
-    log_debug("Copy outfile", pdf_outfile, "to final location", filename)
-    file.copy(pdf_outfile, filename, overwrite = TRUE)
   }
+  
+  log_debug("Copy outfile", pdf_outfile, "to final location", filename)
+  file.copy(pdf_outfile, filename, overwrite = TRUE)
   
   log_info("PDF produced for language", language, ".", style = "success")
   return(filename)
