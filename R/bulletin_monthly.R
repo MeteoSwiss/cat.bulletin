@@ -9,7 +9,7 @@
 #' @export
 #' @examples 
 #' bulletin <- bulletin_monthly(year = 2024, month = 8)
-#' bulletin_to_pdf <- function(bulletin, language = "fr")
+#' bulletin_to_pdf(bulletin, language = "fr")
 bulletin_monthly <- function(year = 2024, 
                              month = 8, 
                              provisional,
@@ -129,6 +129,12 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     title
   }
   
+  teaser_texts <- lapply(bulletin$languages, 
+                         function(lang) 
+                           monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
+  )
+  names(teaser_texts) <- bulletin$languages
+  
   metadata <- publication_metadata(
     path = bulletin_path(bulletin),
     title = bulletin_title(bulletin),
@@ -139,10 +145,8 @@ monatsbulletin_metadata <- function(bulletin, lead_element_id, swissmean, regdif
     ),
     edition = sapply(bulletin$languages, bulletin_edition, provisional = bulletin$provisional),
     teaser_image = monthlybulletin_teaser_image(yearmonth = bulletin$yearmonth),
-    teaser_source = sapply(bulletin$languages, 
-                           function(lang) 
-                             monthlybulletin_teaser_text(yearmonth = bulletin$yearmonth, language = lang)
-    ),
+    teaser_source = sapply(teaser_texts, "[[", "source"),
+    teaser_caption = sapply(teaser_texts, "[[", "caption"),
     keywords = c(),
     publishedAt = Sys.Date()
   )

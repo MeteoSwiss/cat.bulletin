@@ -13,7 +13,10 @@ create_minimal_bulletin <- function() {
     ),
     teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
     teaser_source = c(
-      de = "Foto: "
+      de = "Foto: xy"
+    ),
+    teaser_caption = c(
+      de = "Bildunterschrift"
     ),
     keywords = c(),
     authors = c(

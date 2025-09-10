@@ -13,6 +13,7 @@ publication_metadata(
   keywords = NULL,
   teaser_image = NULL,
   teaser_source = NULL,
+  teaser_caption = NULL,
   categories = c("climate"),
   authors = "MeteoSchweiz / MétéoSuisse / MeteoSvizzera",
   publication = NULL,
@@ -37,6 +38,8 @@ it will be interpreted as relative to \code{"/meteoswiss/homepage/service-and-pu
 \item{teaser_image}{a path to the teaser image. It will be copied to the bulletins image folder during processing.}
 
 \item{teaser_source}{a multilanguage string denoting the source of the teaser image}
+
+\item{teaser_caption}{a multilanguage string denoting the caption of the teaser image}
 
 \item{categories}{a comma separated string with publication categories. 
 Possible categories: weather, hazards, climate, measurementAndForecastingSystem.}
@@ -82,9 +85,14 @@ my_metadata <- publication_metadata(
   ),
   teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
   teaser_source = c(
-    de = "Foto: ",
-    it = "Foto: ",
-    fr = "Photo: "
+    de = "Foto: xy",
+    it = "Foto: xy",
+    fr = "Photo: xy"
+  ),
+  teaser_caption = c(
+    de = "Deutscher teaser caption",
+    it = "it teaser caption",
+    fr = "fr teaser caption"
   ),
   keywords = c(),
   authors = c(

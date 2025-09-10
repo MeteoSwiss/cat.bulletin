@@ -82,7 +82,7 @@ shorties_list_to_xml <- function(xml, element, language) {
   text_node
 }
 
-#' Create a shorty list object
+#' Create a shorty object
 #' @param title title element
 #' @param lead lead/content of the shorty
 #' @param link optional https link that links to additional information. Must start with 'https://'.
