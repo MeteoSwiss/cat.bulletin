@@ -3,7 +3,7 @@ test_that("Create bulletin contains element slots for all languages", {
   bulletin <- create_bulletin() 
   expect_contains(names(bulletin), languaged("elements", bulletin$languages))
 })
-  
+
 test_that("Create bulletin with text elements", {
   language = "de"
   bulletin <- create_bulletin(languages = language) %>%
@@ -43,15 +43,15 @@ test_that("Create pdf from bulletin with metadata", {
   text <- c("## This is a level two title",
             "This is normal text."
   )
+  teaser_text = monthlybulletin_teaser_text(yearmonth = format(Sys.Date(), "%Y%m"), language = "de")
   bulletin <- create_bulletin(
     languages = "en",
     metadata = publication_metadata(
-     title = c(en = "This is the bulletin title"),
-     lead = c(en = "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."),
-     teaser_image = monthlybulletin_teaser_image(yearmonth = format(Sys.Date(), "%Y%m")),
-     teaser_source = c(
-       en = monthlybulletin_teaser_text(yearmonth = format(Sys.Date(), "%Y%m"), language = "de")
-     )
+      title = c(en = "This is the bulletin title"),
+      lead = c(en = "Im Leadtext Reihenfolge der zu nennenden Parameter über die Ränge entscheiden. Super wären Sätze im Sinne von DER AUGUST 2024 WAR GEPRÄGT VON HOHEN TEMPERATUREN UND WENIG NIEDERSCHLAG."),
+      teaser_image = monthlybulletin_teaser_image(yearmonth = format(Sys.Date(), "%Y%m")),
+      teaser_source = c("en" = teaser_text[["source"]]),
+      teaser_caption = c("en" = teaser_text[["caption"]])
     )
   ) %>%
     add_text(text[1]) %>%
@@ -94,7 +94,7 @@ test_that("get_elements", {
     add_text(text) 
   
   text_element = bulletin[[languaged_elements(language)]][[1]]
-
+  
   expect_equal(get_elements(bulletin, type = "text"), list(text_element), ignore_attr = TRUE)
   expect_equal(get_elements(bulletin, type = "blabla"), list(), ignore_attr = TRUE)
   expect_equal(get_elements(bulletin, id = text_element$id), list(text_element), ignore_attr = TRUE)

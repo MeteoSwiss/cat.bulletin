@@ -50,8 +50,10 @@ image_to_markdown <- function(element) {
   # see also https://bookdown.org/yihui/rmarkdown-cookbook/figure-placement.html
   # or https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
   label <- if (!is.null(element$label)) paste0("\\label{", element$label, "}") else ""
-  paste0("![", element$caption, " ", label, "](", element$filepath, ')', "\n",
-         element$source, "\n")
+  caption <- element$caption
+  if (!is.null(element$source))
+    caption <- paste0(caption, "(", element$source, ")")
+  paste0("![", caption, " ", label, "](", element$filepath, ')', "\n\n")
 }
 
 image_to_xml <- function(xml, element, language) {
@@ -190,17 +192,17 @@ crop_image <- function(image_filepath,
   
   crop_arg <- switch(side,
                      "top" = paste0(size["width"], "x",
-                                   size["height"] - margin,
-                                   "+", 0,
-                                   "+", margin),
-                     "bottom" = paste0(size["width"], "x",
                                     size["height"] - margin,
                                     "+", 0,
-                                    "+", 0),
+                                    "+", margin),
+                     "bottom" = paste0(size["width"], "x",
+                                       size["height"] - margin,
+                                       "+", 0,
+                                       "+", 0),
                      "left" = paste0(size["width"] - margin, "x",
                                      size["height"],
-                                       "+", margin,
-                                       "+", 0),
+                                     "+", margin,
+                                     "+", 0),
                      "right" = paste0(size["width"] - margin, "x",
                                       size["height"],
                                       "+", 0,

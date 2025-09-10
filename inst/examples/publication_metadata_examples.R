@@ -18,9 +18,14 @@ my_metadata <- publication_metadata(
   ),
   teaser_image = system.file(package = "cat.bulletin", "example-data", "teaser-image.jpg"),
   teaser_source = c(
-    de = "Foto: ",
-    it = "Foto: ",
-    fr = "Photo: "
+    de = "Foto: xy",
+    it = "Foto: xy",
+    fr = "Photo: xy"
+  ),
+  teaser_caption = c(
+    de = "Deutscher teaser caption",
+    it = "it teaser caption",
+    fr = "fr teaser caption"
   ),
   keywords = c(),
   authors = c(

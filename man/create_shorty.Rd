@@ -2,7 +2,7 @@
 % Please edit documentation in R/shorties.R
 \name{create_shorty}
 \alias{create_shorty}
-\title{Create a shorty list object}
+\title{Create a shorty object}
 \usage{
 create_shorty(title, lead, link = NULL, language, id, pdf_file = NULL)
 }
@@ -21,5 +21,5 @@ create_shorty(title, lead, link = NULL, language, id, pdf_file = NULL)
 Will be merged with the bulletin pdf when creating the pdf of the bulletin for this language.}
 }
 \description{
-Create a shorty list object
+Create a shorty object
 }

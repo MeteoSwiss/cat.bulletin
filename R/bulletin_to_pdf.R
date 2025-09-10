@@ -226,11 +226,17 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   # Teaser image
   if (!is.null(metadata$teaser_image)) {
     image_element <- copy_teaser_image(filepath = metadata$teaser_image, bulletin = bulletin)
+
+    # do not use caption and source of the image element so that we do not get a "figure" label
+    # -> prepare manual caption
+    caption <- metadata$teaser_caption[language]
     if (!is.null(metadata$teaser_source)) {
-      image_element$source <- metadata$teaser_source[language]
+      caption <- paste0(caption, " (", metadata$teaser_source[language], ")")
     }
+    
     lines <- image_to_markdown(element = image_element)
     write_lines(lines)
+    write_lines(caption) # output manual caption as simple text
   }
   
   bulletin
