@@ -3,8 +3,21 @@
 #' @param filename The name of the file to write the pdf.
 #' @param bulletin The bulletin object created with \code{\link{create_bulletin}}.
 #' @param language Single language identifier.
+#' @section PDF options:
+#' \describe{
+#'  \item{Contact email address}{Per default, MeteoSwiss Customer Service email is used in the footer. 
+#'  To overwrite this, set the slot \code{pdf_contact_email} of the bulletin object to an email address 
+#'  or to NULL to suppress the contact output.
+#'  }
+#' }
 #' @details 
 #' This function will set the current active language to language as a side effect.
+#' @examples
+#' bulletin <- create_test_bulletin_for_web()
+#' # change pdf contact email 
+#' bulletin[["pdf_contact_email"]] <- "helpdesk@meteoswiss.ch"
+#' bulletin_to_pdf(bulletin)
+#' 
 #' @family rendering
 #' @export
 bulletin_to_pdf <- function(bulletin, 
@@ -13,7 +26,7 @@ bulletin_to_pdf <- function(bulletin,
                                                 fileext = ".pdf")
 ) {
   #documentation: https://bookdown.org/yihui/rmarkdown/pdf-document.html
-  
+
   log_info("Processing bulletin for {.emph language", language, "} to pdf via markdown...", style = "h3")
   #cat.report::load.cat.report()
   
@@ -173,23 +186,34 @@ write_latex_preabmle <- function(bulletin, file_conn = file_conn) {
   # latex commands must be escaped (double backslash)
   preamble <- c(
     "```{=latex}
-    % define variables used in headers and footers
-    \\catpackage{cat.bulletin}",
-    paste0("\\copyrightmeteo{", cat.lang::get.text("copyright"), "}"),
-    paste0("\\contact{", cat.lang::get.text("contact"), ": ", cat.lang::get.text("email.kud"), "}"),
-    "%\\headerleft{left header}
+    % define variables used in headers and footers",
+    paste0("\\catpackage{", get_calling_namespace(), "}"),
+    paste0("\\copyrightmeteo{", cat.lang::get.text("copyright"), "}")
+  )
+  # add contact email (can be configured via bulletin-object)
+  contact_email <- cat.lang::get.text("email.kud") #default
+  if (utils::hasName(bulletin, "pdf_contact_email")) {
+    contact_email <- bulletin[["pdf_contact_email"]]
+  }
+  if (! is.null(contact_email))
+    preamble <- c(preamble, 
+                  paste0("\\contact{", cat.lang::get.text("contact"), ": ", contact_email, "}")
+    )
+  # continue preamble
+  preamble <- c(preamble, 
+                "%\\headerleft{left header}
     %\\headercenter{center header}
     %\\headerright{right header}
     ",
-    #language for header picture
-    paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
-    paste0("\\title{",bulletin$metadata$title[bulletin$language],"}"),
-    "% make room for frontpage header - has to come before maketitle",
-    "\\newgeometry{top=48mm,bottom=16mm,left=30mm,right=20mm}",
-    "\\maketitle",
-    "% show the MeteoSwiss logo on the first page
+                #language for header picture
+                paste0("\\lang{", cat.func::isolang2dwhlang(bulletin$language), "}"),
+                paste0("\\title{",bulletin$metadata$title[bulletin$language],"}"),
+                "% make room for frontpage header - has to come before maketitle",
+                "\\newgeometry{top=48mm,bottom=16mm,left=30mm,right=20mm}",
+                "\\maketitle",
+                "% show the MeteoSwiss logo on the first page
     \\thispagestyle{frontpage}",
-    "```"
+                "```"
   )
   
   # load required R packages
@@ -226,7 +250,7 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
   # Teaser image
   if (!is.null(metadata$teaser_image)) {
     image_element <- copy_teaser_image(filepath = metadata$teaser_image, bulletin = bulletin)
-
+    
     # do not use caption and source of the image element so that we do not get a "figure" label
     # -> prepare manual caption
     caption <- metadata$teaser_caption[language]

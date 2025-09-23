@@ -28,6 +28,18 @@ The creation of a publication is a two step process:
 
 See the function [create_test_bulletin_for_web](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/create_test_bulletin_for_web.html) to see how a basic bulletin is created.
 
+Rmd-element files can be kept in your own package in the inst/elements folder. 
+This will only work, however, when your package is installed. To make it work also in `devtools::load_all()` mode, create your own version of the add_Rmd function: 
+```
+#' Integration with the cat.bulletin package:
+# Import frequently used functions
+#' @importFrom cat.bulletin create_bulletin publication_metadata add_text
+# Overwrite add_Rmd function to configure location of the Rmd files. 
+add_Rmd <- function(..., elements_dir = system.file("elements", filename, package = "clim.bull")) {
+  cat.bulletin::add_Rmd(..., elements_dir = elements_dir)
+}
+```
+
 2) The bulletin object is rendered to either pdf [bulletin_to_pdf](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_pdf.html) or xml [bulletin_to_xml](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_xml.html). xml format is required for publication as html on the MeteoSwiss website. 
 
 The [bulletin_to_webzip](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_webzip.html) function will create a zip file with both pdf and xml files that can be sent to the MeteoSwiss website.

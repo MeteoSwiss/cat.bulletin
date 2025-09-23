@@ -23,6 +23,23 @@ Render a bulletin to pdf
 \details{
 This function will set the current active language to language as a side effect.
 }
+\section{PDF options}{
+
+\describe{
+ \item{Contact email address}{Per default, MeteoSwiss Customer Service email is used in the footer. 
+ To overwrite this, set the slot \code{pdf_contact_email} of the bulletin object to an email address 
+ or to NULL to suppress the contact output.
+ }
+}
+}
+
+\examples{
+bulletin <- create_test_bulletin_for_web()
+# change pdf contact email 
+bulletin[["pdf_contact_email"]] <- "helpdesk@meteoswiss.ch"
+bulletin_to_pdf(bulletin)
+
+}
 \seealso{
 Bulletin rendering functions
 \code{\link{bulletin_to_markdown}()},
