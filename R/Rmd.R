@@ -1,10 +1,28 @@
-Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id = NULL) {
-  file <- system.file("elements", filename, package = "cat.bulletin")
-  assertthat::assert_that(assertthat::is.readable(file), msg = paste("Rmd element with filename", filename, "does not exist"))
+Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id = NULL, elements_dir = NULL) {
+  
+  file_path <- if(is.null(elements_dir)) {
+    # try to load the file from the calling package's namespace, 
+    # fall back to cat.bulletin if not successfull
+    tryCatch({
+      namespace <- get_calling_namespace()
+      log_debug("Trying to find file", filename, "in namespace", namespace)
+      system.file("elements", filename, mustWork = TRUE, package = namespace)
+    },
+    error = function(e) {
+      log_debug("Cannot load Rmd_element'", filename, "' file in the caller's namespace. Error message was: '",
+                e$message, "'. Trying to find file in the cat.bulletin package.")
+      system.file("elements", filename, mustWork = TRUE, package = "cat.bulletin")
+    }
+    )
+  } else {
+    file.path(elements_dir, filename)
+  }
+  assertthat::assert_that(assertthat::is.readable(file_path), msg = paste("Rmd element with filename", filename, "does not exist"))
+  log_debug("Using file ", file_path)
   assert_that(is.logical(clear_page), length(clear_page) == 1)
   
   Rmd_element <- bulletin_element(type = "Rmd", id = id, appear = appear)
-  Rmd_element[["Rmd_file"]] <- file
+  Rmd_element[["Rmd_file"]] <- file_path
   Rmd_element[["envir"]] <- envir
   Rmd_element[["clear_page"]] <- clear_page  
   Rmd_element
@@ -19,10 +37,22 @@ Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id =
 #' @inheritParams add_element
 #' @family bulletin_elements
 #' @export
-add_Rmd <- function(bulletin, element_id, envir = parent.frame(), clear_page = FALSE, id = element_id, appear = c("xml", "pdf")) {
+add_Rmd <- function(bulletin, 
+                    element_id, 
+                    envir = parent.frame(), 
+                    clear_page = FALSE, 
+                    id = element_id, 
+                    appear = c("xml", "pdf"),
+                    elements_dir = NULL) {
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")
   log_debug("Adding RMD element with filename", filename, ". 'appear'=", paste(appear, collapse = ","))
-  add_element(bulletin, Rmd_element(filename, envir = envir, clear_page = clear_page, id = id, appear = appear))
+  add_element(bulletin, 
+              Rmd_element(filename, 
+                          envir = envir, 
+                          clear_page = clear_page, 
+                          id = id, 
+                          appear = appear,
+                          elements_dir = elements_dir))
 }
 
 Rmd_to_markdown_file <- function(element) {

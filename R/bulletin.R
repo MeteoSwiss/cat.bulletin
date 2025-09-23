@@ -109,6 +109,7 @@ languaged_elements <- function(language) {
 #' The language defines the language environment / settings to use when compiling input or adding elements to a bulletin.
 #' @param bulletin The bulletin object created with \code{\link{create_bulletin}}.
 #' @param language language identifier.
+#' @export
 set_active_language <- function(bulletin, language = bulletin$languages[1]) {
   language = match.arg(language, choices = bulletin$languages)
   

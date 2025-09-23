@@ -38,3 +38,9 @@ update_multi_language_string <- function(string, language, value) {
   string[language] <- value
   string
 }
+
+#' return name of the topmost namespace calling the current function
+#' @export
+get_calling_namespace <- function() {
+  rlang::ns_env_name(sys.frames()[[1]])
+}

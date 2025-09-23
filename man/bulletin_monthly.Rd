@@ -23,5 +23,5 @@ Create the monthly bulletin
 }
 \examples{
 bulletin <- bulletin_monthly(year = 2024, month = 8)
-bulletin_to_pdf <- function(bulletin, language = "fr")
+bulletin_to_pdf(bulletin, language = "fr")
 }
