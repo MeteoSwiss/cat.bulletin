@@ -1,5 +1,6 @@
 Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id = NULL, elements_dir = NULL) {
   
+  # find path to elements file
   file_path <- if(is.null(elements_dir)) {
     # try to load the file from the calling package's namespace, 
     # fall back to cat.bulletin if not successfull
@@ -19,6 +20,7 @@ Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id =
   }
   assertthat::assert_that(assertthat::is.readable(file_path), msg = paste("Rmd element with filename", filename, "does not exist"))
   log_debug("Using file ", file_path)
+  
   assert_that(is.logical(clear_page), length(clear_page) == 1)
   
   Rmd_element <- bulletin_element(type = "Rmd", id = id, appear = appear)
@@ -33,6 +35,8 @@ Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id =
 #' @param envir environment in which to knit the Rmd later. 
 #' @param clear_page boolean indicating if the page should be cleared after this Rmd element when generating the pdf. 
 #' This means that a new page will be started after the output of the Rmd element.
+#' @param elements_dir optional path to the directory from which to load the Rmd file. 
+#' If NULL, the \code{inst/elements} folder of the calling package and of \code{cat.bulletin} will be searched. 
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
 #' @family bulletin_elements

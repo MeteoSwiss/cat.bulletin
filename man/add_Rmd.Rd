@@ -29,6 +29,9 @@ be the same across languages. During xml generation, elements with the same id a
 The default is a composition of type and a random string.}
 
 \item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
+
+\item{elements_dir}{optional path to the directory from which to load the Rmd file. 
+If NULL, the \code{inst/elements} folder of the calling package and of \code{cat.bulletin} will be searched.}
 }
 \description{
 Add R markdown to a bulletin
