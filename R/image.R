@@ -212,7 +212,8 @@ crop_image <- function(image_filepath,
   
   args <- paste(
     "-crop",
-    crop_arg, 
+    crop_arg,
+    "+repage",
     image_filepath,
     outpath
   )
