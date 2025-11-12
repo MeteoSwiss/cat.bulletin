@@ -7,7 +7,8 @@
 #' \describe{
 #'  \item{Contact email address}{Per default, MeteoSwiss Customer Service email is used in the footer. 
 #'  To overwrite this, set the slot \code{pdf_contact_email} of the bulletin object to an email address 
-#'  or to NULL to suppress the contact output.
+#'  or to NULL to suppress the contact output. You can do this at creation time using the \code{bulletin_args} argument 
+#'  of \code{\link{create_bulletin}} or set it at a later stage.  
 #'  }
 #' }
 #' @details 
@@ -261,6 +262,7 @@ write_markdown_metadata <- function(bulletin, file_conn = file_conn) {
     lines <- image_to_markdown(element = image_element)
     write_lines(lines)
     write_lines(caption) # output manual caption as simple text
+    write_lines("\n\n")
   }
   
   bulletin

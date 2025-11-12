@@ -1,23 +1,6 @@
-Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id = NULL, elements_dir = NULL) {
+Rmd_element <- function(filename, envir, elements_dir, clear_page = FALSE, appear = NULL, id = NULL) {
   
-  # find path to elements file
-  file_path <- if(is.null(elements_dir)) {
-    # try to load the file from the calling package's namespace, 
-    # fall back to cat.bulletin if not successfull
-    tryCatch({
-      namespace <- get_calling_namespace()
-      log_debug("Trying to find file", filename, "in namespace", namespace)
-      system.file("elements", filename, mustWork = TRUE, package = namespace)
-    },
-    error = function(e) {
-      log_debug("Cannot load Rmd_element'", filename, "' file in the caller's namespace. Error message was: '",
-                e$message, "'. Trying to find file in the cat.bulletin package.")
-      system.file("elements", filename, mustWork = TRUE, package = "cat.bulletin")
-    }
-    )
-  } else {
-    file.path(elements_dir, filename)
-  }
+  file_path <- file.path(elements_dir, filename)
   assertthat::assert_that(assertthat::is.readable(file_path), msg = paste("Rmd element with filename", filename, "does not exist"))
   log_debug("Using file ", file_path)
   
@@ -35,8 +18,8 @@ Rmd_element <- function(filename, envir, clear_page = FALSE, appear = NULL, id =
 #' @param envir environment in which to knit the Rmd later. 
 #' @param clear_page boolean indicating if the page should be cleared after this Rmd element when generating the pdf. 
 #' This means that a new page will be started after the output of the Rmd element.
-#' @param elements_dir optional path to the directory from which to load the Rmd file. 
-#' If NULL, the \code{inst/elements} folder of the calling package and of \code{cat.bulletin} will be searched. 
+#' @param elements_dir optional path to the directory from which to load the Rmd file. Per default, it will 
+#' use the return value of \code{\link{get_default_Rmd_elements_dir}}.
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
 #' @family bulletin_elements
@@ -47,9 +30,14 @@ add_Rmd <- function(bulletin,
                     clear_page = FALSE, 
                     id = element_id, 
                     appear = c("xml", "pdf"),
-                    elements_dir = NULL) {
+                    elements_dir = get_default_Rmd_elements_dir(bulletin)) {
+  
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")
   log_debug("Adding RMD element with filename", filename, ". 'appear'=", paste(appear, collapse = ","))
+  
+  assert_that(is.readable(elements_dir), msg = paste0("elements_dir '", elements_dir, "' cannot be read."))
+  log_debug("... will look in", elements_dir, "for Rmd element files.")
+  
   add_element(bulletin, 
               Rmd_element(filename, 
                           envir = envir, 
@@ -57,6 +45,24 @@ add_Rmd <- function(bulletin,
                           id = id, 
                           appear = appear,
                           elements_dir = elements_dir))
+}
+
+#' Get the default directory for Rmd element files
+#' @return If the \code{Rmd_elements_dir} property of the bulletin object is set, this setting will be returned as default. 
+#' If this is not set, the \code{inst/elements} folder of the \code{cat.bulletin} package will be used. 
+#' \code{Rmd_elements_dir} property can be set at creation time using using 
+#' the \code{bulletin_args} argument of \code{\link{create_bulletin}} or it can also be set at a later stage. 
+#' @param bulletin a bulletin object
+#' @export
+#' @examples
+#' bulletin <- create_bulletin(bulletin_args = list(Rmd_elements_dir = "foo"))  
+#' get_default_Rmd_elements_dir(bulletin)
+get_default_Rmd_elements_dir <- function(bulletin) {
+  if (utils::hasName(bulletin, "Rmd_elements_dir")) {
+    bulletin[["Rmd_elements_dir"]]
+  } else {
+    system.file("elements", package = "cat.bulletin")
+  }
 }
 
 Rmd_to_markdown_file <- function(element) {

@@ -5,7 +5,9 @@
 #' The bulletin elements represent building blocks of a bulletin like text, R-Markdown sections, links, images etc.
 #' The bulletin data structure also contains information needed for bulletin rendering, like working directories etc. 
 #' @param bulletin_id a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}
-#' @param bulletin_args a list of arguments 
+#' @param bulletin_args a list of arguments/properties of the bulletin object to be created. The list will be taken as base to construct the bulletin object. 
+#' Examples are the \code{Rmd_elements_dir} proprety (see \code{\link{add_Rmd}}) 
+#' or the \code{pdf_contact_email} property (see \code{\link{bulletin_to_pdf}}).
 #' @param languages The set of supported language identifiers for the publication. Must be a subset of \code{de}, \code{fr}, \code{it}, \code{en}.
 #' @param workdir working directory for bulletin creation
 #' @param bulletin_dir the name of the directory within the bulletin_path where bulletin related files will be stored.
