@@ -18,7 +18,7 @@ crop_image(
 If only a filename is given, the output is written to \code{temdir()}. 
 If outpath is NULL, output will be set to a temporary file}
 
-\item{side, }{either "top", "bottom", "left", or "right".}
+\item{side}{either "top", "bottom", "left", or "right".}
 
 \item{margin}{Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width resp. height. Use a string like "20\%" for this.}
 }
