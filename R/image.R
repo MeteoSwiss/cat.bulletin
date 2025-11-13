@@ -141,7 +141,7 @@ get_image_size <- function(image_filepath) {
 #' Crop an image 
 #' @inheritParams get_image_size
 #' @inheritParams assert_image_outpath
-#' @param side, either "top", "bottom", "left", or "right".
+#' @param side either "top", "bottom", "left", or "right".
 #' @param margin Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width resp. height. Use a string like "20\%" for this.
 #' @return the path to the output file
 #' @export
@@ -226,6 +226,84 @@ crop_image <- function(image_filepath,
   }
   )
   assert_that(is.readable(outpath), msg = "crop image: output was not generated")
+  outpath
+}
+
+#' Resize an image
+#' @inheritParams get_image_size
+#' @inheritParams assert_image_outpath
+#' @param width Either an integer (pixels) or a string like "50\%" for relative width. 
+#' @param height Either an integer (pixels) or a string like "50\%" for relative height.
+#' @return the path to the output file
+#' @export
+#' @examples
+#' outpath <- resize_image(
+#'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"),
+#'   width = "50%"
+#' )
+resize_image <- function(image_filepath,
+                         outpath = NULL,
+                         width = NULL,
+                         height = NULL) {
+  assert_that(is.readable(image_filepath))
+  outpath <- assert_image_outpath(outpath)
+  
+  # Must specify at least one of width or height
+  if (is.null(width) && is.null(height)) {
+    stop("You must specify either width or height.")
+  }
+  
+  # Helper function to interpret relative or absolute sizes
+  parse_dimension <- function(dim_value, total_size) {
+    if (is.null(dim_value)) return(NULL)
+    if (is.character(dim_value)) {
+      if (endsWith(dim_value, "%")) {
+        rel <- tryCatch(
+          as.numeric(substr(dim_value, 0, nchar(dim_value) - 1)),
+          error = function(e)
+            stop("Could not interpret relative dimension: ", dim_value)
+        )
+        return(round(total_size * rel / 100))
+      } else {
+        stop("Dimension strings must end with '%' to indicate relative size.")
+      }
+    } else if (is.number(dim_value) && dim_value > 0) {
+      return(dim_value)
+    } else {
+      stop("Invalid dimension value: must be positive number or percentage string.")
+    }
+  }
+  
+  size <- get_image_size(image_filepath)
+  
+  new_width  <- parse_dimension(width,  size["width"])
+  new_height <- parse_dimension(height, size["height"])
+  
+  # Build resize argument for ImageMagick
+  # If one dimension is NULL, ImageMagick will maintain aspect ratio
+  resize_arg <- paste0(
+    if (!is.null(new_width)) new_width else "",
+    "x",
+    if (!is.null(new_height)) new_height else ""
+  )
+  
+  args <- paste(
+    "-resize",
+    resize_arg,
+    image_filepath,
+    outpath
+  )
+  
+  log_debug("Calling convert to resize image with arguments: '", args, "'.")
+  
+  tryCatch({
+    system2("convert", args)
+  },
+  error = function(e) {
+    stop(paste("Error during resize of image.", e$message))
+  })
+  
+  assert_that(is.readable(outpath), msg = "resize image: output was not generated")
   outpath
 }
 

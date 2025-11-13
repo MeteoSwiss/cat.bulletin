@@ -35,3 +35,24 @@ test_that("crop image", {
   size_out <- get_image_size(outpath)
   expect_equal(size_out["height"], size_in["height"] - margin)
 })
+
+test_that("resize image", {
+  filepath <- system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
+  
+  # Resize to half the width, keeping aspect ratio
+  outpath <- resize_image(
+    image_filepath = filepath,
+    outpath = tempfile(fileext = ".png"),
+    width = "50%"
+  )
+  
+  size_in <- get_image_size(filepath)
+  size_out <- get_image_size(outpath)
+  
+  # Expect the width to be halved
+  expect_equal(size_out["width"], round(size_in["width"] * 0.5))
+  
+  # Height should be proportional
+  expected_height <- round(size_in["height"] * 0.5)
+  expect_equal(size_out["height"], expected_height)
+})
