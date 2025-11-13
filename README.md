@@ -33,8 +33,8 @@ Rmd-element files can be kept in your own package, for example in the `inst/elem
 In this case, configure the elements location when creating the bulletin like this:
 
 ```
+my_elements_dir = system.file("elements", package = "<your package>")
 bulletin <- cat.bulletin::create_bulletin(
-  my_elements_dir = system.file("elements", package = "<your package>")
   bulletin_args = list(Rmd_elements_dir = my_elements_dir
 )
 ```
