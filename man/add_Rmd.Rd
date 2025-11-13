@@ -10,7 +10,8 @@ add_Rmd(
   envir = parent.frame(),
   clear_page = FALSE,
   id = element_id,
-  appear = c("xml", "pdf")
+  appear = c("xml", "pdf"),
+  elements_dir = get_default_Rmd_elements_dir(bulletin)
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ be the same across languages. During xml generation, elements with the same id a
 The default is a composition of type and a random string.}
 
 \item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
+
+\item{elements_dir}{optional path to the directory from which to load the Rmd file. Per default, it will 
+use the return value of \code{\link{get_default_Rmd_elements_dir}}.}
 }
 \description{
 Add R markdown to a bulletin

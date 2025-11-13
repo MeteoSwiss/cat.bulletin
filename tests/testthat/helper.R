@@ -1,4 +1,4 @@
-create_minimal_bulletin <- function() {
+create_minimal_bulletin <- function(...) {
   title = "this is a title"
   metadata <- publication_metadata(
     path = "webtest",
@@ -25,6 +25,7 @@ create_minimal_bulletin <- function() {
     publishedAt = Sys.Date()
   )
   bulletin <- create_bulletin(languages = c("de"),
-                              metadata = metadata)
+                              metadata = metadata,
+                              ...)
   bulletin
 }

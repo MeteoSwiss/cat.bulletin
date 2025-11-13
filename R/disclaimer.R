@@ -32,7 +32,10 @@ add_disclaimer <- function(bulletin,
   
   # body as Rmd
   filename <- paste0(paste(bulletin$bulletin_id, body_Rmd_element_id, bulletin$language, sep ="_"), ".Rmd")
-  body_Rmd_element <- Rmd_element(filename = filename, clear_page = clear_page, envir = envir)
+  body_Rmd_element <- Rmd_element(filename = filename, 
+                                  clear_page = clear_page, 
+                                  envir = envir,
+                                  elements_dir = get_default_Rmd_elements_dir(bulletin))
   
   add_element(bulletin, disclaimer_element(
     caption_text_element = caption_text_element,

@@ -18,10 +18,19 @@ randomString <- function(length = 10) {
   rawToChar(as.raw(sample(c(65:90,97:122), size = length, replace=T)))
 }
 
+#' generate an element id for given type
+#' @param type string denoting an element type
+#' @return an element_id string
+#' @export 
 generate_element_id <- function(type) {
   paste(type, randomString(), sep ="_")
 }
 
+#' asserts if a bulletin element is of a given type
+#' @param element a bulletin element
+#' @param type a bulletin type
+#' @return a boolean
+#' @export 
 bulletin_element_is_of_type <- function(element, type) {
   element[["type"]] == type
 }

@@ -20,7 +20,7 @@
       [15] "---"                                                                  
       [16] "```{=latex}"                                                          
       [17] "    % define variables used in headers and footers"                   
-      [18] "    \\catpackage{cat.bulletin}"                                       
+      [18] "\\catpackage{testthat}"                                               
       [19] "\\copyrightmeteo{© MeteoSchweiz}"                                     
       [20] "\\contact{Kontakt: kundendienst@meteoschweiz.ch}"                     
       [21] "%\\headerleft{left header}"                                           
