@@ -1,3 +1,11 @@
+# cat.bulletin 1.2.2
+
+CATS-504
+
+* Bugfix: Fix `meno` (for precip >150 %) in ital. leadtext
+
+_fma;2025_09_23_
+
 # cat.bulletin 1.2.0
 
 CATS-414 

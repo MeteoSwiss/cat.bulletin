@@ -1,7 +1,7 @@
 Package: cat.bulletin
 Type: Package
 Title: Automation of bulletion creation for publication on the MeteoSwiss website
-Version: 1.2.1
+Version: 1.2.2
 Authors@R: c(person(given="Elias", family="Zubler", email="elias.zubler@meteoswiss.ch", role=c("aut")),
     person(given="Felix", family="Maurer", email="felix.maurer@meteoswiss.ch", role=c("aut","cre"))
     )
