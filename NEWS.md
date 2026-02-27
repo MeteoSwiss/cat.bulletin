@@ -1,10 +1,11 @@
-# cat.bulletin 1.2.2
+# cat.bulletin 1.2.2/3
 
 CATS-504
 
 * Bugfix: Fix `meno` (for precip >150 %) in ital. leadtext
+* Update Jenkinsfile
 
-_fma;2025_09_23_
+_por;2026_02_27_
 
 # cat.bulletin 1.2.0
 
