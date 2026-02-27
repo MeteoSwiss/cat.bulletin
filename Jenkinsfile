@@ -52,6 +52,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+		updateGitlabCommitStatus name: 'Build', state: 'running'
+
 		// checkout into source directory
 		dir('source'){
                     checkout scm
@@ -60,7 +62,6 @@ pipeline {
         }
 	stage('Preparation') {
 	    steps {
-   updateGitlabCommitStatus name: 'Build', state: 'running'
 		script {
 		    // get Global variables from R-package DESCRIPTION
 		    Globals.package_name = sh( script: 'grep "Package:" source/DESCRIPTION | cut -d":" -f2', returnStdout: true).trim()
@@ -199,7 +200,7 @@ pipeline {
 
 	stage('Publish Documentation') {
 	    when {
-		expression { Globals.documentation_publish }
+		expression { return Globals.documentation_publish == true }
 	    }
             environment {
 		PATH = "${HOME}/tools/openshift-client-tools:$PATH"
@@ -208,7 +209,7 @@ pipeline {
             steps {
 		withCredentials([string(credentialsId: "documentation-main-prod-token",
 					variable: 'TOKEN')]) {
-                    sh "oc login https://api.cp.meteoswiss.ch:6443 --token \$TOKEN"
+                    sh "oc login https://api.prod.cp1.meteoswiss.ch:6443/ --token \$TOKEN"
                     publishDoc "${WORKSPACE}/docs/", Globals.package_name, Globals.package_version, 'R', Globals.documentation_tag
 		}
             }
@@ -223,6 +224,17 @@ pipeline {
     post {
 	always {
             echo "Build stage complete"
+	}
+	cleanup {
+	    echo "Cleanup workspace"
+	    cleanWs(deleteDirs: true,
+		    patterns: [[pattern: '*@tmp', type: 'INCLUDE']])
+	    echo "Monitor workspace size"
+	    script {
+	        sh '''#!/bin/bash -l
+                   shopt -s dotglob; du -sh * | sort -h
+                   '''
+	    }
 	}
 	failure {
             echo "Build failed"
