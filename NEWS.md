@@ -1,4 +1,11 @@
-# cat.bulletin 1.2.2/3
+# cat.bulletin 1.3.0
+
+CATS-482 separate monthly bulletin into clim.bull package
+
+* The code for creating the monthly climate bulletin is now separated in the clim.bull package. cat.bulletin only contains generic code for creating bulletins.
+* Switched to logger package for logging. See [Logging with logger (for package developing)](https://meteoswiss.atlassian.net/wiki/x/pQFBU)
+
+# cat.bulletin 1.2.3
 
 CATS-504
 

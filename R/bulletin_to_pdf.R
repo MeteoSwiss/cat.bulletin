@@ -28,14 +28,14 @@ bulletin_to_pdf <- function(bulletin,
 ) {
   #documentation: https://bookdown.org/yihui/rmarkdown/pdf-document.html
 
-  log_info("Processing bulletin for {.emph language", language, "} to pdf via markdown...", style = "h3")
+  log_info("Processing bulletin for ", language, " to pdf via markdown...")
   #cat.report::load.cat.report()
   
   markdown_file = bulletin_to_markdown(bulletin, language = language,
                                        filename = file.path(bulletin$bulletin_path, 
                                                             paste0(bulletin$bulletin_id, "_", language, ".Rmd"))
   )
-  log_debug("Processing file", markdown_file, "to pdf.")
+  log_debug("Processing file ", markdown_file, " to pdf.")
   
   # create file in workdir 
   pdf_outfile <- tempfile(tmpdir = bulletin$bulletin_path, 
@@ -43,9 +43,9 @@ bulletin_to_pdf <- function(bulletin,
                           fileext = ".pdf"
   )
   
-  log_debug("Expected pdf-file:", pdf_outfile)
+  log_debug("Expected pdf-file: ", pdf_outfile)
   
-  quiet = get_log_level() < 2 # be verbose on debug level
+  quiet = logger::log_threshold() >= logger::DEBUG # be verbose on debug level
   # !! latex / pandoc won't work within tryCatch block !! 
   #  tryCatch(
   rmarkdown::render(markdown_file, 
@@ -67,24 +67,24 @@ bulletin_to_pdf <- function(bulletin,
     
     shorties_lists <- get_elements(bulletin, language = language, type = "shorties_list")
     
-    log_debug("Found", length(shorties_lists), "shorties_lists")
+    log_debug("Found ", length(shorties_lists), " shorties_lists")
     
     combined_outfile <- NULL
     
     pdfs <- unlist(sapply(shorties_lists, get_shorties_pdfs))
     
     if (length(pdfs) > 0) {
-      log_info("Attaching ", length(pdfs), "pdf files to bulletin")
+      log_info("Attaching ", length(pdfs), " pdf files to bulletin")
       tryCatch({
         combined_outfile <- file.path(bulletin$bulletin_path, 
                                       paste0(bulletin$bulletin_id, "_combined_", language, ".pdf")
         )
         qpdf::pdf_combine(input = c(pdf_outfile, pdfs),
                           output = combined_outfile)
-        log_debug("Successfully merged pdfs to file", combined_outfile)
+        log_debug("Successfully merged pdfs to file ", combined_outfile)
       },
       error = function(e) {
-        log_info("Error during combination of bulletin pdf with pdfs from shorties.", e$message, style = "warning")
+        log_warn("Error during combination of bulletin pdf with pdfs from shorties.", e$message)
         combined_outfile <- NULL
       }
       )
@@ -95,10 +95,10 @@ bulletin_to_pdf <- function(bulletin,
       pdf_outfile <- combined_outfile
   }
   
-  log_debug("Copy outfile", pdf_outfile, "to final location", filename)
+  log_debug("Copy outfile '", pdf_outfile, "' to final location: ", filename)
   file.copy(pdf_outfile, filename, overwrite = TRUE)
   
-  log_info("PDF produced for language", language, ".", style = "success")
+  log_info("PDF produced for language ", language, ".")
   return(filename)
 }
 

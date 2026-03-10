@@ -49,7 +49,7 @@ link_to_markdown <- function(link) {
   md <- if (!is.null(link$url)) {
     paste0("* [", label, "](", link$url, ")\n")
   } else {
-    log_info("Link", link$label, "has empty url", style = "warning")
+    log_warn("Link", link$label, "has empty url")
     ""
   }
   paste(md, collapse = "\n")
@@ -76,7 +76,7 @@ link_list_to_xml <- function(xml, element, language) {
       node <- xml2::xml_child(link_list_node, search = i)
       # assert that the path is identical
       if (!xml2::xml_has_attr(node, "path") || xml2::xml_attr(node, "path") != link$path)
-        log_info("Path for link", i, "(language ", language, ") does not match the path of the corresponding link in the primary language", style = "warning")
+        log_warn("Path for link", i, "(language ", language, ") does not match the path of the corresponding link in the primary language")
       node
     }
     set_languaged_attribute(link_node, attribute = "label", value = link$label, language = language)

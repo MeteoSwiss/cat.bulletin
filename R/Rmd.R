@@ -33,10 +33,10 @@ add_Rmd <- function(bulletin,
                     elements_dir = get_default_Rmd_elements_dir(bulletin)) {
   
   filename <- paste0(paste(bulletin$bulletin_id, element_id, bulletin$language, sep ="_"), ".Rmd")
-  log_debug("Adding RMD element with filename", filename, ". 'appear'=", paste(appear, collapse = ","))
+  log_debug("Adding RMD element with filename '", filename, "'. 'appear'=", paste(appear, collapse = ","))
   
   assert_that(is.readable(elements_dir), msg = paste0("elements_dir '", elements_dir, "' cannot be read."))
-  log_debug("... will look in", elements_dir, "for Rmd element files.")
+  log_debug("... will look in ", elements_dir, " for Rmd element files.")
   
   add_element(bulletin, 
               Rmd_element(filename, 
@@ -68,7 +68,7 @@ get_default_Rmd_elements_dir <- function(bulletin) {
 Rmd_to_markdown_file <- function(element) {
   tmpfile <- tempfile(fileext = ".md")
   #tryCatch({
-  quiet = get_log_level() < 2 # be verbose on debug level
+  quiet = logger::log_threshold() >= logger::DEBUG # be verbose on debug level
   knitr::knit(element[["Rmd_file"]], output = tmpfile, envir = element[["envir"]], quiet = quiet)
   #},
   # warning = function(w) {
@@ -125,6 +125,10 @@ Rmd_to_html <- function(element) {
   html
 }
 
+#' Compile an Rmd element to text output
+#' @param element an Rmd_element
+#' @returns a string with the compiled text output
+#' @export
 Rmd_to_text <- function(element) {
   md_in <- Rmd_to_markdown_file(element) 
   text_out <- tempfile(fileext = ".txt")

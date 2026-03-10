@@ -6,6 +6,7 @@
 \alias{add_element}
 \alias{set_element}
 \alias{has_element}
+\alias{get_elements}
 \title{Create a bulletin}
 \usage{
 create_bulletin(
@@ -25,6 +26,14 @@ add_element(bulletin, element, language = bulletin$language)
 set_element(bulletin, element, language = bulletin$language, id = element$id)
 
 has_element(bulletin, language = bulletin$language, type = NULL, id = NULL)
+
+get_elements(
+  bulletin,
+  language = bulletin$language,
+  type = NULL,
+  id = NULL,
+  appear = NULL
+)
 }
 \arguments{
 \item{bulletin_id}{a string that identifies the type of the bulletin, e.g. \code{climate-bulletin-monthly}}
@@ -54,6 +63,8 @@ The language parameter specifies the language of the element to be added.}
 \item{id}{string The id of the element}
 
 \item{type}{string The type of the element(s)}
+
+\item{appear}{vector of output formats the element is used for. One or both of "xml", "pdf".}
 }
 \value{
 an object that represents the bulletin content

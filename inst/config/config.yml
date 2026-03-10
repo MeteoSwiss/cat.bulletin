@@ -1,5 +1,0 @@
-default:
-  bulletin_prod_path: "/prod/zue/climate/basic_serv/information/klimabulletin/klimabulletin_automatisch/"
-
-testNonReadableProdPath:
-  bulletin_prod_path: "/foo"

@@ -1,7 +1,7 @@
 Package: cat.bulletin
 Type: Package
 Title: Automation of bulletion creation for publication on the MeteoSwiss website
-Version: 1.2.3
+Version: 1.3.0
 Authors@R: c(person(given="Elias", family="Zubler", email="elias.zubler@meteoswiss.ch", role=c("aut")),
     person(given="Felix", family="Maurer", email="felix.maurer@meteoswiss.ch", role=c("aut","cre"))
     )
@@ -16,25 +16,17 @@ Imports:
     readr,
     rlang,
     rmarkdown,
-    glue,
     xml2,
     cat.func (>= 0.17.1),
     flextable,
     cat.lang,
     magrittr,
     assertthat,
-    config,
-    yaml (>= 2.3.10), 
-    lubridate,
     kableExtra (>= 1.4.0),
     markdown,
-    clim.table,
-    datefuns,
-    evoclim,
     knitr,
-    mchdwh (>= 1.14.1),
-    mmtpred,
     withr,
     cli,
-    qpdf
-RoxygenNote: 7.3.2
+    qpdf,
+    logger
+RoxygenNote: 7.3.3

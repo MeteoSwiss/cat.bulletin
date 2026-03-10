@@ -7,7 +7,7 @@
 #' @export
 bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
-  log_info("Generating xml for publication", bulletin$bulletin_id, style = "h3")
+  log_info("Generating xml for publication ", bulletin$bulletin_id)
   
   assert_that(length(get_elements(bulletin)) > 0, msg = "Bulletin must contain at least one element for xml processing.")
   
@@ -22,7 +22,7 @@ bulletin_to_xml <- function(bulletin, filename = tempfile(fileext = ".xml")) {
   
   xml2::write_xml(xml2::xml_root(xml), file = filename)
   
-  log_info("xml for publication", bulletin$bulletin_id, "created.", style = "success")
+  log_info("xml for publication ", bulletin$bulletin_id, " created.")
   
   filename
 }
@@ -32,7 +32,7 @@ xml_add_bulletin_elements <- function(content_node, bulletin) {
   default_language <- bulletin$languages[1]
   
   for (element in get_elements(bulletin, language = default_language, appear = "xml")) {
-    log_debug("processing element", element$id)
+    log_debug("processing element ", element$id)
     bulletin <- set_active_language(bulletin, language = default_language)
     function_name <- paste0(element$type, "_to_xml")
     

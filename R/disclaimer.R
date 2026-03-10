@@ -72,7 +72,7 @@ disclaimer_to_xml <- function(xml, element, language) {
   title = element$caption_text_element$text
   body = Rmd_to_html(element$body_Rmd_element)
   
-  log_debug("Processing disclaimer to xml with title", title)
+  log_debug("Processing disclaimer to xml with title '", title, "'.")
   
   # get text node
   text_node  <- if (xml2::xml_length(box_node) == 0) {

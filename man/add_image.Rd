@@ -41,7 +41,11 @@ The default is a composition of type and a random string.}
 copies the image from the filepath to the bulletin directory and adds an image element
 }
 \examples{
-image_filepath = system.file("example-data", "bulletin_monthly", "evolution-outlook_abs_regSwiss_de.txt", package = "cat.bulletin")
+image_filepath = system.file(
+  "example-data", 
+  "climate-temperature-evolution-loess_regSwiss_fr.png", 
+  package = "cat.bulletin"
+)
 bulletin <- create_bulletin() \%>\%
   add_image(filepath = image_filepath, caption = "An example figure.")
 }

@@ -2,9 +2,9 @@
 #' 
 #' cat.bulletin is used to automate climate bulletins to be published on the MeteoSwiss website as both html (xml) and pdf. 
 #' @import assertthat
+#' @importFrom logger log_info log_debug log_warn
 #' @keywords internal
 "_PACKAGE"
-
 
 
 .onLoad <- function(libname,pkgname){

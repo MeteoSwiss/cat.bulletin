@@ -1,0 +1,25 @@
+default:
+  - set:
+      TaskProperties:
+
+jenkins:
+  - build:
+      - check_rpkg:
+          containerRunImage:
+            imageName: ${var.docker_base}
+            imageTag: ${var.docker_version}
+            commands: "/src/scripts/start_r_builder.bash docu_check"
+            extraArgs: ${var.docker_env}
+  - deploy:
+      - publish_docu:
+          openshiftPublishDocs:
+            deploymentEnvironment: prod
+            ocpHostName: api.prod.cp1.meteoswiss.ch:6443
+            docType: R
+  
+
+variables:
+  project: 'cat.bulletin'
+  docker_base: 'dockerhub.apps.cp.meteoswiss.ch/climateanalysis/cat-build/ubuntu-noble/r-4.4'
+  docker_version: 'latest'
+  docker_env: ["--env", "CI=TRUE"]

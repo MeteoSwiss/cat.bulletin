@@ -64,7 +64,7 @@ shorty_to_markdown <- function(shorty) {
     "\n"
   )
   if (!is.null(shorty$link)) {
-    md <- c(md, paste0("[", cat.lang::get.text("bulletin_monthly_shorties_linktext"), "](", shorty$link, ")\n"))
+    md <- c(md, paste0("[", cat.lang::get.text("shorties_linktext"), "](", shorty$link, ")\n"))
   }
   paste(md, collapse = "\n")
 }
@@ -94,7 +94,7 @@ create_shorty <- function(title, lead, link = NULL, language, id, pdf_file = NUL
   
   # assert link
   if (!is.null(link) && !(startsWith(link, "https://"))) {
-    log_info("link for shorty with title '", title, "' does not start with 'https://'. Ignoring it.", style = "warning")
+    log_warn("link for shorty with title '", title, "' does not start with 'https://'. Ignoring it.")
     link = NULL
   }
 
@@ -131,7 +131,7 @@ read_shorties <- function(group_id, language, path, subdir = NULL) {
   # list all files for given group
   pattern <- paste0("^", group_id, "_.*_", language, "\\.txt")
   #pattern <- paste0("^", group_id, "_.*\\.txt")
-  log_debug("Looking for shorties with pattern", pattern, "in path", shorties_path)
+  log_debug("Looking for shorties with pattern '", pattern, "' in path: ", shorties_path)
   files <- list.files(shorties_path, pattern = pattern)
   
   lapply(files, function(file) {
@@ -156,7 +156,7 @@ read_shorties <- function(group_id, language, path, subdir = NULL) {
 #' }
 #' @keywords internal
 read_shorty <- function(filepath) {
-  log_debug("reading shorty file", filepath)
+  log_debug("reading shorty file: ", filepath)
   assert_that(is.readable(filepath),
               msg = paste("Cannot read shorty text file", filepath))
   
@@ -185,10 +185,10 @@ read_shorty <- function(filepath) {
   # look for a pdf file with the same base name
   pdf_filepath <- sub(".txt$", ".pdf", filepath)
   pdf_file <- if (see_if(is.readable(pdf_filepath))) {
-    log_debug("Found pdf file for shorty", filename)
+    log_debug("Found pdf file for shorty: ", filename)
     pdf_filepath
   } else {
-    log_debug("No pdf file for shorty", filename)
+    log_debug("No pdf file for shorty: ", filename)
     NULL
   }
   
