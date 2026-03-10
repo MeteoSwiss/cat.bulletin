@@ -1,5 +1,5 @@
 test_that("flextable element", {
-  filename_abs <- system.file("example-data", "bulletin_monthly","evolution-outlook_anom_regSwiss_de.txt", package = "cat.bulletin")
+  filename_abs <- system.file("example-data","evolution-outlook_anom_regSwiss_de.txt", package = "cat.bulletin")
   data_abs <- read.table(filename_abs, header = TRUE)
   
   data_abs <- data_abs[1:10,]

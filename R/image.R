@@ -24,7 +24,11 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' @inheritParams add_element
 #' @family bulletin_elements
 #' @examples 
-#' image_filepath = system.file("example-data", "bulletin_monthly", "evolution-outlook_abs_regSwiss_de.txt", package = "cat.bulletin")
+#' image_filepath = system.file(
+#'   "example-data", 
+#'   "climate-temperature-evolution-loess_regSwiss_fr.png", 
+#'   package = "cat.bulletin"
+#' )
 #' bulletin <- create_bulletin() %>%
 #'   add_image(filepath = image_filepath, caption = "An example figure.")
 #' @export
@@ -35,7 +39,7 @@ add_image <- function(bulletin, filepath, filename = basename(filepath),
   assert_that(file.exists(filepath))
   newpath <- file.path(bulletin$image_path, filename)
   if (file.exists(newpath)) {
-    log_debug("add_image: file", bulletin$image_dir, "/", filename, "alread exists. Using existing file.")
+    log_debug("add_image: file ", bulletin$image_dir, "/", filename, " alread exists. Using existing file.")
   } else {
     file.copy(filepath, newpath)
   }
@@ -322,7 +326,7 @@ assert_image_outpath <- function(outpath = NULL) {
   assert_that(is.string(outpath))
   
   if (!startsWith(outpath, "/")) {
-    log_debug("outpath'", outpath, "'does not seem to be an absolute path.")
+    log_debug("outpath'", outpath, "' does not seem to be an absolute path.")
     if (length(grep("/", outpath)) > 0)
       stop("image operation: outpath must be absolute path or filename only")
     # seems to be a single filename -> adding tempdir

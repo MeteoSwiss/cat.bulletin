@@ -1,32 +1,27 @@
 class Globals {
-    // docker: builder image
-    static String docker_base = 'climateanalysis/cat-build/ubuntu-noble/r-4.4'
-    static String docker_version = 'latest'
-    static String docker_image = ''
+    // Pin mchbuild to stable version to avoid breaking changes
+    static String mchbuildVersion = ">=0.9.0"
 
     // This parameters will be adapted during preparation stage
     // package name and version (from DESCRIPTION file)
-    static String package_name = ''
+    static String package_name = 'cat.bulletin'
     static String package_version = ''
     static String package_file = ''
 
     // deployment stages setup (check vs deploy vs abort)
     static String deploy_stages = 'check'
 
-    // documentation tag (develop vs main)
-    static String documentation_tag = 'develop'
-
     // publish documentation
     static boolean documentation_publish = false
 }
 
-@Library('dev_tools@main') _
 pipeline {
-    agent { label 'docker' }
+    agent { label 'podman' }
 
     environment {
-	NEXUS_REPO = "https://nexus.meteoswiss.ch/nexus/repository/r-mch/src/contrib"
-	DOCKER_REPO = "dockerhub.apps.cp.meteoswiss.ch"
+	NEXUS_REPO = 'https://nexus.meteoswiss.ch/nexus/repository/r-mch/src/contrib'
+	DOCKER_REPO = 'dockerhub.apps.cp.meteoswiss.ch'
+	PATH = "${WORKSPACE}/.venv-mchbuild/bin:${HOME}/tools/openshift-client-tools:${PATH}"
     }
 
     options {
@@ -50,6 +45,23 @@ pipeline {
     }
 
     stages {
+
+	stage('Init') {
+	    steps {
+
+                updateGitlabCommitStatus name: 'Build', state: 'running'
+
+		script{
+		    echo 'Install mchbuild'
+		    sh """
+                    python -m venv .venv-mchbuild
+                    PIP_INDEX_URL=https://hub.meteoswiss.ch/nexus/repository/python-all/simple \
+                        .venv-mchbuild/bin/pip install 'mchbuild${Globals.mchbuildVersion}'
+                    """
+		}
+	    }
+	}
+
         stage('Checkout') {
             steps {
 		updateGitlabCommitStatus name: 'Build', state: 'running'
@@ -60,11 +72,11 @@ pipeline {
 		}
             }
         }
+
 	stage('Preparation') {
 	    steps {
 		script {
 		    // get Global variables from R-package DESCRIPTION
-		    Globals.package_name = sh( script: 'grep "Package:" source/DESCRIPTION | cut -d":" -f2', returnStdout: true).trim()
 		    Globals.package_version = sh( script: 'grep "Version:" source/DESCRIPTION | cut -d":" -f2', returnStdout: true).trim()
 
 		    // set package name
@@ -75,25 +87,16 @@ pipeline {
 		    // get env variables from git
 		    echo "GIT specs: ${env.BRANCH_NAME}"
 
-		    // set docker image name
-		    Globals.docker_image = "${DOCKER_REPO}/${Globals.docker_base}:${Globals.docker_version}"
-
-		    echo "Docker specs: ${Globals.docker_image}"
-
 		    // decide what to do in next stages
 		    if (env.BRANCH_NAME != "main" && env.BRANCH_NAME != "master"){
-			echo "Do only package check for ${Globals.package_name} as branch is ${env.BRANCH_NAME} (--> not main or master)."
+			echo "Do only package check for ${Globals.package_name} as branch is ${env.BRANCH_NAME} (--> neither main nor master)."
 			Globals.deploy_stages = "check"
 			Globals.documentation_publish = false
 		    } else {
 			echo "Do package check, deploy and docu for ${Globals.package_name} as branch is ${env.BRANCH_NAME}."
 			Globals.deploy_stages = "deploy"
 			Globals.documentation_publish = true
-			Globals.documentation_tag = env.BRANCH_NAME
 		    }
-
-		    echo "Deploy specs: ${Globals.deploy_stages}"
-		    echo "Docu specs: ${Globals.documentation_publish} with docu_tag ${Globals.documentation_tag}"
 		}
 
 		dir('build-lib'){
@@ -116,18 +119,30 @@ pipeline {
 		}
         steps {
 		script {
-            withCredentials([usernamePassword(credentialsId: 'openshift-nexus',
-			 			      passwordVariable: 'NXPASS',
-						      usernameVariable: 'NXUSER')]) {
-			runWithDocker "${Globals.docker_image}", "/src/scripts/start_r_builder.bash docu_check", "--env MCHDWH_CLIENTSECRET=\$MCHDWH_CLIENTSECRET --env GRIDGET_CLIENTSECRET=\$GRIDGET_CLIENTSECRET --env PRODUCT_PROVIDER_CLIENTSECRET=\$PROVIDER_CLIENTSECRET --env CI=TRUE", true
-                    }
+		    echo "task: build.check_rpkg"
+
+		    def docker_env = '["--env", "MCHDWH_CLIENTSECRET=\'${MCHDWH_CLIENTSECRET}\'", "--env", "GRIDGET_CLIENTSECRET=\'${GRIDGET_CLIENTSECRET}\'", "--env", "PRODUCT_PROVIDER_CLIENTSECRET=\'${PROVIDER_CLIENTSECRET}\'", "--env", "CI=\'TRUE\'"]'
+
+		    sh "mchbuild -c ${WORKSPACE}/source/Jenkinsfile_config.yml \
+                                 -s extraArgs='${docker_env}' \
+                                 jenkins.build.check_rpkg"
+
+		    if ( ! fileExists ("source/${Globals.package_file}")){
+			error (message: "Package build was not successful. Package file (source/${Globals.package_file}) not found. Aborting.")
+		    } else {
+			echo "Package build was successful."
+		    }
 		}
             }
 	    post{
 		always {
 		    echo "Check complete"
-		    junit allowEmptyResults: true, keepLongStdio: true, testResults: "source/${Globals.package_name}.Rcheck/tests/testthat/junit_result.xml"
-		    archiveArtifacts allowEmptyArchive: true, artifacts: "source/${Globals.package_name}.Rcheck/*.log", followSymlinks: false
+		    junit (allowEmptyResults: true,
+			   keepLongStdio: true,
+			   testResults: "source/${Globals.package_name}.Rcheck/tests/testthat/junit_result.xml")
+		    archiveArtifacts (allowEmptyArchive: true,
+				      artifacts: "source/${Globals.package_name}.Rcheck/*.log",
+				      followSymlinks: false)
 		}
 	    }
 	}
@@ -139,31 +154,13 @@ pipeline {
             steps {
 		echo "Check package version on Nexus"
 		script{
-		    try {
-			withCredentials([usernamePassword(credentialsId: 'r-nexus',
-							  passwordVariable: 'NXPASS',
-							  usernameVariable: 'NXUSER')]) {
-            		    sh """#!/bin/bash
-                            cd source
-                            if [ -f ${Globals.package_file} ]; then
-                               status=\$(curl --user ${NXUSER}:${NXPASS} -o /dev/null --silent -Iw "%{http_code}" ${NEXUS_REPO}/${Globals.package_file})
-                               if [ "\$status" -eq 200 ]; then
-                                  echo "PROBLEM: "${Globals.package_file}" already exists on Nexus."
-                                  echo "--> Please check your package version (DESCRIPTION)"
-                                  exit 1
-                               fi
-                            else
-                               echo "${Globals.package_file} does not exist"
-                               exit 1
-                            fi
-                            cd ${WORKSPACE}
-                            """
-			}
-		    } catch (err) {
+		    def status = sh( script: "curl -o /dev/null --silent -Iw '%{http_code}' ${NEXUS_REPO}/${Globals.package_file}",
+				    returnStdout: true).trim()
+		    if ( status == '200' ) {
 			if ( Globals.deploy_stages == "deploy" ){
-			    error(message: "ERROR: ${Globals.package_file} already exists on Nexus.")
+			    error (message: "${Globals.package_file} already exists on Nexus.")
 			} else {
-			    unstable(message: "WARNING: ${Globals.package_file} already exists on Nexus.")
+			    unstable (message: "${Globals.package_file} already exists on Nexus.")
 			}
 		    }
 		}
@@ -180,44 +177,36 @@ pipeline {
 		    withCredentials([usernamePassword(credentialsId: 'r-nexus',
 						      passwordVariable: 'NXPASS',
 						      usernameVariable: 'NXUSER')]) {
-            		sh """#!/bin/bash
-                        cd source
-                        if [ -f ${Globals.package_file} ]; then
-                            status=\$(curl --user ${NXUSER}:${NXPASS} -w "%{http_code}" --upload-file ${Globals.package_file} ${NEXUS_REPO}/${Globals.package_file})
-                            if [ "\$status" -ne 200 ]; then
-                                echo "Error: curl upload failed due to server return code - \$status"
-                                exit 1
-                            fi
-                        else
-                            echo "${Globals.package_file} does not exist"
-                        fi
-                        cd ${WORKSPACE}
-                    """
+
+			def status = sh( script: "curl --user " + NXUSER + ":" + NXPASS + " -w '%{http_code}' --upload-file source/${Globals.package_file} ${NEXUS_REPO}/${Globals.package_file}",
+					returnStdout: true).trim()
+			echo status
+
+			if ( status != '200' ){
+			    error (message: "Upload of ${Globals.package_file} to Nexus FAILED (with status ${status}).")
+			} else {
+			    echo "Upload of ${Globals.package_file} to Nexus SUCCESSFUL."
+			}
 		    }
 		}
 	    }
 	}
 
-	stage('Publish Documentation') {
+	stage("Publish documentation") {
 	    when {
 		expression { return Globals.documentation_publish == true }
 	    }
-            environment {
-		PATH = "${HOME}/tools/openshift-client-tools:$PATH"
-		KUBECONFIG = "${WORKSPACE}/.kube/config"
-            }
-            steps {
-		withCredentials([string(credentialsId: "documentation-main-prod-token",
-					variable: 'TOKEN')]) {
-                    sh "oc login https://api.prod.cp1.meteoswiss.ch:6443/ --token \$TOKEN"
-                    publishDoc "${WORKSPACE}/docs/", Globals.package_name, Globals.package_version, 'R', Globals.documentation_tag
+	    steps {
+		script {
+		    withCredentials([string(credentialsId: 'documentation-main-prod-token',
+                                            variable: 'DOC_TOKEN')]) {
+			sh "mchbuild -c ${WORKSPACE}/source/Jenkinsfile_config.yml \
+                                     -s project=${Globals.package_name} \
+                                     -s docSrc='${WORKSPACE}/docs/' \
+                                     jenkins.deploy.publish_docu"
+                    }
 		}
-            }
-            post {
-		cleanup {
-                    sh 'oc logout || true'
-		}
-            }
+	    }
 	}
     }
 

@@ -1,8 +1,0 @@
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
-
-
-Le tableau 2 indique le cumul des précipitations mensuelles et l'écart par rapport à la période de référence dans certaines stations du réseau de mesure de MétéoSuisse.

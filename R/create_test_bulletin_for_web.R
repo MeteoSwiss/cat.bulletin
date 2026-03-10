@@ -11,7 +11,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   
   sections <- match.arg(sections, several.ok = TRUE)
   
-  log_info("Creating cat.bulletin test bulletin in workdir", workdir, style = "h1")
+  log_info("Creating cat.bulletin test bulletin in workdir ", workdir)
   
   bulletin <- create_bulletin(
     bulletin_id = "webtest",
@@ -111,7 +111,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
   ## Table element
   if ("table" %in% sections) {
     element_id <- "my_first_table"
-    regdata <- readRDS(system.file("example-data", "bulletin_monthly", "regdata-example.Rdata", package = "cat.bulletin"))
+    regdata <- readRDS(system.file("example-data", "regdata-example.Rdata", package = "cat.bulletin"))
     for (language in bulletin$languages)
       bulletin <- bulletin %>%
       set_active_language(language = language) %>%
@@ -130,7 +130,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       bulletin <- bulletin %>%
         set_active_language(language = language) %>%
         add_shorties_list(group_id = "event",
-                          title = cat.lang::get.text("bulletin_monthly_shorties_title"),
+                          title = paste("shorties list title for language", language),
                           path = system.file(package = "cat.bulletin", "example-data", "shorties"),
                           id = element_id
         )
@@ -139,7 +139,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
       bulletin <- bulletin %>%
       set_active_language(language = language) %>%
       add_shorties_list(group_id = "vegi",
-                        title = cat.lang::get.text("bulletin_monthly_vegetation_title"),
+                        title = paste("veg shorties list title for language", language),
                         path = system.file(package = "cat.bulletin", "example-data", "shorties"),
                         id = element_id
       )
@@ -175,7 +175,7 @@ create_test_bulletin_for_web <- function(workdir = tempdir(),
     }
   }
   
-  log_info("Finished adding elements", style = "success")
+  log_info("Finished adding elements")
   
   ## Generate pdfs in all languages and the xml and zip everything up
   

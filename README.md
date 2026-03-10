@@ -2,21 +2,12 @@
 
 Package documentation: https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/
 
-## How to use 
-
-### Produce the monthly climate bulletin
-
-The CAT is used to produce the monthly climate bulletin for the [MeteoSwiss website](https://www.meteoschweiz.admin.ch/service-und-publikationen/publikationen.html#order=date-desc&page=1&pageGroup=publication&tenant=mchweb&category=climate).
-
-See documentation of the  [bulletin_monthly](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_monthly.html) function for how to produce it locally. 
-
-Make sure to have the configuration setup necessary to access the product provider (see Configuration).
-
-### Create your own publication
+## How to use cat.bulletin to create your own publication
 
 The creation of a publication is a two step process:
 
-1) A bulletin object is assembled starting with [create_bulletin](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/create_bulletin.html) followed by adding elements by using functionality like
+### Assembly of a bulletin object
+A bulletin object is assembled starting with [create_bulletin](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/create_bulletin.html) followed by adding elements by using functionality like
 
 - [add_image](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/add_image.html)
 - [add_Rmd](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/add_Rmd.html)
@@ -27,6 +18,8 @@ The creation of a publication is a two step process:
 - [add_shorties](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/add_shorties_list.html)
 
 See the function [create_test_bulletin_for_web](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/create_test_bulletin_for_web.html) to see how a basic bulletin is created.
+
+#### Rmd elements
 
 Rmd-element files can be kept in your own package, for example in the `inst/elements` folder. 
 
@@ -46,7 +39,9 @@ my_elements_dir <- system.file("elements", package = "<your package>")
 bulletin <- cat.bulletin::add_Rmd(bulletin, "title", elements_dir = my_elements_dir)
 ```
 
-2) The bulletin object is rendered to either pdf [bulletin_to_pdf](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_pdf.html) or xml [bulletin_to_xml](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_xml.html). xml format is required for publication as html on the MeteoSwiss website. 
+### Rendering to pdf and/or xml
+
+The bulletin object is rendered to either pdf [bulletin_to_pdf](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_pdf.html) or xml [bulletin_to_xml](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_xml.html). xml format is required for publication as html on the MeteoSwiss website. 
 
 The [bulletin_to_webzip](https://service.meteoswiss.ch/documentation/cat.bulletin/latest/R/reference/bulletin_to_webzip.html) function will create a zip file with both pdf and xml files that can be sent to the MeteoSwiss website.
 
@@ -75,13 +70,13 @@ For information about obtaining authentication tokens, see [Using oauth2 authent
 
 ## Log output
 
-### Info messages
-use
-`options(log_level = 1)`
-to see only messages on info level.
+### Switch log level
 
-### Debug messages
-`options(log_level = 2)`
-to see also debug information.
+```
+logger::log_threshold("INFO")
+logger::log_threshold("DEBUG", namespace = "cat.bulletin")
+```
+
+See [Logging with logger (for package developing)](https://meteoswiss.atlassian.net/wiki/x/pQFBU) for more information.
 
 

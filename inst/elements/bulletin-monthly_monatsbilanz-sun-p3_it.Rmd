@@ -1,8 +1,0 @@
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
-
-La tabella 3 mostra la durata mensile del soleggiamento e la sua deviazione rispetto al periodo di riferimento per stazioni selezionate della rete di misurazione di MeteoSvizzera.
-

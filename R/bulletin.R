@@ -125,6 +125,7 @@ set_active_language <- function(bulletin, language = bulletin$languages[1]) {
 #' Set the metadata object for a bulletin
 #' @rdname create_bulletin
 #' @param metadata A list of metadata information created with \code{\link{publication_metadata}}.
+#' @export
 set_metadata <- function(bulletin, metadata) {
   assert_publication_metdata(metadata, languages = bulletin$languages)
   bulletin[["metadata"]] <- metadata
@@ -133,6 +134,7 @@ set_metadata <- function(bulletin, metadata) {
 
 #' Adds an element to a bulletin
 #' @rdname create_bulletin
+#' @export
 add_element <- function(bulletin, element, language = bulletin$language) {
   slot <- languaged_elements(language)
   bulletin[[slot]] <- append(bulletin[[slot]], list(element))
@@ -157,6 +159,7 @@ set_element <- function(bulletin, element, language = bulletin$language, id = el
 #' @rdname create_bulletin
 #' @param type string The type of the element(s) 
 #' @param id string The id of the element
+#' @export
 has_element <- function(bulletin, language = bulletin$language, type = NULL, id = NULL) {
   
   if (!is.null(type) && !is.null(id))
@@ -178,6 +181,11 @@ has_element <- function(bulletin, language = bulletin$language, type = NULL, id 
   length(bulletin[[slot]]) > 0
 }
 
+#' Get a (filtered) list of bulletin elements for the given language
+#' @rdname create_bulletin
+#' @inheritParams has_element
+#' @inheritParams bulletin_element
+#' @export
 get_elements <- function(bulletin, language = bulletin$language, type = NULL, id = NULL, appear = NULL) {
   if (!is.null(type) && !is.null(id))
     stop("either look for type or id, not both")
@@ -222,6 +230,12 @@ bulletin_pdfxmlzip <- function(bulletin) {
   cli::cli_li(paste("zip:", zip))
 }
 
+#' Get the OS local setting depending on language
+#' 
+#' cat.bulletin uses UTF-8 swiss local settings
+#' @return a locale descriptor
+#' @param language language identifier
+#' @export
 get_locale <- function(language) {
   paste0(language, "_CH.UTF-8")
 }
