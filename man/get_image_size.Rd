@@ -20,3 +20,11 @@ get_image_size(
   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
 )
 }
+\seealso{
+Other image_handling: 
+\code{\link{convert_to_image}()},
+\code{\link{crop_image}()},
+\code{\link{join_images}()},
+\code{\link{resize_image}()}
+}
+\concept{image_handling}

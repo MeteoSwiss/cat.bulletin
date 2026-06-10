@@ -19,7 +19,7 @@ image_element <- function(filename, image_dir, filepath, caption, alt, source, l
 #' @param alt alt text to use for html / xml export
 #' @param source image source (a small text)
 #' @param label optional string to identify the image. Use \code{\\@ref(label)} for creating cross references.
-#' @family bulletin_element#' 
+#' @family bulletin_element 
 #' @inheritParams bulletin_element 
 #' @inheritParams add_element
 #' @family bulletin_elements
@@ -75,6 +75,7 @@ image_to_xml <- function(xml, element, language) {
 #' @param direction direction of join, either 'horizontal' or 'vertical'.
 #' @inheritParams assert_image_outpath
 #' @return the path to the output file
+#' @family image_handling
 #' @export
 #' @examples
 #' outpath <- join_images(
@@ -111,10 +112,67 @@ join_images <- function(image_filepaths, outpath = NULL, direction = c("horizont
   outpath
 }
 
+#' Converts a (pdf) image to png or jpg
+#' @param image_filepath an image source filepath
+#' @param density numeric resolution in px/inch of the resulting image
+#' @param target_format either NULL, "png", or "jpg". Ignored if \code{outpath} present. 
+#' @param outpath if NULL, the name of the image will be composed by replacing the ending with \code{image_format}.
+#' @param background_color set background color and remove transparency when converting to png. Use "white" or any other color supported by convert.
+#' @return the path to the output file
+#' @family image_handling
+#' @export
+#' @examples
+#' image_filepath <- system.file(package="cat.bulletin", "example-data", "climate-outlook_precipitation_R_halfyear_regSwiss.pdf")
+#' outpath <- convert_to_image(image_filepath, background_color = "white")
+#' outpath <- convert_to_image(image_filepath, target_format = "jpg")
+#' outpath <- convert_to_image(image_filepath, density = 300)
+convert_to_image <- function(image_filepath, 
+                             density = 150, 
+                             target_format = c("png", "jpg"),
+                             background_color = NULL,
+                             outpath = NULL) {
+  
+  assert_that(is.numeric(density), length(density) == 1, density > 0)
+  assert_that(is.readable(image_filepath))
+  target_format <- match.arg(target_format)
+  
+  if (is.null(outpath)) {
+    outpath <- paste0(tools::file_path_sans_ext(image_filepath), ".", target_format)
+    log_debug("Image outpath set to: ", outpath)
+  }
+  outpath <- assert_image_outpath(outpath)
+
+  background_arg <- ""
+  if (!is.null(background_color)) {
+    assert_that(is.character(background_color), length(background_color) == 1)
+    
+    background_arg <- paste("-background", background_color, "-alpha remove -alpha off")
+  } 
+  
+  convert_args <- paste(
+    "-density ", density,
+    background_arg,
+    image_filepath, 
+    outpath
+  )
+  log_debug("Calling convert for png conversion: '", convert_args, "'.")
+  tryCatch({
+    system2("convert", convert_args)
+  },
+  error = function(e) {
+    stop("Error during image conversion.")
+  }
+  )
+  assert_that(is.readable(outpath), msg = "convert images: output was not created")
+  
+  outpath
+}
+
 #' Get width and heigth of an image
 #' @param image_filepath an image source filepath
 #' @return a named numeric vector with width and height of the image
 #' @export
+#' @family image_handling
 #' @examples
 #' get_image_size(
 #'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png")
@@ -149,6 +207,7 @@ get_image_size <- function(image_filepath) {
 #' @param margin Margin size as a positive number of pixels. Can also be specified relatively as percentage of total width resp. height. Use a string like "20\%" for this.
 #' @return the path to the output file
 #' @export
+#' @family image_handling
 #' @examples
 #' outpath <- crop_image(
 #'   image_filepath = system.file(package="cat.bulletin", "example-data", "climate-temperature-evolution-loess_regSwiss_fr.png"),
@@ -239,6 +298,7 @@ crop_image <- function(image_filepath,
 #' @param width Either an integer (pixels) or a string like "50\%" for relative width. 
 #' @param height Either an integer (pixels) or a string like "50\%" for relative height.
 #' @return the path to the output file
+#' @family image_handling
 #' @export
 #' @examples
 #' outpath <- resize_image(

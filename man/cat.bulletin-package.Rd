@@ -11,10 +11,5 @@ cat.bulletin is used to automate climate bulletins to be published on the MeteoS
 \author{
 \strong{Maintainer}: Felix Maurer \email{felix.maurer@meteoswiss.ch}
 
-Authors:
-\itemize{
-  \item Elias Zubler \email{elias.zubler@meteoswiss.ch}
-}
-
 }
 \keyword{internal}

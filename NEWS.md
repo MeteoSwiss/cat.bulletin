@@ -1,3 +1,9 @@
+# cat.bulletin 1.4.0
+
+CATS-583: Add convert_to_image helper function to convert pdfs to png or jpgs
+
+_fma;2026_06_10_
+
 # cat.bulletin 1.3.0
 
 CATS-482 separate monthly bulletin into clim.bull package
