@@ -59,5 +59,5 @@ Bulletin elements
 \code{\link{add_table}()},
 \code{\link{add_text}()}
 }
-\concept{bulletin_element#'}
+\concept{bulletin_element}
 \concept{bulletin_elements}

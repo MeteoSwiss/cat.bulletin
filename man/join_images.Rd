@@ -31,3 +31,11 @@ outpath <- join_images(
   direction = "horizontal"
 )
 }
+\seealso{
+Other image_handling: 
+\code{\link{convert_to_image}()},
+\code{\link{crop_image}()},
+\code{\link{get_image_size}()},
+\code{\link{resize_image}()}
+}
+\concept{image_handling}

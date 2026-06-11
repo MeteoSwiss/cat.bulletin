@@ -35,3 +35,11 @@ outpath <- crop_image(
   margin = "5\%"
 )
 }
+\seealso{
+Other image_handling: 
+\code{\link{convert_to_image}()},
+\code{\link{get_image_size}()},
+\code{\link{join_images}()},
+\code{\link{resize_image}()}
+}
+\concept{image_handling}

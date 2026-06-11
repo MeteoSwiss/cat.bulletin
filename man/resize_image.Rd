@@ -29,3 +29,11 @@ outpath <- resize_image(
   width = "50\%"
 )
 }
+\seealso{
+Other image_handling: 
+\code{\link{convert_to_image}()},
+\code{\link{crop_image}()},
+\code{\link{get_image_size}()},
+\code{\link{join_images}()}
+}
+\concept{image_handling}
