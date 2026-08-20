@@ -1,9 +1,5 @@
 Version: 1.0
-<<<<<<< HEAD
-ProjectId: 7fec4903-9398-48ac-b2f7-8f2a09406e8b
-=======
 ProjectId: e4d14ccc-46ca-4710-b41e-048551bb7ce0
->>>>>>> a82ee26 (CATS-583 add convert_to_image helper function)
 
 RestoreWorkspace: Default
 SaveWorkspace: Default
