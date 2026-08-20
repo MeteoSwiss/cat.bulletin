@@ -1,3 +1,9 @@
+# cat.bulletin 1.4.1
+
+Allow further arguments for download_realization
+
+_fma;2026_08_20_
+
 # cat.bulletin 1.4.0
 
 CATS-583: Add convert_to_image helper function to convert pdfs to png or jpgs

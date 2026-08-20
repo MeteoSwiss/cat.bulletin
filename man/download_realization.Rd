@@ -10,7 +10,8 @@ download_realization(
   filter,
   filename,
   out_path,
-  redownload = FALSE
+  redownload = FALSE,
+  ...
 )
 }
 \arguments{
@@ -21,7 +22,25 @@ download_realization(
 \item{filter}{argument for \code{\link[cat.func]{download_realization}}}
 
 \item{redownload}{boolean if \code{FALSE} (default), the realization is not downloaded if the file already exists.}
+
+\item{...}{further parameters for \code{\link[cat.func]{download_realization}}}
 }
 \description{
 Download a realization from the ProductBrowser ProductProvider
+}
+\examples{
+\dontrun{
+download_realization(
+bulletin = create_bulletin(),
+product = "climate-precipitation-maps-Ynorm",
+filter = list(
+ "productName" = "climate-precipitation-maps-Ynorm",
+ "valueBase" = "diff",
+ "timeGranularity" = "Y",
+ "parameter" = "R",
+ "normalPeriod" = "1991-2020",
+ "mediaType" = "image/png",
+ "representation" = "nostats"
+))
+}
 }
